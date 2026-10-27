@@ -1,3 +1,7 @@
+# CẤU TRÚC KIẾN TRÚC DỰ ÁN QLSANBONG
+
+```text
+
 QLSanBong (Solution / Web Project)
 │
 ├── Areas/
@@ -98,3 +102,5 @@ QLSanBong (Solution / Web Project)
 │
 ├── appsettings.json                # Chuỗi kết nối Database SQL Server & thông số ứng dụng
 └── Program.cs                      # File khởi chạy: Đăng ký DI DbContext, Authentication, Area Routing
+
+```
