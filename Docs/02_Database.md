@@ -1,0 +1,344 @@
+
+
+DROP DATABASE IF EXISTS QLSanBong
+
+GO
+
+
+
+CREATE DATABASE QLSanBong;
+
+GO
+
+
+
+USE QLSanBong;
+
+GO
+
+
+
+CREATE TABLE QuyenHan (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   TenQuyen NVARCHAR(50) NOT NULL UNIQUE
+
+);
+
+
+
+CREATE TABLE NguoiDung (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   QuyenHanId INT NOT NULL,
+
+&#x20;   HoTen NVARCHAR(100) NOT NULL,
+
+&#x20;   Email VARCHAR(100) NOT NULL UNIQUE,
+
+&#x20;   SoDienThoai VARCHAR(20) NOT NULL,
+
+&#x20;   MatKhauMaHoa VARCHAR(255) NOT NULL,
+
+&#x20;   AnhDaiDienUrl VARCHAR(255) NULL,
+
+&#x20;   TrangThai NVARCHAR(20) NOT NULL DEFAULT N'Hoạt động',
+
+&#x20;   NgayTao DATETIME2 DEFAULT GETDATE(),
+
+&#x20;   NgayCapNhat DATETIME2 DEFAULT GETDATE(),
+
+&#x20;   CONSTRAINT FK\_NguoiDung\_QuyenHan FOREIGN KEY (QuyenHanId) REFERENCES QuyenHan(Id)
+
+);
+
+
+
+CREATE TABLE SanBong (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   TenSan NVARCHAR(100) NOT NULL,
+
+&#x20;   LoaiSan NVARCHAR(50) NOT NULL,
+
+&#x20;   MoTa NVARCHAR(MAX) NULL,
+
+&#x20;   TrangThai NVARCHAR(50) NOT NULL DEFAULT N'Sẵn sàng',
+
+&#x20;   NgayTao DATETIME2 DEFAULT GETDATE()
+
+);
+
+
+
+ALTER TABLE SanBong ADD AnhSan NVARCHAR(255) NULL;
+
+
+
+CREATE TABLE LichBaoTri (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   SanBongId INT NOT NULL,
+
+&#x20;   ThoiGianBatDau DATETIME2 NOT NULL,
+
+&#x20;   ThoiGianKetThuc DATETIME2 NOT NULL,
+
+&#x20;   GhiChu NVARCHAR(MAX) NULL,
+
+&#x20;   CONSTRAINT FK\_LichBaoTri\_SanBong FOREIGN KEY (SanBongId) REFERENCES SanBong(Id) ON DELETE CASCADE
+
+);
+
+
+
+CREATE TABLE KhungGio (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   GioBatDau TIME NOT NULL,
+
+&#x20;   GioKetThuc TIME NOT NULL
+
+);
+
+
+
+CREATE TABLE ThietLapGia (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   SanBongId INT NOT NULL,
+
+&#x20;   KhungGioId INT NOT NULL,
+
+&#x20;   NgayTrongTuan NVARCHAR(20) NOT NULL,
+
+&#x20;   GiaThue DECIMAL(18,2) NOT NULL CHECK (GiaThue >= 0),
+
+&#x20;   CONSTRAINT FK\_ThietLapGia\_SanBong FOREIGN KEY (SanBongId) REFERENCES SanBong(Id) ON DELETE CASCADE,
+
+&#x20;   CONSTRAINT FK\_ThietLapGia\_KhungGio FOREIGN KEY (KhungGioId) REFERENCES KhungGio(Id) ON DELETE CASCADE
+
+);
+
+
+
+CREATE TABLE DichVu (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   TenDichVu NVARCHAR(100) NOT NULL,
+
+&#x20;   GiaDichVu DECIMAL(18,2) NOT NULL CHECK (GiaDichVu >= 0),
+
+&#x20;   DonViTinh NVARCHAR(20) NOT NULL
+
+);
+
+
+
+CREATE TABLE DatSan (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   NguoiDungId INT NOT NULL,
+
+&#x20;   SanBongId INT NOT NULL,
+
+&#x20;   KhungGioId INT NOT NULL,
+
+&#x20;   NgayDat DATE NOT NULL,
+
+&#x20;   TongTien DECIMAL(18,2) NOT NULL DEFAULT 0 CHECK (TongTien >= 0),
+
+&#x20;   TrangThai NVARCHAR(50) NOT NULL DEFAULT N'Chờ duyệt',
+
+&#x20;   NgayTao DATETIME2 DEFAULT GETDATE(),
+
+&#x20;   CONSTRAINT FK\_DatSan\_NguoiDung FOREIGN KEY (NguoiDungId) REFERENCES NguoiDung(Id),
+
+&#x20;   CONSTRAINT FK\_DatSan\_SanBong FOREIGN KEY (SanBongId) REFERENCES SanBong(Id),
+
+&#x20;   CONSTRAINT FK\_DatSan\_KhungGio FOREIGN KEY (KhungGioId) REFERENCES KhungGio(Id)
+
+);
+
+
+
+CREATE TABLE ChiTietDichVuDat (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   DatSanId INT NOT NULL,
+
+&#x20;   DichVuId INT NOT NULL,
+
+&#x20;   SoLuong INT NOT NULL CHECK (SoLuong > 0),
+
+&#x20;   DonGia DECIMAL(18,2) NOT NULL CHECK (DonGia >= 0),
+
+&#x20;   CONSTRAINT FK\_ChiTietDichVuDat\_DatSan FOREIGN KEY (DatSanId) REFERENCES DatSan(Id) ON DELETE CASCADE,
+
+&#x20;   CONSTRAINT FK\_ChiTietDichVuDat\_DichVu FOREIGN KEY (DichVuId) REFERENCES DichVu(Id)
+
+);
+
+
+
+CREATE TABLE YeuCauDoiLich (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   DatSanId INT NOT NULL,
+
+&#x20;   SanBongMoiId INT NOT NULL,
+
+&#x20;   KhungGioMoiId INT NOT NULL,
+
+&#x20;   NgayDatMoi DATE NOT NULL,
+
+&#x20;   TrangThai NVARCHAR(50) NOT NULL DEFAULT N'Chờ duyệt',
+
+&#x20;   LyDo NVARCHAR(MAX) NULL,
+
+&#x20;   NgayTao DATETIME2 DEFAULT GETDATE(),
+
+&#x20;   CONSTRAINT FK\_YeuCauDoiLich\_DatSan FOREIGN KEY (DatSanId) REFERENCES DatSan(Id),
+
+&#x20;   CONSTRAINT FK\_YeuCauDoiLich\_SanBong FOREIGN KEY (SanBongMoiId) REFERENCES SanBong(Id),
+
+&#x20;   CONSTRAINT FK\_YeuCauDoiLich\_KhungGio FOREIGN KEY (KhungGioMoiId) REFERENCES KhungGio(Id)
+
+);
+
+
+
+CREATE TABLE ThanhToan (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   DatSanId INT NOT NULL,
+
+&#x20;   SoTien DECIMAL(18,2) NOT NULL CHECK (SoTien >= 0),
+
+&#x20;   PhuongThucThanhToan NVARCHAR(50) NOT NULL,
+
+&#x20;   LoaiThanhToan NVARCHAR(50) NOT NULL,
+
+&#x20;   TrangThai NVARCHAR(50) NOT NULL DEFAULT N'Chờ xử lý',
+
+&#x20;   MaGiaoDich VARCHAR(100) NULL,
+
+&#x20;   ThoiGianThanhToan DATETIME2 NULL,
+
+&#x20;   CONSTRAINT FK\_ThanhToan\_DatSan FOREIGN KEY (DatSanId) REFERENCES DatSan(Id) ON DELETE CASCADE
+
+);
+
+
+
+CREATE TABLE HoaDon (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   DatSanId INT NOT NULL UNIQUE,
+
+&#x20;   MaHoaDon VARCHAR(50) NOT NULL UNIQUE,
+
+&#x20;   NgayXuat DATETIME2 DEFAULT GETDATE(),
+
+&#x20;   CONSTRAINT FK\_HoaDon\_DatSan FOREIGN KEY (DatSanId) REFERENCES DatSan(Id) ON DELETE CASCADE
+
+);
+
+
+
+CREATE TABLE MaGiamGia (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   MaCode VARCHAR(50) NOT NULL UNIQUE,
+
+&#x20;   PhanTramGiam INT NULL CHECK (PhanTramGiam BETWEEN 1 AND 100),
+
+&#x20;   SoTienGiam DECIMAL(18,2) NULL CHECK (SoTienGiam >= 0),
+
+&#x20;   HieuLucTu DATETIME2 NOT NULL,
+
+&#x20;   HieuLucDen DATETIME2 NOT NULL,
+
+&#x20;   GiaTriDonToiThieu DECIMAL(18,2) DEFAULT 0
+
+);
+
+
+
+CREATE TABLE ThongBao (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   NguoiDungId INT NOT NULL,
+
+&#x20;   TieuDe NVARCHAR(200) NOT NULL,
+
+&#x20;   NoiDung NVARCHAR(MAX) NOT NULL,
+
+&#x20;   LoaiThongBao NVARCHAR(50) NOT NULL,
+
+&#x20;   DaDoc BIT DEFAULT 0,
+
+&#x20;   NgayTao DATETIME2 DEFAULT GETDATE(),
+
+&#x20;   CONSTRAINT FK\_ThongBao\_NguoiDung FOREIGN KEY (NguoiDungId) REFERENCES NguoiDung(Id) ON DELETE CASCADE
+
+);
+
+
+
+CREATE TABLE DanhGia (
+
+&#x20;   Id INT IDENTITY(1,1) PRIMARY KEY,
+
+&#x20;   DatSanId INT NOT NULL UNIQUE,
+
+&#x20;   NguoiDungId INT NOT NULL,
+
+&#x20;   SanBongId INT NOT NULL,
+
+&#x20;   SoSao INT NOT NULL CHECK (SoSao BETWEEN 1 AND 5),
+
+&#x20;   BinhLuan NVARCHAR(MAX) NULL,
+
+&#x20;   NgayTao DATETIME2 DEFAULT GETDATE(),
+
+&#x20;   CONSTRAINT FK\_DanhGia\_DatSan FOREIGN KEY (DatSanId) REFERENCES DatSan(Id),
+
+&#x20;   CONSTRAINT FK\_DanhGia\_NguoiDung FOREIGN KEY (NguoiDungId) REFERENCES NguoiDung(Id),
+
+&#x20;   CONSTRAINT FK\_DanhGia\_SanBong FOREIGN KEY (SanBongId) REFERENCES SanBong(Id)
+
+);
+
+GO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
