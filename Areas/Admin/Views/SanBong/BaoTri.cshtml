@@ -1,0 +1,239 @@
+@model QLSanBong.Areas.Admin.Models.AdminLichBaoTriViewModel
+@{
+    ViewData["Title"] = "Quản lý Lịch Bảo trì Mặt sân - UTC STADIUM";
+}
+
+<!-- Page Header Banner -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="SanBong" asp-action="Index" class="text-decoration-none">Quản lý Sân</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Lịch Bảo Trì</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Điều Phối &amp; Quản Lý Lịch Bảo Trì Sân Bóng</h2>
+        <p class="text-muted small mb-0">Thiết lập thời gian chăm sóc mặt cỏ nhân tạo, kiểm tra dàn đèn LED và hệ thống lưới.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a asp-area="Admin" asp-controller="SanBong" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3 fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Danh Sách Sân
+        </a>
+    </div>
+</div>
+
+<!-- CẢNH BÁO XUNG ĐỘT KẸT LỊCH ĐẶT SÂN (NẾU CÓ) -->
+@if (Model.ConflictingBookings.Any())
+{
+    <div class="alert alert-danger rounded-4 p-4 shadow-sm mb-4 border-0" style="background-color: #FEF2F2; border-left: 6px solid #EF4444 !important;">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="rounded-circle p-2 bg-danger text-white">
+                <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+            </div>
+            <div>
+                <h5 class="fw-bold text-danger mb-0">CHẶN TẠO LỊCH BẢO TRÌ: PHÁT HIỆN @Model.ConflictingBookings.Count ĐƠN ĐẶT SÂN BỊ XUNG ĐỘT</h5>
+                <p class="small text-danger mb-0">
+                    Khoảng thời gian bảo trì bạn vừa chọn trùng với các ca thi đấu đã có khách đặt và đang ở trạng thái <em>Chờ duyệt / Đã duyệt</em>. Vui lòng liên hệ khách hàng để hủy đơn hoặc điều phối sang sân khác trước khi tiến hành bảo trì sân này.
+                </p>
+            </div>
+        </div>
+
+        <div class="table-responsive bg-white rounded-3 shadow-sm border p-2 mb-3">
+            <table class="table table-sm align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>MÃ ĐƠN</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th>SỐ ĐIỆN THOẠI</th>
+                        <th>SÂN BÓNG</th>
+                        <th>CA THI ĐẤU</th>
+                        <th>NGÀY ĐẶT</th>
+                        <th>TRẠNG THÁI</th>
+                        <th class="text-end">THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model.ConflictingBookings)
+                    {
+                        <tr>
+                            <td><span class="fw-bold text-primary">#@b.Id</span></td>
+                            <td class="fw-semibold">@b.TenKhachHang</td>
+                            <td>@b.SoDienThoai</td>
+                            <td><span class="badge bg-light text-dark border">@b.TenSan</span></td>
+                            <td><span class="badge bg-light text-primary border fw-bold">@b.KhungGioDisplay</span></td>
+                            <td>@b.NgayDat.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="badge @(b.TrangThai == "Chờ duyệt" ? "bg-warning text-dark" : "bg-success")">
+                                    @b.TrangThai
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-search="@b.Id"
+                                   class="btn btn-xs btn-outline-primary rounded-pill px-2 py-1 small" target="_blank">
+                                    <i class="bi bi-arrow-up-right me-1"></i>Xử lý đơn
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<div class="row g-4">
+    <!-- Cột trái: Form Lập Lịch Bảo Trì Mới -->
+    <div class="col-lg-5">
+        <div class="admin-card h-100">
+            <h5 class="fw-bold text-navy mb-3">
+                <i class="bi bi-calendar-plus text-warning me-2"></i>Thiết Lập Lịch Bảo Trì Mới
+            </h5>
+            <p class="text-muted small mb-4">
+                Hệ thống sẽ tự động kiểm tra xem có trận bóng nào trùng lịch trước khi kích hoạt bảo trì.
+            </p>
+
+            <form asp-area="Admin" asp-controller="SanBong" asp-action="TaoLichBaoTri" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Chọn Sân Bóng Cần Bảo Trì <span class="text-danger">*</span></label>
+                    <select name="sanBongId" class="form-select rounded-3" required>
+                        @foreach (var s in Model.DanhSachSan)
+                        {
+                            <option value="@s.Id" selected="@(s.Id == Model.SanBongId)">
+                                @s.TenSan (@s.LoaiSan) - Trạng thái: @s.TrangThai
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Thời Gian Bắt Đầu <span class="text-danger">*</span></label>
+                    <input type="datetime-local" name="tuNgay" class="form-control rounded-3"
+                           value="@Model.ThoiGianBatDau.ToString("yyyy-MM-ddTHH:mm")" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Thời Gian Dự Kiến Kết Thúc <span class="text-danger">*</span></label>
+                    <input type="datetime-local" name="denNgay" class="form-control rounded-3"
+                           value="@Model.ThoiGianKetThuc.ToString("yyyy-MM-ddTHH:mm")" required />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small">Lý Do / Hạng Mục Bảo Trì</label>
+                    <textarea name="ghiChu" rows="3" class="form-control rounded-3"
+                              placeholder="Ví dụ: Rải cao su bảo dưỡng cỏ nhân tạo, thay thế bóng đèn LED trụ 3...">@Model.GhiChu</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-warning fw-bold text-dark rounded-pill w-100 py-2 shadow-sm">
+                    <i class="bi bi-shield-lock-fill me-1"></i> Kiểm Tra Xung Đột &amp; Lưu Lịch
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cột phải: Bảng Danh Sách Lịch Bảo Trì -->
+    <div class="col-lg-7">
+        <div class="admin-card h-100">
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+                <h5 class="fw-bold text-navy mb-0">
+                    <i class="bi bi-clock-history text-primary me-2"></i>Danh Sách Lịch Bảo Trì Đã Thiết Lập
+                </h5>
+
+                <!-- Lọc theo sân -->
+                <form asp-area="Admin" asp-controller="SanBong" asp-action="BaoTri" method="get" class="d-inline-flex gap-1">
+                    <select name="sanBongId" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">
+                        <option value="">-- Tất cả các sân --</option>
+                        @foreach (var s in Model.DanhSachSan)
+                        {
+                            <option value="@s.Id" selected="@(s.Id == Model.SelectedSanBongId)">@s.TenSan</option>
+                        }
+                    </select>
+                </form>
+            </div>
+
+            @if (!Model.DanhSachBaoTri.Any())
+            {
+                <div class="text-center py-5">
+                    <div class="rounded-circle d-inline-flex p-3 mb-2" style="background-color: #ECFDF5; color: #10B981;">
+                        <i class="bi bi-check2-circle fs-2"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark">Hiện không có lịch bảo trì nào</h6>
+                    <p class="text-muted small mb-0">Tất cả các sân bóng đang trong tình trạng sẵn sàng phục vụ.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>SÂN BÓNG</th>
+                                <th>THỜI GIAN BẢO TRÌ</th>
+                                <th>NỘI DUNG</th>
+                                <th class="text-center">TIẾN ĐỘ</th>
+                                <th class="text-end">HỦY</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bt in Model.DanhSachBaoTri)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">@bt.TenSan</div>
+                                        <div class="small text-muted">@bt.LoaiSan</div>
+                                    </td>
+                                    <td>
+                                        <div class="small fw-semibold text-dark">
+                                            <i class="bi bi-play-circle text-success me-1"></i>@bt.ThoiGianBatDau.ToString("HH:mm dd/MM/yyyy")
+                                        </div>
+                                        <div class="small text-muted">
+                                            <i class="bi bi-stop-circle text-danger me-1"></i>@bt.ThoiGianKetThuc.ToString("HH:mm dd/MM/yyyy")
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="small text-muted">
+                                            @(string.IsNullOrEmpty(bt.GhiChu) ? "Bảo trì định kỳ" : bt.GhiChu)
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (bt.TrangThaiHienTai == "Đang bảo trì")
+                                        {
+                                            <span class="admin-badge admin-badge-warning">
+                                                <i class="bi bi-cone-striped"></i> Đang bảo trì
+                                            </span>
+                                        }
+                                        else if (bt.TrangThaiHienTai == "Sắp diễn ra")
+                                        {
+                                            <span class="admin-badge admin-badge-info">
+                                                <i class="bi bi-clock"></i> Sắp diễn ra
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="admin-badge admin-badge-active">
+                                                <i class="bi bi-check-all"></i> Đã hoàn tất
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <form asp-area="Admin" asp-controller="SanBong" asp-action="XoaLichBaoTri" method="post" class="d-inline"
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn XÓA lịch bảo trì này?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@bt.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1" title="Xóa lịch bảo trì">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

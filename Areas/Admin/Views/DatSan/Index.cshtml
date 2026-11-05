@@ -1,0 +1,399 @@
+@model QLSanBong.Areas.Admin.Models.AdminDatSanListViewModel
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Quản lý Lịch Đặt Sân - UTC STADIUM Admin";
+}
+
+<!-- Page Header Banner -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-navy text-white fw-bold rounded-pill px-3 py-1" style="background-color: #002B5B;">
+                <i class="bi bi-calendar2-check-fill me-1 text-warning"></i> MODULE 3
+            </span>
+            <span class="text-muted small">Vận hành ca thi đấu &amp; Bàn giao sân</span>
+        </div>
+        <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Quản Lý Lịch Đặt Sân &amp; Bàn Giao Sân</h2>
+        <p class="text-muted small mb-0">Duyệt ca, điều phối nhận/trả sân, tự động xuất hóa đơn và bắn thông báo Gmail cho sinh viên.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="CreateTaiQuay" class="btn btn-warning fw-bold text-dark rounded-pill px-3 shadow-sm">
+            <i class="bi bi-plus-circle-fill me-1"></i> Đặt Hộ Tại Quầy
+        </a>
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="YeuCauDoiLich" class="btn btn-outline-primary rounded-pill px-3 fw-semibold shadow-sm">
+            <i class="bi bi-arrow-repeat me-1"></i> Yêu Cầu Đổi Lịch
+        </a>
+    </div>
+</div>
+
+<!-- 5 Thẻ Chỉ Số Trạng Thái Tổng Quan -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-2dot4" style="flex: 0 0 auto; width: 20%;">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-trangThai="Chờ duyệt"
+           class="admin-card text-decoration-none p-3 d-flex align-items-center justify-content-between h-100 @(Model.TrangThai == "Chờ duyệt" ? "border-warning border-2" : "")">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase">Chờ duyệt</span>
+                <h3 class="fw-bold mb-0 text-warning">@Model.CountChoDuyet</h3>
+            </div>
+            <div class="rounded-circle p-2" style="background-color: rgba(245, 158, 11, 0.12); color: #B45309;">
+                <i class="bi bi-hourglass-split fs-4"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-6 col-xl-2dot4" style="flex: 0 0 auto; width: 20%;">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-trangThai="Đã xác nhận"
+           class="admin-card text-decoration-none p-3 d-flex align-items-center justify-content-between h-100 @(Model.TrangThai == "Đã xác nhận" || Model.TrangThai == "Đã duyệt" ? "border-info border-2" : "")">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase">Đã xác nhận</span>
+                <h3 class="fw-bold mb-0 text-info">@Model.CountDaXacNhan</h3>
+            </div>
+            <div class="rounded-circle p-2" style="background-color: rgba(59, 130, 246, 0.12); color: #1D4ED8;">
+                <i class="bi bi-check2-circle fs-4"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-6 col-xl-2dot4" style="flex: 0 0 auto; width: 20%;">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-trangThai="Đang đá"
+           class="admin-card text-decoration-none p-3 d-flex align-items-center justify-content-between h-100 @(Model.TrangThai == "Đang đá" ? "border-primary border-2" : "")">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase">Đang đá</span>
+                <h3 class="fw-bold mb-0 text-primary">@Model.CountDangDa</h3>
+            </div>
+            <div class="rounded-circle p-2" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B;">
+                <i class="bi bi-dribbble fs-4"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-6 col-xl-2dot4" style="flex: 0 0 auto; width: 20%;">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-trangThai="Hoàn thành"
+           class="admin-card text-decoration-none p-3 d-flex align-items-center justify-content-between h-100 @(Model.TrangThai == "Hoàn thành" ? "border-success border-2" : "")">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase">Hoàn thành</span>
+                <h3 class="fw-bold mb-0 text-success">@Model.CountHoanThanh</h3>
+            </div>
+            <div class="rounded-circle p-2" style="background-color: rgba(16, 185, 129, 0.12); color: #047857;">
+                <i class="bi bi-award-fill fs-4"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-6 col-xl-2dot4" style="flex: 0 0 auto; width: 20%;">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-trangThai="Đã hủy"
+           class="admin-card text-decoration-none p-3 d-flex align-items-center justify-content-between h-100 @(Model.TrangThai == "Đã hủy" || Model.TrangThai == "Từ chối" ? "border-danger border-2" : "")">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase">Hủy / Từ chối</span>
+                <h3 class="fw-bold mb-0 text-danger">@Model.CountDaHuy</h3>
+            </div>
+            <div class="rounded-circle p-2" style="background-color: rgba(239, 68, 68, 0.12); color: #B91C1C;">
+                <i class="bi bi-x-octagon-fill fs-4"></i>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Toolbar Bộ Lọc & Tìm Kiếm Thông Minh -->
+<div class="admin-filter-bar mb-4">
+    <form asp-area="Admin" asp-controller="DatSan" asp-action="Index" method="get" class="row g-2 align-items-center">
+        <!-- Input Search -->
+        <div class="col-lg-3 col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" name="search" value="@Model.Search" class="form-control bg-light border-start-0"
+                       placeholder="Mã đơn (#12), tên, SĐT, sân..." />
+            </div>
+        </div>
+
+        <!-- Filter Trạng thái -->
+        <div class="col-lg-3 col-md-6">
+            <select name="trangThai" class="form-select bg-light">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Chờ duyệt" selected="@(Model.TrangThai == "Chờ duyệt")">Chờ duyệt (@Model.CountChoDuyet)</option>
+                <option value="Đã xác nhận" selected="@(Model.TrangThai == "Đã xác nhận" || Model.TrangThai == "Đã duyệt")">Đã xác nhận (@Model.CountDaXacNhan)</option>
+                <option value="Đang đá" selected="@(Model.TrangThai == "Đang đá")">Đang trong trận (@Model.CountDangDa)</option>
+                <option value="Hoàn thành" selected="@(Model.TrangThai == "Hoàn thành")">Hoàn thành (@Model.CountHoanThanh)</option>
+                <option value="Đã hủy" selected="@(Model.TrangThai == "Đã hủy" || Model.TrangThai == "Từ chối")">Đã hủy / Từ chối (@Model.CountDaHuy)</option>
+            </select>
+        </div>
+
+        <!-- Filter Ngày đặt -->
+        <div class="col-lg-2 col-md-4">
+            <input type="date" name="ngayDat" value="@(Model.NgayDat.HasValue ? Model.NgayDat.Value.ToString("yyyy-MM-dd") : "")"
+                   class="form-control bg-light" title="Lọc theo ngày thi đấu" />
+        </div>
+
+        <!-- Filter Sân bóng -->
+        <div class="col-lg-2 col-md-4">
+            <select name="sanBongId" class="form-select bg-light">
+                <option value="">-- Tất cả sân --</option>
+                @foreach (var s in Model.DanhSachSan)
+                {
+                    <option value="@s.Id" selected="@(s.Id == Model.SanBongId)">@s.TenSan</option>
+                }
+            </select>
+        </div>
+
+        <!-- Submit & Reset -->
+        <div class="col-lg-2 col-md-4 d-flex gap-1">
+            <button type="submit" class="btn btn-primary rounded-pill px-3 fw-semibold w-100" style="background-color: #002B5B; border-color: #002B5B;">
+                <i class="bi bi-funnel me-1"></i> Lọc
+            </button>
+            <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" class="btn btn-light rounded-pill px-3 border" title="Xóa bộ lọc">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Bảng Danh Sách Đơn Đặt Sân -->
+<div class="admin-card">
+    @if (!Model.Items.Any())
+    {
+        <div class="text-center py-5">
+            <div class="rounded-circle d-inline-flex p-3 mb-2" style="background-color: #F1F5F9; color: #64748B;">
+                <i class="bi bi-calendar-x fs-2"></i>
+            </div>
+            <h6 class="fw-bold text-dark">Không tìm thấy đơn đặt sân nào phù hợp</h6>
+            <p class="text-muted small mb-0">Thử thay đổi từ khóa hoặc bộ lọc để xem các đơn khác.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">MÃ ĐƠN</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th>SÂN BÓNG</th>
+                        <th>CA THI ĐẤU</th>
+                        <th>NGÀY ĐÁ</th>
+                        <th>TỔNG TIỀN</th>
+                        <th>ĐÃ TRẢ / CỌC</th>
+                        <th class="text-center">TRẠNG THÁI</th>
+                        <th class="text-end" style="width: 200px;">BÀN GIAO &amp; THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        var isPending = item.TrangThai == "Chờ duyệt";
+                        var isConfirmed = item.TrangThai == "Đã xác nhận" || item.TrangThai == "Đã duyệt";
+                        var isPlaying = item.TrangThai == "Đang đá";
+                        var isCompleted = item.TrangThai == "Hoàn thành";
+                        var isCancelled = item.TrangThai == "Từ chối" || item.TrangThai == "Đã hủy";
+
+                        <tr>
+                            <td>
+                                <a asp-area="Admin" asp-controller="DatSan" asp-action="Details" asp-route-id="@item.Id"
+                                   class="fw-bold text-primary text-decoration-none">
+                                    #@item.Id
+                                </a>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@item.TenNguoiDung</div>
+                                <div class="small text-muted"><i class="bi bi-telephone me-1"></i>@item.SoDienThoai</div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@item.TenSan</div>
+                                <span class="badge bg-light text-muted border small">@item.LoaiSan</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-navy border fw-bold">
+                                    <i class="bi bi-clock me-1 text-primary"></i>@item.KhungGioDisplay
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark">@item.NgayDat.ToString("dd/MM/yyyy")</span>
+                            </td>
+                            <td>
+                                <span class="fw-bold" style="color: #002B5B;">@item.TongTien.ToString("N0") đ</span>
+                            </td>
+                            <td>
+                                @if (item.DaThanhToan > 0)
+                                {
+                                    <span class="badge bg-success-subtle text-success fw-bold">
+                                        @item.DaThanhToan.ToString("N0") đ
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-muted">Chưa trả</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (isPending)
+                                {
+                                    <span class="admin-badge admin-badge-warning">
+                                        <i class="bi bi-hourglass-split"></i> Chờ duyệt
+                                    </span>
+                                }
+                                else if (isConfirmed)
+                                {
+                                    <span class="admin-badge admin-badge-info">
+                                        <i class="bi bi-check-circle"></i> Đã xác nhận
+                                    </span>
+                                }
+                                else if (isPlaying)
+                                {
+                                    <span class="badge bg-primary rounded-pill px-3 py-1 shadow-sm animate-pulse">
+                                        <i class="bi bi-dribbble me-1"></i> Đang đá
+                                    </span>
+                                }
+                                else if (isCompleted)
+                                {
+                                    <span class="admin-badge admin-badge-success">
+                                        <i class="bi bi-check2-all"></i> Hoàn thành
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="admin-badge admin-badge-locked">
+                                        <i class="bi bi-x-circle"></i> @item.TrangThai
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1 align-items-center">
+                                    <!-- Xem chi tiết -->
+                                    <a asp-area="Admin" asp-controller="DatSan" asp-action="Details" asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" title="Xem chi tiết đơn">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    <!-- NÚT DUYỆT NHANH (Khi Chờ duyệt) -->
+                                    @if (isPending)
+                                    {
+                                        <form asp-area="Admin" asp-controller="DatSan" asp-action="UpdateStatus" method="post" class="d-inline"
+                                              onsubmit="return confirm('Duyệt đơn #@item.Id? Hệ thống sẽ gửi email xác nhận cho khách.');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="trangThaiMoi" value="Đã xác nhận" />
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2 py-1 fw-semibold" title="Duyệt đơn">
+                                                <i class="bi bi-check-lg me-1"></i>Duyệt
+                                            </button>
+                                        </form>
+
+                                        <!-- Nút Từ chối kích hoạt modal -->
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1"
+                                                data-bs-toggle="modal" data-bs-target="#modalTuChoi_@item.Id" title="Từ chối đơn">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    }
+
+                                    <!-- NÚT BÀN GIAO SÂN: NHẬN SÂN (Khi Đã xác nhận) -->
+                                    @if (isConfirmed)
+                                    {
+                                        <form asp-area="Admin" asp-controller="DatSan" asp-action="NhanSan" method="post" class="d-inline"
+                                              onsubmit="return confirm('Xác nhận khách hàng đã đến và NHẬN SÂN để bắt đầu thi đấu?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-primary rounded-pill px-2 py-1 fw-semibold shadow-sm" title="Nhận sân (Bắt đầu trận)">
+                                                <i class="bi bi-play-circle-fill me-1"></i>Nhận sân
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <!-- NÚT BÀN GIAO SÂN: TRẢ SÂN (Khi Đang đá) -->
+                                    @if (isPlaying)
+                                    {
+                                        <form asp-area="Admin" asp-controller="DatSan" asp-action="TraSan" method="post" class="d-inline"
+                                              onsubmit="return confirm('Xác nhận TRẢ SÂN và kết thúc trận đấu? Hệ thống sẽ xuất Hóa đơn điện tử.');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2 py-1 fw-semibold shadow-sm" title="Trả sân &amp; Xuất hóa đơn">
+                                                <i class="bi bi-check-circle-fill me-1"></i>Trả sân
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+
+                                <!-- Modal Từ Chối Đơn -->
+                                @if (isPending)
+                                {
+                                    <div class="modal fade" id="modalTuChoi_@item.Id" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered text-start">
+                                            <div class="modal-content rounded-4 border-0 shadow">
+                                                <form asp-area="Admin" asp-controller="DatSan" asp-action="UpdateStatus" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <input type="hidden" name="trangThaiMoi" value="Từ chối" />
+
+                                                    <div class="modal-header border-bottom-0 pb-0">
+                                                        <h5 class="modal-title fw-bold text-danger">
+                                                            <i class="bi bi-exclamation-octagon-fill me-2"></i>Từ Chối Đơn Đặt Sân #@item.Id
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                                    </div>
+
+                                                    <div class="modal-body py-3">
+                                                        <div class="alert alert-warning small rounded-3 mb-3">
+                                                            Khách <strong>@item.TenNguoiDung</strong> (@item.SoDienThoai) đã đặt <strong>@item.TenSan</strong> ca <strong>@item.KhungGioDisplay</strong> ngày <strong>@item.NgayDat.ToString("dd/MM/yyyy")</strong>.
+                                                        </div>
+
+                                                        <label class="form-label fw-semibold small">Lý do từ chối (Gửi thông báo &amp; Email cho khách) <span class="text-danger">*</span></label>
+                                                        <textarea class="form-control rounded-3" name="lyDo" rows="3" required
+                                                                  placeholder="Ví dụ: Trùng lịch sự kiện thể thao trường ĐHGTVT, quý khách vui lòng chọn ca khác..."></textarea>
+                                                    </div>
+
+                                                    <div class="modal-footer border-top-0 pt-0">
+                                                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                                                        <button type="submit" class="btn btn-sm btn-danger rounded-pill px-4 fw-semibold">
+                                                            <i class="bi bi-x-circle me-1"></i> Xác Nhận Từ Chối
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phân trang 10 dòng/trang -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 mt-4 pt-3 border-top">
+                <span class="text-muted small">
+                    Hiển thị trang <strong>@Model.CurrentPage</strong> / <strong>@Model.TotalPages</strong> (Tổng @Model.TotalItems đơn)
+                </span>
+
+                <nav aria-label="Lịch đặt pagination">
+                    <ul class="pagination admin-pagination mb-0">
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a class="page-link" asp-area="Admin" asp-controller="DatSan" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai" asp-route-sanBongId="@Model.SanBongId" asp-route-ngayDat="@(Model.NgayDat.HasValue ? Model.NgayDat.Value.ToString("yyyy-MM-dd") : "")">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-area="Admin" asp-controller="DatSan" asp-action="Index"
+                                   asp-route-page="@i" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai" asp-route-sanBongId="@Model.SanBongId" asp-route-ngayDat="@(Model.NgayDat.HasValue ? Model.NgayDat.Value.ToString("yyyy-MM-dd") : "")">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a class="page-link" asp-area="Admin" asp-controller="DatSan" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai" asp-route-sanBongId="@Model.SanBongId" asp-route-ngayDat="@(Model.NgayDat.HasValue ? Model.NgayDat.Value.ToString("yyyy-MM-dd") : "")">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    }
+</div>

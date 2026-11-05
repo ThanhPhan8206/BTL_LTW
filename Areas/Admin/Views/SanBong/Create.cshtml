@@ -1,0 +1,89 @@
+@model QLSanBong.Areas.Admin.Models.AdminSanBongInputViewModel
+@{
+    ViewData["Title"] = "Thêm Sân Bóng Mới - UTC STADIUM";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small">
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="SanBong" asp-action="Index" class="text-decoration-none">Quản lý Sân</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thêm Sân Mới</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Khởi Tạo Sân Bóng Mới</h2>
+            </div>
+            <a asp-area="Admin" asp-controller="SanBong" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3 fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="admin-card">
+            <form asp-area="Admin" asp-controller="SanBong" asp-action="Create" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
+
+                <div class="row g-3">
+                    <!-- Tên sân -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Tên Sân Bóng <span class="text-danger">*</span></label>
+                        <input asp-for="TenSan" class="form-control rounded-3" placeholder="Ví dụ: Sân 5 số 4, Sân 7 Vip..." required />
+                        <span asp-validation-for="TenSan" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Loại sân -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Loại Sân <span class="text-danger">*</span></label>
+                        <select asp-for="LoaiSan" class="form-select rounded-3">
+                            <option value="Sân 5 người">Sân 5 người (Mini cỏ nhân tạo)</option>
+                            <option value="Sân 7 người">Sân 7 người (Tiêu chuẩn thi đấu giải)</option>
+                            <option value="Sân 11 người">Sân 11 người (Mặt sân chuẩn Quốc gia)</option>
+                        </select>
+                        <span asp-validation-for="LoaiSan" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Trạng thái -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Trạng Thái Khởi Tạo</label>
+                        <select asp-for="TrangThai" class="form-select rounded-3">
+                            <option value="Sẵn sàng">Sẵn sàng (Đón khách đặt)</option>
+                            <option value="Ngừng hoạt động">Ngừng hoạt động (Tạm ẩn)</option>
+                        </select>
+                    </div>
+
+                    <!-- Ảnh sân bóng -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Ảnh Minh Họa Sân (Upload)</label>
+                        <input asp-for="AnhSanFile" type="file" class="form-control rounded-3" accept="image/*" />
+                        <div class="form-text small">Nếu không tải ảnh, hệ thống sẽ sử dụng ảnh mặc định theo loại sân.</div>
+                    </div>
+
+                    <!-- Mô tả -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small">Mô Tả &amp; Đặc Điểm Mặt Sân</label>
+                        <textarea asp-for="MoTa" rows="3" class="form-control rounded-3"
+                                  placeholder="Mặt cỏ sợi mềm êm chân, thoát nước nhanh, hệ thống đèn LED cao cấp chống chói..."></textarea>
+                    </div>
+                </div>
+
+                <div class="alert alert-info rounded-4 mt-4 mb-0 small d-flex align-items-center gap-2">
+                    <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+                    <div>
+                        <strong>Tự động cấu hình giá:</strong> Sau khi tạo sân, hệ thống sẽ tự động khởi tạo ma trận giá mặc định cho toàn bộ các khung giờ và loại ngày (Ngày thường, Cuối tuần, Ngày lễ). Bạn có thể chỉnh sửa lại trong mục <em>Khung giờ &amp; Thiết lập giá</em>.
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a asp-area="Admin" asp-controller="SanBong" asp-action="Index" class="btn btn-light rounded-pill px-4">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 fw-semibold" style="background-color: #002B5B; border-color: #002B5B;">
+                        <i class="bi bi-check-lg me-1 text-warning"></i> Lưu &amp; Khởi Tạo Sân
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

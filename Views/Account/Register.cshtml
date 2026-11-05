@@ -1,0 +1,225 @@
+@model QLSanBong.Models.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký tài khoản - Hệ Thống Đặt Sân UTC STADIUM";
+    ViewData["HideFooter"] = true;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/client/auth.css" asp-append-version="true" />
+}
+
+<section class="auth-page-section">
+    <div class="container">
+        <div class="auth-split-card">
+            <div class="row g-0">
+                <!-- ===========================================================
+                     CỘT TRÁI (NỀN XANH NAVY #002B5B + LOGO + KHẨU HIỆU THỂ THAO)
+                =========================================================== -->
+                <div class="col-lg-5 auth-brand-pane">
+                    <div class="auth-brand-top">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <img src="~/uploads/sanbong/logo.png"
+                                 alt="Logo UTC STADIUM"
+                                 class="auth-brand-logo"
+                                 onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect width=%22100%25%22 height=%22100%25%22 rx=%2216%22 fill=%22%23FFC107%22/><text x=%2250%25%22 y=%2255%25%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2222%22 fill=%22%23002B5B%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>UTC</text></svg>';" />
+                            <div>
+                                <div class="auth-brand-title">UTC STADIUM</div>
+                                <div class="auth-brand-subtitle">SÂN BÓNG SINH VIÊN</div>
+                            </div>
+                        </div>
+
+                        <div class="auth-slogan-badge">
+                            <i class="bi bi-stars text-warning me-1"></i>
+                            <span>Cộng đồng bóng đá sinh viên UTC</span>
+                        </div>
+
+                        <h2 class="auth-pane-heading">
+                            Gia Nhập Hệ Sinh Thái Bóng Đá Học Đường Sôi Động!
+                        </h2>
+
+                        <p class="auth-pane-desc">
+                            Chỉ với 1 phút đăng ký tài khoản, bạn có thể đại diện lớp đặt lịch sân cỏ nhân tạo, nhận thông báo giải đấu Đoàn trường và hưởng chính sách trợ giá sinh viên.
+                        </p>
+                    </div>
+
+                    <div class="auth-feature-list mt-3">
+                        <div class="auth-feature-item">
+                            <span class="auth-feature-icon"><i class="bi bi-calendar2-check-fill"></i></span>
+                            <div>
+                                <div class="fw-bold text-white small">Đặt lịch trực tuyến 24/7</div>
+                                <div class="text-white-50" style="font-size: 0.77rem;">Chủ động chọn sân 5, sân 7 và ca giờ phù hợp lịch học</div>
+                            </div>
+                        </div>
+                        <div class="auth-feature-item mb-0">
+                            <span class="auth-feature-icon"><i class="bi bi-gift-fill"></i></span>
+                            <div>
+                                <div class="fw-bold text-white small">Đặc quyền thành viên sinh viên</div>
+                                <div class="text-white-50" style="font-size: 0.77rem;">Trợ giá 20% khi đặt lịch tập định kỳ cho đội bóng lớp</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="auth-brand-footer mt-auto pt-3">
+                        <a href="/" class="auth-back-home">
+                            <i class="bi bi-arrow-left me-1"></i> Quay về Trang chủ UTC STADIUM
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ===========================================================
+                     CỘT PHẢI (NỀN TRẮNG - FORM ĐĂNG KÝ TÀI KHOẢN)
+                =========================================================== -->
+                <div class="col-lg-7 auth-form-pane">
+                    <div class="auth-form-inner">
+                        <div class="mb-3">
+                            <span class="auth-step-pill">Đăng Ký Thành Viên Mới</span>
+                            <h1 class="auth-form-title">Tạo Tài Khoản Đặt Sân</h1>
+                            <p class="auth-form-subtitle mb-0">
+                                Điền thông tin cá nhân bên dưới để kích hoạt tài khoản khách hàng tại <strong>UTC STADIUM</strong>.
+                            </p>
+                        </div>
+
+                        <!-- Thông báo lỗi tổng hợp ModelState -->
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+                        {
+                            <div class="alert auth-alert-error d-flex align-items-start gap-2 mb-3 py-2" role="alert">
+                                <i class="bi bi-exclamation-octagon-fill fs-5 mt-1"></i>
+                                <div asp-validation-summary="ModelOnly" class="mb-0"></div>
+                            </div>
+                        }
+
+                        <form asp-area="" asp-controller="Account" asp-action="Register" method="post" novalidate>
+                            @Html.AntiForgeryToken()
+
+                            <!-- Họ và tên -->
+                            <div class="mb-2">
+                                <label asp-for="HoTen" class="auth-label">Họ và tên <span class="text-danger">*</span></label>
+                                <div class="auth-input-group">
+                                    <span class="auth-input-icon"><i class="bi bi-person-vcard-fill"></i></span>
+                                    <input asp-for="HoTen"
+                                           class="form-control auth-input"
+                                           placeholder="Ví dụ: Nguyễn Minh Tuấn (Đội trưởng K64-CNTT1)"
+                                           autocomplete="name" />
+                                </div>
+                                <span asp-validation-for="HoTen" class="auth-error-msg"></span>
+                            </div>
+
+                            <!-- Email & Số điện thoại trên 2 cột -->
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-7">
+                                    <label asp-for="Email" class="auth-label">Địa chỉ Email <span class="text-danger">*</span></label>
+                                    <div class="auth-input-group">
+                                        <span class="auth-input-icon"><i class="bi bi-envelope-fill"></i></span>
+                                        <input asp-for="Email"
+                                               class="form-control auth-input"
+                                               placeholder="sinhvien@st.utc.edu.vn"
+                                               autocomplete="email" />
+                                    </div>
+                                    <span asp-validation-for="Email" class="auth-error-msg"></span>
+                                </div>
+
+                                <div class="col-md-5">
+                                    <label asp-for="SoDienThoai" class="auth-label">Số điện thoại <span class="text-danger">*</span></label>
+                                    <div class="auth-input-group">
+                                        <span class="auth-input-icon"><i class="bi bi-telephone-fill"></i></span>
+                                        <input asp-for="SoDienThoai"
+                                               class="form-control auth-input"
+                                               placeholder="0988xxxxxx"
+                                               autocomplete="tel" />
+                                    </div>
+                                    <span asp-validation-for="SoDienThoai" class="auth-error-msg"></span>
+                                </div>
+                            </div>
+
+                            <!-- Mật khẩu & Xác nhận mật khẩu trên 2 cột -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="MatKhau" class="auth-label">Mật khẩu <span class="text-danger">*</span></label>
+                                    <div class="auth-input-group">
+                                        <span class="auth-input-icon"><i class="bi bi-shield-lock-fill"></i></span>
+                                        <input asp-for="MatKhau"
+                                               id="registerPasswordInput"
+                                               class="form-control auth-input pe-5"
+                                               placeholder="Tối thiểu 6 ký tự"
+                                               autocomplete="new-password" />
+                                        <button type="button"
+                                                class="auth-toggle-password"
+                                                data-target="registerPasswordInput"
+                                                aria-label="Ẩn/Hiện mật khẩu">
+                                            <i class="bi bi-eye-slash"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="MatKhau" class="auth-error-msg"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="XacNhanMatKhau" class="auth-label">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                                    <div class="auth-input-group">
+                                        <span class="auth-input-icon"><i class="bi bi-check2-shield"></i></span>
+                                        <input asp-for="XacNhanMatKhau"
+                                               id="registerConfirmPasswordInput"
+                                               class="form-control auth-input pe-5"
+                                               placeholder="Nhập lại mật khẩu"
+                                               autocomplete="new-password" />
+                                        <button type="button"
+                                                class="auth-toggle-password"
+                                                data-target="registerConfirmPasswordInput"
+                                                aria-label="Ẩn/Hiện mật khẩu xác nhận">
+                                            <i class="bi bi-eye-slash"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="XacNhanMatKhau" class="auth-error-msg"></span>
+                                </div>
+                            </div>
+
+                            <!-- Nút Submit màu vàng #FFC107 -->
+                            <button type="submit" class="btn auth-btn-submit w-100 mt-1">
+                                <i class="bi bi-person-plus-fill fs-5"></i>
+                                <span>Hoàn Tất Đăng Ký Tài Khoản</span>
+                            </button>
+                        </form>
+
+                        <!-- Chuyển đổi sang trang Đăng nhập -->
+                        <div class="auth-switch-box text-center mt-3 pt-3 border-top">
+                            <span class="text-muted">Bạn đã có tài khoản tại hệ thống?</span>
+                            <a asp-area="" asp-controller="Account" asp-action="Login" class="auth-switch-link ms-1">
+                                Đăng nhập ngay <i class="bi bi-arrow-right-short"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dòng bản quyền nhỏ gọn dưới đáy -->
+        <div class="auth-mini-copyright text-center mt-3">
+            &copy; 2026 <strong>UTC STADIUM</strong> &bull; Hệ Thống Đặt Sân &amp; Kết Nối Giải Đấu Sinh Viên
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".auth-toggle-password").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const targetId = this.getAttribute("data-target");
+                    const input = document.getElementById(targetId);
+                    const icon = this.querySelector("i");
+                    if (!input) return;
+
+                    if (input.type === "password") {
+                        input.type = "text";
+                        icon.classList.remove("bi-eye-slash");
+                        icon.classList.add("bi-eye");
+                    } else {
+                        input.type = "password";
+                        icon.classList.remove("bi-eye");
+                        icon.classList.add("bi-eye-slash");
+                    }
+                });
+            });
+        });
+    </script>
+}

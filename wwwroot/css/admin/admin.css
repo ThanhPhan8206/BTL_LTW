@@ -1,0 +1,344 @@
+/* ==========================================================================
+   UTC STADIUM - ADMIN PORTAL STYLESHEET
+   Brand Colors:
+     - Navy Primary: #002B5B (Deep Stadium Navy)
+     - Gold Accent:  #FFC107 (Bright Amber Gold)
+     - Background:   #F4F7FB
+     - Card Border:  #E2E8F0
+   ========================================================================== */
+
+:root {
+    --admin-navy: #002B5B;
+    --admin-navy-dark: #001A38;
+    --admin-navy-light: #0A3D78;
+    --admin-gold: #FFC107;
+    --admin-gold-hover: #E0A800;
+    --admin-bg: #F4F7FB;
+    --admin-card-bg: #FFFFFF;
+    --admin-text-main: #1E293B;
+    --admin-text-muted: #64748B;
+    --admin-border: #E2E8F0;
+    --admin-success: #10B981;
+    --admin-warning: #F59E0B;
+    --admin-danger: #EF4444;
+    --admin-info: #3B82F6;
+}
+
+body.admin-body {
+    background-color: var(--admin-bg);
+    color: var(--admin-text-main);
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   Topbar Navigation
+   -------------------------------------------------------------------------- */
+.admin-navbar {
+    background: linear-gradient(90deg, var(--admin-navy) 0%, var(--admin-navy-light) 100%);
+    box-shadow: 0 4px 16px rgba(0, 43, 91, 0.15);
+    border-bottom: 2px solid var(--admin-gold);
+    z-index: 1030;
+    padding: 0.65rem 1.25rem;
+}
+
+.admin-brand {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.admin-brand-logo {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.admin-brand-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+.admin-brand-subtitle {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--admin-gold);
+    text-transform: uppercase;
+}
+
+.admin-user-pill {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    border-radius: 50rem;
+    padding: 0.35rem 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ffffff;
+    font-size: 0.85rem;
+}
+
+.admin-user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid var(--admin-gold);
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar Navigation
+   -------------------------------------------------------------------------- */
+.admin-sidebar {
+    background: #ffffff;
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 20px rgba(0, 43, 91, 0.06);
+    border: 1px solid var(--admin-border);
+    padding: 1.25rem 0.85rem;
+    position: sticky;
+    top: 5rem;
+}
+
+.admin-sidebar-section-title {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #94A3B8;
+    padding: 0.6rem 0.85rem 0.3rem;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.95rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #334155;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.admin-nav-item:hover {
+    background-color: rgba(0, 43, 91, 0.05);
+    color: var(--admin-navy);
+    transform: translateX(3px);
+}
+
+.admin-nav-item.active {
+    background: linear-gradient(135deg, var(--admin-navy) 0%, var(--admin-navy-light) 100%);
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 43, 91, 0.25);
+}
+
+.admin-nav-item.active .admin-nav-icon {
+    color: var(--admin-gold) !important;
+}
+
+.admin-nav-icon {
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+    color: var(--admin-navy);
+    transition: color 0.2s ease;
+}
+
+.admin-nav-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 50rem;
+}
+
+/* --------------------------------------------------------------------------
+   KPI Metric Cards
+   -------------------------------------------------------------------------- */
+.admin-kpi-card {
+    background: #ffffff;
+    border-radius: 1.25rem;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 4px 16px rgba(0, 43, 91, 0.05);
+    padding: 1.35rem;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0, 43, 91, 0.12);
+    border-color: var(--admin-navy-light);
+    color: inherit;
+}
+
+.admin-kpi-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: transparent;
+    transition: background 0.2s;
+}
+
+.admin-kpi-card.kpi-warning::before {
+    background: var(--admin-warning);
+}
+.admin-kpi-card.kpi-info::before {
+    background: var(--admin-info);
+}
+.admin-kpi-card.kpi-success::before {
+    background: var(--admin-success);
+}
+.admin-kpi-card.kpi-navy::before {
+    background: var(--admin-navy);
+}
+
+.admin-kpi-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.admin-kpi-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-top: 0.4rem;
+    color: var(--admin-navy);
+}
+
+.admin-kpi-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--admin-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Standard Admin Card & Tables
+   -------------------------------------------------------------------------- */
+.admin-card {
+    background: #ffffff;
+    border-radius: 1.25rem;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 4px 18px rgba(0, 43, 91, 0.05);
+    padding: 1.5rem;
+}
+
+.admin-table {
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.admin-table thead th {
+    background-color: #F8FAFC;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--admin-border);
+    padding: 0.85rem 1rem;
+    white-space: nowrap;
+}
+
+.admin-table tbody td {
+    padding: 0.95rem 1rem;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.admin-table tbody tr:hover td {
+    background-color: #F8FAFC;
+}
+
+/* Status Badges */
+.admin-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.admin-badge-active,
+.admin-badge-success {
+    background-color: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.admin-badge-warning {
+    background-color: rgba(245, 158, 11, 0.12);
+    color: #B45309;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.admin-badge-locked,
+.admin-badge-danger {
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #B91C1C;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.admin-badge-info {
+    background-color: rgba(59, 130, 246, 0.12);
+    color: #1D4ED8;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+/* --------------------------------------------------------------------------
+   Filter & Search Toolbar
+   -------------------------------------------------------------------------- */
+.admin-filter-bar {
+    background: #ffffff;
+    border: 1px solid var(--admin-border);
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 2px 10px rgba(0, 43, 91, 0.04);
+}
+
+/* --------------------------------------------------------------------------
+   Pagination
+   -------------------------------------------------------------------------- */
+.admin-pagination .page-link {
+    color: var(--admin-navy);
+    border-color: var(--admin-border);
+    font-weight: 600;
+    padding: 0.45rem 0.85rem;
+    border-radius: 0.5rem;
+    margin: 0 2px;
+}
+
+.admin-pagination .page-item.active .page-link {
+    background-color: var(--admin-navy);
+    border-color: var(--admin-navy);
+    color: #ffffff;
+}
+

@@ -1,0 +1,212 @@
+@model QLSanBong.Areas.Admin.Models.AdminCreateTaiQuayViewModel
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Đặt Sân Hộ Khách Tại Quầy - UTC STADIUM Admin";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small">
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="DatSan" asp-action="Index" class="text-decoration-none">Quản lý đặt sân</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Đặt hộ tại quầy</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">
+                    <i class="bi bi-person-workspace text-warning me-2"></i>Đặt Hộ Sân Tại Quầy Tiếp Tân
+                </h2>
+                <p class="text-muted small mb-0">Hỗ trợ khách hàng đặt ca trực tiếp tại quầy hoặc gọi điện thoại đặt trước.</p>
+            </div>
+            <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3 fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Danh Sách Đơn
+            </a>
+        </div>
+
+        <form asp-area="Admin" asp-controller="DatSan" asp-action="CreateTaiQuay" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
+
+            <div class="row g-4">
+                <!-- Cột trái: Thông tin Khách & Sân bóng -->
+                <div class="col-lg-7">
+                    <!-- Khách hàng -->
+                    <div class="admin-card mb-4">
+                        <h5 class="fw-bold mb-3 text-navy" style="color: #002B5B;">
+                            <i class="bi bi-person-fill text-primary me-2"></i>1. Thông Tin Khách Hàng
+                        </h5>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Loại Khách Hàng</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="customerType" id="typeWalkIn" value="walkin" checked onchange="toggleCustomerType()">
+                                    <label class="form-check-label fw-semibold small" for="typeWalkIn">
+                                        Khách vãng lai / Gọi điện thoại
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="customerType" id="typeExisting" value="existing" onchange="toggleCustomerType()">
+                                    <label class="form-check-label fw-semibold small" for="typeExisting">
+                                        Chọn thành viên đã có tài khoản
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Khối chọn thành viên có sẵn -->
+                        <div class="mb-3" id="existingCustomerBlock" style="display: none;">
+                            <label class="form-label fw-semibold small">Chọn Khách Hàng Thành Viên</label>
+                            <select asp-for="NguoiDungId" class="form-select rounded-3" id="selectExistingCustomer" onchange="fillCustomerInfo(this)">
+                                <option value="">-- Chọn khách hàng thành viên --</option>
+                                @foreach (var c in Model.DanhSachKhachHang)
+                                {
+                                    <option value="@c.Id" data-name="@c.HoTen" data-phone="@c.SoDienThoai" data-email="@c.Email">
+                                        @c.HoTen - SĐT: @c.SoDienThoai (@c.Email)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Khối nhập thông tin khách -->
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Họ Và Tên <span class="text-danger">*</span></label>
+                                <input asp-for="TenKhachHang" class="form-control rounded-3" id="inputTenKhach" placeholder="Ví dụ: Nguyễn Văn A" required />
+                                <span asp-validation-for="TenKhachHang" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Số Điện Thoại <span class="text-danger">*</span></label>
+                                <input asp-for="SoDienThoai" class="form-control rounded-3" id="inputSoDienThoai" placeholder="Ví dụ: 0912345678" required />
+                                <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">Email (Tùy chọn)</label>
+                                <input asp-for="Email" type="email" class="form-control rounded-3" id="inputEmail" placeholder="khachhang@gmail.com" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lịch thi đấu & Sân bóng -->
+                    <div class="admin-card">
+                        <h5 class="fw-bold mb-3 text-navy" style="color: #002B5B;">
+                            <i class="bi bi-dribbble text-warning me-2"></i>2. Chọn Sân &amp; Ca Thi Đấu
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold small">Chọn Sân Bóng <span class="text-danger">*</span></label>
+                                <select asp-for="SanBongId" class="form-select rounded-3" required>
+                                    @foreach (var s in Model.DanhSachSan)
+                                    {
+                                        <option value="@s.Id">@s.TenSan (@s.LoaiSan) - Trạng thái: @s.TrangThai</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Ngày Đặt Sân <span class="text-danger">*</span></label>
+                                <input asp-for="NgayDat" type="date" class="form-control rounded-3" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Ca Thi Đấu <span class="text-danger">*</span></label>
+                                <select asp-for="KhungGioId" class="form-select rounded-3" required>
+                                    @foreach (var k in Model.DanhSachKhungGio)
+                                    {
+                                        <option value="@k.Id">Ca @k.GioBatDau.ToString("HH:mm") - @k.GioKetThuc.ToString("HH:mm")</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">Ghi Chú Đơn Đặt</label>
+                                <textarea asp-for="GhiChu" rows="2" class="form-control rounded-3"
+                                          placeholder="Yêu cầu bật đèn sớm 10 phút, chuẩn bị bóng..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Dịch vụ đi kèm & Quyết toán thanh toán -->
+                <div class="col-lg-5">
+                    <!-- Dịch vụ đi kèm -->
+                    <div class="admin-card mb-4">
+                        <h5 class="fw-bold mb-3 text-navy" style="color: #002B5B;">
+                            <i class="bi bi-cup-straw text-success me-2"></i>3. Dịch Vụ Đi Kèm (Tùy chọn)
+                        </h5>
+
+                        <div class="d-flex flex-column gap-2" style="max-height: 250px; overflow-y: auto;">
+                            @foreach (var d in Model.DichVus)
+                            {
+                                <div class="p-2 rounded-3 border d-flex align-items-center justify-content-between bg-light">
+                                    <div>
+                                        <div class="fw-semibold small text-dark">@d.TenDichVu</div>
+                                        <span class="text-muted" style="font-size: 0.75rem;">@d.DonGia.ToString("N0") đ / @d.DonViTinh</span>
+                                    </div>
+                                    <div style="width: 90px;">
+                                        <input type="number" min="0" max="50" name="soLuongDichVu[@d.DichVuId]" value="0"
+                                               class="form-control form-control-sm text-center fw-bold" />
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Thanh toán tại quầy -->
+                    <div class="admin-card" style="background-color: #F8FAFC; border: 1.5px solid #E2E8F0;">
+                        <h5 class="fw-bold mb-3 text-navy" style="color: #002B5B;">
+                            <i class="bi bi-wallet2 text-warning me-2"></i>4. Thanh Toán Tại Quầy
+                        </h5>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Hình Thức Thu Tiền</label>
+                            <select asp-for="PhuongThucThanhToan" class="form-select rounded-3">
+                                <option value="Tiền mặt">Tiền mặt tại quầy</option>
+                                <option value="Chuyển khoản VietQR">Chuyển khoản VietQR tại quầy</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Số Tiền Thực Thu Tại Quầy (VNĐ)</label>
+                            <input asp-for="SoTienThanhToan" type="number" step="10000" min="0" class="form-control rounded-3 fw-bold text-success"
+                                   placeholder="0 nếu chưa thu tiền" value="100000" />
+                            <div class="form-text small">Nhập số tiền khách đặt cọc trước hoặc trả toàn bộ.</div>
+                        </div>
+
+                        <div class="alert alert-info rounded-3 small mb-3">
+                            <i class="bi bi-info-circle-fill me-1"></i>
+                            Đơn đặt tại quầy sẽ được tự động gắn trạng thái <strong>"Đã xác nhận"</strong> ngay khi tạo.
+                        </div>
+
+                        <button type="submit" class="btn btn-warning fw-bold text-dark rounded-pill w-100 py-2 shadow-sm">
+                            <i class="bi bi-check-circle-fill me-1"></i> Xác Nhận Tạo Đơn Đặt Sân
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleCustomerType() {
+            const isExisting = document.getElementById('typeExisting').checked;
+            const block = document.getElementById('existingCustomerBlock');
+            block.style.display = isExisting ? 'block' : 'none';
+        }
+
+        function fillCustomerInfo(select) {
+            const opt = select.options[select.selectedIndex];
+            if (opt && opt.value) {
+                document.getElementById('inputTenKhach').value = opt.getAttribute('data-name') || '';
+                document.getElementById('inputSoDienThoai').value = opt.getAttribute('data-phone') || '';
+                document.getElementById('inputEmail').value = opt.getAttribute('data-email') || '';
+            }
+        }
+    </script>
+}
+

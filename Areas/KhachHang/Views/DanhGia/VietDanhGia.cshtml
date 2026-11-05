@@ -1,0 +1,200 @@
+@model QLSanBong.Areas.KhachHang.Models.CreateReviewViewModel
+@{
+    ViewData["Title"] = "Đánh Giá & Nhận Xét Sân Bóng - UTC STADIUM";
+}
+
+<div class="container-fluid px-3 px-lg-5 py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <!-- Breadcrumb điều hướng -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="text-decoration-none text-muted">Lịch đặt của tôi</a></li>
+                    <li class="breadcrumb-item active fw-semibold" aria-current="page" style="color: #002B5B;">Viết đánh giá</li>
+                </ol>
+            </nav>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                <!-- Header Card -->
+                <div class="p-4 text-white" style="background-color: #002B5B;">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold">
+                                <i class="bi bi-patch-check-fill me-1"></i>VERIFIED BOOKING
+                            </span>
+                            <span class="small text-white-50">Đơn đặt #@Model.DatSanId</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold">
+                            <i class="bi bi-check-circle-fill me-1"></i>Trận đấu hoàn thành
+                        </span>
+                    </div>
+
+                    <h3 class="fw-bold mt-3 mb-1 text-white">Đánh Giá &amp; Nhận Xét Sân Bóng</h3>
+                    <p class="text-white-50 small mb-0">Cảm nhận thực tế của bạn giúp Ban Quản Lý nâng cao chất lượng dịch vụ và hỗ trợ các bạn sinh viên khác chọn sân phù hợp.</p>
+                </div>
+
+                <!-- Thẻ thông tin tóm tắt trận đấu đã hoàn thành -->
+                <div class="p-4" style="background-color: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+                    <div class="d-flex gap-3 align-items-center">
+                        <img src="@Model.AnhSan" alt="@Model.TenSan"
+                             class="rounded-3 object-fit-cover shadow-sm"
+                             style="width: 80px; height: 80px; min-width: 80px;"
+                             onerror="this.onerror=null;this.src='/uploads/sanbong/san-5-so-1.jpg';" />
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="fw-bold mb-0" style="color: #002B5B;">@Model.TenSan</h5>
+                                <span class="badge bg-secondary rounded-pill small">@Model.LoaiSan</span>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-calendar-event me-1 text-warning"></i>Ngày thi đấu: <strong>@Model.NgayDa.ToString("dd/MM/yyyy")</strong>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-clock me-1 text-warning"></i>Khung giờ: <strong>@Model.KhungGioDisplay</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form gửi đánh giá -->
+                <div class="p-4 p-md-5">
+                    <form asp-area="KhachHang" asp-controller="DanhGia" asp-action="VietDanhGia" method="post" id="reviewForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="DatSanId" />
+                        <input type="hidden" asp-for="SanBongId" />
+                        <input type="hidden" asp-for="SoSao" id="selectedStarInput" value="@Model.SoSao" />
+
+                        <!-- Chọn số sao Rating -->
+                        <div class="text-center mb-4 pb-3 border-bottom">
+                            <label class="form-label fw-bold text-dark mb-2" style="font-size: 1.05rem;">
+                                Bạn đánh giá trải nghiệm trận đấu như thế nào? <span class="text-danger">*</span>
+                            </label>
+
+                            <!-- Widget Sao Tương Tác -->
+                            <div class="d-flex justify-content-center gap-2 my-2" id="starContainer">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <button type="button" class="btn btn-link p-1 text-decoration-none star-btn" data-value="@i" aria-label="@i sao">
+                                        <i class="bi bi-star-fill fs-1 text-warning star-icon" data-value="@i"></i>
+                                    </button>
+                                }
+                            </div>
+                            <div id="starDescription" class="fw-bold fs-6 mt-1 text-warning-emphasis">
+                                Tuyệt vời - Mặt cỏ êm và dàn đèn sáng rõ
+                            </div>
+                            <span asp-validation-for="SoSao" class="text-danger small d-block mt-1"></span>
+                        </div>
+
+                        <!-- Nhập bình luận nhận xét chi tiết -->
+                        <div class="mb-4">
+                            <label asp-for="BinhLuan" class="form-label fw-bold" style="color: #002B5B;">
+                                <i class="bi bi-chat-left-text me-1 text-warning"></i> Nhận xét chi tiết về sân bóng <span class="text-danger">*</span>
+                            </label>
+                            <textarea asp-for="BinhLuan" rows="5" class="form-control rounded-4 p-3 shadow-none"
+                                      placeholder="Chia sẻ về chất lượng cỏ, hệ thống đèn ban đêm, bóng và phụ kiện thi đấu, thái độ phục vụ của nhân viên trực sân..."
+                                      style="border: 2px solid #E2E8F0; resize: vertical;"
+                                      id="reviewCommentText"></textarea>
+                            <div class="d-flex justify-content-between align-items-center mt-2 small">
+                                <span asp-validation-for="BinhLuan" class="text-danger"></span>
+                                <span class="text-muted ms-auto" id="charCount">0/1000 ký tự (tối thiểu 10)</span>
+                            </div>
+                        </div>
+
+                        <!-- Ghi chú về quy tắc Verified Review -->
+                        <div class="alert alert-light border rounded-3 p-3 mb-4 d-flex align-items-center gap-2 small text-muted">
+                            <i class="bi bi-shield-check text-success fs-4"></i>
+                            <div>
+                                Đánh giá của bạn sẽ được hiển thị công khai với nhãn <strong>Verified Booking (Người chơi đã trải nghiệm thực tế)</strong> trên trang chi tiết sân. Mỗi đơn đặt sân chỉ được đánh giá 1 lần duy nhất.
+                            </div>
+                        </div>
+
+                        <!-- Các nút điều hướng -->
+                        <div class="d-flex justify-content-between align-items-center gap-3">
+                            <a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="btn btn-light rounded-pill px-4 text-muted fw-semibold">
+                                <i class="bi bi-arrow-left me-1"></i> Quay lại lịch sử
+                            </a>
+                            <button type="submit" class="btn btn-warning fw-bold text-dark rounded-pill px-5 py-2 shadow-sm" id="submitReviewBtn">
+                                <i class="bi bi-send-fill me-1"></i> Gửi Đánh Giá Ngay
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const starBtns = document.querySelectorAll('.star-btn');
+            const starIcons = document.querySelectorAll('.star-icon');
+            const selectedStarInput = document.getElementById('selectedStarInput');
+            const starDescription = document.getElementById('starDescription');
+            const commentText = document.getElementById('reviewCommentText');
+            const charCount = document.getElementById('charCount');
+
+            const descriptions = {
+                1: 'Kém - Cần cải tạo mặt sân hoặc đèn chiếu sáng',
+                2: 'Tạm được - Cần cải thiện một số điểm',
+                3: 'Bình thường - Đạt yêu cầu thi đấu cơ bản',
+                4: 'Rất tốt - Mặt cỏ đẹp, đèn sáng, nhân viên nhiệt tình',
+                5: 'Tuyệt vời - Sân rất chuẩn, trải nghiệm thi đấu xuất sắc'
+            };
+
+            function updateStars(rating) {
+                starIcons.forEach(icon => {
+                    const val = parseInt(icon.getAttribute('data-value'), 10);
+                    if (val <= rating) {
+                        icon.classList.remove('bi-star', 'text-muted');
+                        icon.classList.add('bi-star-fill', 'text-warning');
+                    } else {
+                        icon.classList.remove('bi-star-fill', 'text-warning');
+                        icon.classList.add('bi-star', 'text-muted');
+                    }
+                });
+                starDescription.textContent = descriptions[rating] || '';
+            }
+
+            // Khởi tạo số sao ban đầu
+            let currentRating = parseInt(selectedStarInput.value, 10) || 5;
+            updateStars(currentRating);
+
+            // Sự kiện hover và click vào sao
+            starBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', function () {
+                    const val = parseInt(this.getAttribute('data-value'), 10);
+                    updateStars(val);
+                });
+
+                btn.addEventListener('mouseleave', function () {
+                    updateStars(currentRating);
+                });
+
+                btn.addEventListener('click', function () {
+                    currentRating = parseInt(this.getAttribute('data-value'), 10);
+                    selectedStarInput.value = currentRating;
+                    updateStars(currentRating);
+                });
+            });
+
+            // Đếm ký tự nhận xét
+            function updateCharCount() {
+                const len = commentText.value.length;
+                charCount.textContent = `${len}/1000 ký tự (tối thiểu 10)`;
+                if (len < 10) {
+                    charCount.classList.add('text-danger');
+                    charCount.classList.remove('text-muted');
+                } else {
+                    charCount.classList.remove('text-danger');
+                    charCount.classList.add('text-muted');
+                }
+            }
+
+            commentText.addEventListener('input', updateCharCount);
+            updateCharCount();
+        });
+    </script>
+}
+

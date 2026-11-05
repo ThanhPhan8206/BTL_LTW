@@ -1,0 +1,303 @@
+@model QLSanBong.Models.ViewModels.KhachHangAdminViewModel
+@{
+    ViewData["Title"] = "Quản lý Khách hàng - UTC STADIUM";
+}
+
+<!-- Page Header Banner -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-navy text-white fw-bold rounded-pill px-3 py-1" style="background-color: #002B5B;">
+                <i class="bi bi-people-fill me-1 text-warning"></i> MODULE 7
+            </span>
+            <span class="text-muted small">Cổng sinh viên &amp; khách hàng</span>
+        </div>
+        <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Quản Lý Danh Sách Khách Hàng</h2>
+        <p class="text-muted small mb-0">Theo dõi hồ sơ, lịch sử thi đấu và phân quyền trạng thái hoạt động tài khoản.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-white text-dark border shadow-sm px-3 py-2 rounded-4">
+            <i class="bi bi-person-check-fill text-success me-1"></i>
+            Tổng: <strong>@Model.TotalItems</strong> khách
+        </span>
+    </div>
+</div>
+
+<!-- Status Summary Counters -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-4">
+        <a asp-area="Admin" asp-controller="KhachHang" asp-action="Index"
+           class="admin-card text-decoration-none d-flex align-items-center justify-content-between p-3 @(string.IsNullOrEmpty(Model.TrangThai) || Model.TrangThai == "all" ? "border-primary" : "")">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase">Tất cả khách hàng</span>
+                <h4 class="fw-bold mb-0 text-dark">@Model.TotalItems</h4>
+            </div>
+            <div class="rounded-circle p-3" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B;">
+                <i class="bi bi-people fs-4"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-4">
+        <a asp-area="Admin" asp-controller="KhachHang" asp-action="Index" asp-route-trangThai="Hoạt động"
+           class="admin-card text-decoration-none d-flex align-items-center justify-content-between p-3 @(Model.TrangThai == "Hoạt động" ? "border-success" : "")">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase">Đang hoạt động</span>
+                <h4 class="fw-bold mb-0 text-success">@Model.TotalActiveCount</h4>
+            </div>
+            <div class="rounded-circle p-3" style="background-color: rgba(16, 185, 129, 0.12); color: #047857;">
+                <i class="bi bi-check-circle-fill fs-4"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-4">
+        <a asp-area="Admin" asp-controller="KhachHang" asp-action="Index" asp-route-trangThai="Bị khóa"
+           class="admin-card text-decoration-none d-flex align-items-center justify-content-between p-3 @(Model.TrangThai == "Bị khóa" ? "border-danger" : "")">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase">Tài khoản bị khóa</span>
+                <h4 class="fw-bold mb-0 text-danger">@Model.TotalLockedCount</h4>
+            </div>
+            <div class="rounded-circle p-3" style="background-color: rgba(239, 68, 68, 0.12); color: #B91C1C;">
+                <i class="bi bi-lock-fill fs-4"></i>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Toolbar Bộ Lọc & Tìm Kiếm -->
+<div class="admin-filter-bar mb-4">
+    <form asp-area="Admin" asp-controller="KhachHang" asp-action="Index" method="get" class="row g-2 align-items-center">
+        <!-- Input Search -->
+        <div class="col-lg-5 col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" name="search" value="@Model.Search" class="form-control bg-light border-start-0"
+                       placeholder="Tìm theo họ tên, email hoặc SĐT..." />
+            </div>
+        </div>
+
+        <!-- Filter Trạng thái -->
+        <div class="col-lg-3 col-md-4">
+            <select name="trangThai" class="form-select bg-light">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Hoạt động" selected="@(Model.TrangThai == "Hoạt động")">Hoạt động</option>
+                <option value="Bị khóa" selected="@(Model.TrangThai == "Bị khóa")">Bị khóa</option>
+            </select>
+        </div>
+
+        <!-- Nút Tìm kiếm & Reset -->
+        <div class="col-lg-4 col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold" style="background-color: #002B5B; border-color: #002B5B;">
+                <i class="bi bi-funnel me-1"></i> Lọc
+            </button>
+            <a asp-area="Admin" asp-controller="KhachHang" asp-action="Index" class="btn btn-light rounded-pill px-3 border" title="Xóa bộ lọc">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Bảng Danh Sách Khách Hàng -->
+<div class="admin-card">
+    @if (!Model.Items.Any())
+    {
+        <div class="text-center py-5">
+            <div class="rounded-circle d-inline-flex p-3 mb-2" style="background-color: #F1F5F9; color: #64748B;">
+                <i class="bi bi-person-x fs-2"></i>
+            </div>
+            <h6 class="fw-bold text-dark">Không tìm thấy khách hàng phù hợp</h6>
+            <p class="text-muted small mb-0">Vui lòng thay đổi từ khóa tìm kiếm hoặc bỏ chọn các điều kiện lọc.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th>HỌ VÀ TÊN</th>
+                        <th>LIÊN HỆ</th>
+                        <th>NGÀY THAM GIA</th>
+                        <th class="text-center">ĐƠN ĐÃ ĐẶT</th>
+                        <th>TỔNG CHI TIÊU</th>
+                        <th class="text-center">TRẠNG THÁI</th>
+                        <th class="text-end" style="width: 160px;">THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var customer in Model.Items)
+                    {
+                        var isLocked = customer.TrangThai.Equals("Bị khóa", StringComparison.OrdinalIgnoreCase) ||
+                                      customer.TrangThai.Equals("Bi khoa", StringComparison.OrdinalIgnoreCase) ||
+                                      customer.TrangThai.Equals("Locked", StringComparison.OrdinalIgnoreCase);
+
+                        <tr>
+                            <td>
+                                <span class="fw-bold text-muted">#@customer.Id</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold text-navy border"
+                                         style="width: 36px; height: 36px; font-size: 0.85rem; color: #002B5B; flex-shrink: 0;">
+                                        @(string.IsNullOrEmpty(customer.HoTen) ? "KH" : customer.HoTen.Substring(0, 1).ToUpper())
+                                    </div>
+                                    <div>
+                                        <a asp-area="Admin" asp-controller="KhachHang" asp-action="Details" asp-route-id="@customer.Id"
+                                           class="fw-bold text-dark text-decoration-none hover-primary">
+                                            @customer.HoTen
+                                        </a>
+                                        <div class="small text-muted text-truncate" style="max-width: 200px;">
+                                            @customer.Email
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">
+                                    <i class="bi bi-telephone text-primary me-1"></i>@customer.SoDienThoai
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-muted small">
+                                    @(customer.NgayTao.HasValue ? customer.NgayTao.Value.ToString("dd/MM/yyyy") : "---")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border fw-bold px-3 py-1">
+                                    @customer.TongDonDat đơn
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold" style="color: #002B5B;">
+                                    @customer.TongChiTieu.ToString("N0") đ
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                @if (isLocked)
+                                {
+                                    <span class="admin-badge admin-badge-locked">
+                                        <i class="bi bi-lock-fill"></i> Bị khóa
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="admin-badge admin-badge-active">
+                                        <i class="bi bi-check-circle-fill"></i> Hoạt động
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <!-- Xem chi tiết -->
+                                    <a asp-area="Admin" asp-controller="KhachHang" asp-action="Details" asp-route-id="@customer.Id"
+                                       class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1" title="Xem hồ sơ &amp; lịch sử">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    <!-- Nút Khóa / Mở khóa kích hoạt Modal -->
+                                    <button type="button" class="btn btn-sm @(isLocked ? "btn-outline-success" : "btn-outline-danger") rounded-pill px-2 py-1"
+                                            data-bs-toggle="modal" data-bs-target="#modalLock_@customer.Id"
+                                            title="@(isLocked ? "Mở khóa tài khoản" : "Khóa tài khoản")">
+                                        <i class="bi @(isLocked ? "bi-unlock" : "bi-lock")"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Modal xác nhận Khóa / Mở Khóa -->
+                                <div class="modal fade" id="modalLock_@customer.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered text-start">
+                                        <div class="modal-content rounded-4 border-0 shadow">
+                                            <form asp-area="Admin" asp-controller="KhachHang" asp-action="ToggleLock" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@customer.Id" />
+                                                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+                                                <div class="modal-header border-bottom-0 pb-0">
+                                                    <h5 class="modal-title fw-bold @(isLocked ? "text-success" : "text-danger")">
+                                                        <i class="bi @(isLocked ? "bi-unlock-fill" : "bi-lock-fill") me-2"></i>
+                                                        @(isLocked ? "Xác nhận Mở Khóa Tài Khoản" : "Xác nhận Khóa Tài Khoản")
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                                </div>
+
+                                                <div class="modal-body py-3">
+                                                    @if (isLocked)
+                                                    {
+                                                        <p class="mb-0">
+                                                            Bạn có chắc chắn muốn <strong>MỞ KHÓA</strong> cho khách hàng <strong>@customer.HoTen</strong> (SĐT: @customer.SoDienThoai)?
+                                                            Khách hàng sẽ có thể đăng nhập và đặt sân lại bình thường.
+                                                        </p>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="alert alert-danger small rounded-3 mb-2">
+                                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                                            Khách hàng bị khóa sẽ bị chặn đăng nhập và nhận thông báo liên hệ Hotline.
+                                                        </div>
+                                                        <p class="mb-0">
+                                                            Bạn có chắc chắn muốn <strong>KHÓA</strong> tài khoản của khách hàng <strong>@customer.HoTen</strong>?
+                                                        </p>
+                                                    }
+                                                </div>
+
+                                                <div class="modal-footer border-top-0 pt-0">
+                                                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Hủy bỏ</button>
+                                                    <button type="submit" class="btn btn-sm @(isLocked ? "btn-success" : "btn-danger") rounded-pill px-4 fw-semibold">
+                                                        <i class="bi @(isLocked ? "bi-check-lg" : "bi-lock") me-1"></i>
+                                                        @(isLocked ? "Mở Khóa Ngay" : "Khóa Tài Khoản")
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phân trang 10 dòng/trang -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 mt-4 pt-3 border-top">
+                <span class="text-muted small">
+                    Hiển thị trang <strong>@Model.CurrentPage</strong> / <strong>@Model.TotalPages</strong> (Tổng @Model.TotalItems khách)
+                </span>
+
+                <nav aria-label="Khách hàng pagination">
+                    <ul class="pagination admin-pagination mb-0">
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a class="page-link" asp-area="Admin" asp-controller="KhachHang" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-area="Admin" asp-controller="KhachHang" asp-action="Index"
+                                   asp-route-page="@i" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a class="page-link" asp-area="Admin" asp-controller="KhachHang" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    }
+</div>
+

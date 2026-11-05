@@ -1,0 +1,1420 @@
+/* ===================================================================
+   TRANG CHỦ - UTC STADIUM (PHONG CÁCH MẢNG MÀU BO GÓC LỚN DOLEARN)
+   Bảng màu chủ đạo:
+   - Primary (Xanh dương đậm): #002B5B
+   - Accent (Vàng ấm): #FFC107
+   - Background: Trắng sạch (#FFFFFF) & Xám xanh nhạt (#F3F6FA)
+=================================================================== */
+
+:root {
+    --primary-navy: #002B5B;
+    --primary-navy-dark: #001d3d;
+    --primary-navy-light: #0A3D78;
+    --accent-amber: #FFC107;
+    --accent-amber-hover: #e5ac00;
+    --bg-clean-white: #FFFFFF;
+    --bg-soft-gray: #F3F6FA;
+    --bg-soft-warm: #FFFBEB;
+    --img-placeholder-bg: #e2e8f0;
+    --text-heading: #002B5B;
+    --text-body: #334155;
+    --text-muted-custom: #64748b;
+    --border-subtle: #e2e8f0;
+    --block-radius-lg: 64px;
+    --shadow-sm-block: 0 8px 22px rgba(0, 43, 91, 0.06);
+    --shadow-md-block: 0 16px 36px rgba(0, 43, 91, 0.12);
+    --shadow-lg-block: 0 24px 48px rgba(0, 43, 91, 0.16);
+}
+
+body {
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text-body);
+    background-color: var(--bg-clean-white);
+    margin-bottom: 0 !important;
+    overflow-x: hidden;
+}
+
+/* ===================================================================
+   KEYFRAMES ANIMATIONS & MICRO-INTERACTIONS
+=================================================================== */
+
+/* 1. Hiệu ứng trượt nhẹ từ dưới lên kèm rõ dần khi tải trang */
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    opacity: 0;
+    animation: fadeInUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.fade-delay-1 { animation-delay: 0.1s; }
+.fade-delay-2 { animation-delay: 0.22s; }
+.fade-delay-3 { animation-delay: 0.34s; }
+.fade-delay-4 { animation-delay: 0.46s; }
+.fade-delay-5 { animation-delay: 0.6s; }
+
+/* 2. Hiệu ứng ánh sáng lướt qua (Shimmer) & đổ bóng nhẹ cho khối chữ "GIẢI ĐẤU SINH VIÊN" */
+@keyframes shimmerSweep {
+    0% {
+        left: -120%;
+    }
+    45%, 100% {
+        left: 140%;
+    }
+}
+
+@keyframes subtleGlowPulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.35);
+    }
+    50% {
+        box-shadow: 0 6px 24px rgba(255, 193, 7, 0.65);
+    }
+}
+
+/* 3. Hiệu ứng rung nhẹ icon trong nút bấm khi hover */
+@keyframes iconWiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-12deg) scale(1.12); }
+    50% { transform: rotate(10deg) scale(1.12); }
+    75% { transform: rotate(-6deg) scale(1.06); }
+}
+
+/* 4. Hiệu ứng tỏa sóng nhấp nháy (Live Pulse) cho trạng thái ca trống */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.85);
+    }
+    70% {
+        box-shadow: 0 0 0 7px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.live-pulse-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    margin-right: 6px;
+    vertical-align: middle;
+    animation: pulse 1.6s infinite;
+}
+
+.live-pulse-dot.pulse-gold {
+    background-color: var(--accent-amber);
+}
+
+/* 5. Hiệu ứng Scroll Reveal khi cuộn trang */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Quy tắc chung chống vỡ khung & nền xám nhạt cho mọi ảnh trong card */
+.tournament-photo-img,
+.pitch-img,
+.news-img,
+.youth-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    background-color: var(--img-placeholder-bg);
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ===================================================================
+   1. NAVBAR / HEADER TỐI GIẢN (#002B5B) - THƯƠNG HIỆU UTC STADIUM
+=================================================================== */
+.app-navbar {
+    background-color: var(--primary-navy) !important;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 43, 91, 0.2);
+}
+
+/* Ảnh Logo ~/uploads/sanbong/logo.png cao 40px, giữ tỉ lệ chuẩn */
+.brand-logo-img {
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+    border-radius: 10px;
+    background-color: var(--accent-amber);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover .brand-logo-img {
+    transform: scale(1.06) rotate(-3deg);
+}
+
+.brand-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.brand-subtext {
+    font-size: 0.7rem;
+    color: var(--accent-amber);
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    font-weight: 700;
+}
+
+/* Nút Đăng nhập */
+.btn-nav-login {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    padding: 0.48rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-nav-login:hover {
+    background-color: #ffffff;
+    color: var(--primary-navy);
+    border-color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+/* Nút Đăng ký (Màu vàng #FFC107) */
+.btn-nav-register {
+    color: var(--primary-navy);
+    background-color: var(--accent-amber);
+    border: 1.5px solid var(--accent-amber);
+    padding: 0.48rem 1.25rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.35);
+    transition: all 0.3s ease;
+}
+
+.btn-nav-register:hover {
+    background-color: var(--accent-amber-hover);
+    border-color: var(--accent-amber-hover);
+    color: var(--primary-navy);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 193, 7, 0.5);
+}
+
+.btn-nav-register:hover i {
+    animation: iconWiggle 0.55s ease;
+}
+
+/* Huy hiệu tên người dùng trên Navbar sau khi đăng nhập */
+.nav-user-pill {
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 193, 7, 0.45);
+    padding: 0.44rem 1rem;
+    border-radius: 50px;
+}
+
+/* ===================================================================
+   NÚT KÊU GỌI HÀNH ĐỘNG CHUNG (CTA BUTTONS)
+=================================================================== */
+.btn-cta-accent {
+    background-color: var(--accent-amber);
+    color: var(--primary-navy);
+    border: 2px solid var(--accent-amber);
+    padding: 0.8rem 1.75rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.98rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-cta-accent:hover {
+    background-color: var(--accent-amber-hover);
+    border-color: var(--accent-amber-hover);
+    color: var(--primary-navy);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 193, 7, 0.5);
+}
+
+.btn-cta-accent:hover i,
+.btn-cta-accent:hover .cta-icon {
+    animation: iconWiggle 0.55s ease;
+}
+
+.btn-cta-outline-navy {
+    background-color: #ffffff;
+    color: var(--primary-navy);
+    border: 2px solid rgba(0, 43, 91, 0.22);
+    padding: 0.8rem 1.65rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.98rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-cta-outline-navy:hover {
+    background-color: var(--primary-navy);
+    color: #ffffff;
+    border-color: var(--primary-navy);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(0, 43, 91, 0.2);
+}
+
+.btn-cta-outline-light {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    padding: 0.8rem 1.65rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.98rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-cta-outline-light:hover {
+    background-color: #ffffff;
+    color: var(--primary-navy);
+    border-color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+}
+
+/* ===================================================================
+   2. PHẦN MỞ ĐẦU TRANG CHỦ (KHÔNG DÙNG ẢNH BANNER - NỀN TRẮNG DOLEARN)
+=================================================================== */
+.hero-clean-section {
+    background-color: var(--bg-clean-white);
+    background-image:
+        linear-gradient(to right, rgba(0, 43, 91, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 43, 91, 0.035) 1px, transparent 1px);
+    background-size: 48px 48px;
+    padding: 65px 0 35px 0;
+}
+
+.hero-clean-center {
+    max-width: 860px;
+}
+
+.hero-clean-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(0, 43, 91, 0.07);
+    border: 1px solid rgba(0, 43, 91, 0.15);
+    color: var(--primary-navy);
+    padding: 0.42rem 1.15rem;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.hero-clean-title {
+    font-size: 2.85rem;
+    font-weight: 800;
+    line-height: 1.22;
+    color: var(--primary-navy);
+    margin-bottom: 1.15rem;
+    letter-spacing: -0.6px;
+}
+
+/* Khối chữ "GIẢI ĐẤU SINH VIÊN" nền vàng kèm hiệu ứng ánh sáng lướt (Shimmer) */
+.text-highlight-navy {
+    position: relative;
+    display: inline-block;
+    background-color: var(--accent-amber);
+    color: var(--primary-navy);
+    padding: 0.06rem 0.8rem;
+    border-radius: 14px;
+    overflow: hidden;
+    vertical-align: bottom;
+    animation: subtleGlowPulse 3s ease-in-out infinite;
+}
+
+.shimmer-highlight::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 65%;
+    height: 100%;
+    background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.65) 50%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    animation: shimmerSweep 3.8s infinite;
+    pointer-events: none;
+}
+
+.hero-clean-subtitle {
+    font-size: 1.08rem;
+    color: var(--text-muted-custom);
+    line-height: 1.75;
+    margin-bottom: 2rem;
+    max-width: 740px;
+}
+
+/* Hiệu ứng 1A: blurFadeInUp cho đoạn mô tả dưới tiêu đề chính */
+@keyframes blurFadeInUp {
+    0% {
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateY(22px);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+}
+
+.blur-fade-in-up {
+    opacity: 0;
+    animation: blurFadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Hiệu ứng 1B: Cụm "theo thời gian thực" kèm chấm tròn nhấp nháy & gạch chân nét đứt màu vàng */
+@keyframes blinkPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.75);
+    }
+    50% {
+        opacity: 0.45;
+        transform: scale(1.22);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+}
+
+.realtime-keyword {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: var(--primary-navy);
+    border-bottom: 2px dashed var(--accent-amber);
+    padding-bottom: 1px;
+}
+
+.realtime-blink-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10b981;
+    animation: blinkPulse 1.4s ease-in-out infinite;
+}
+
+/* Hiệu ứng 1C: Chữ "UTC STADIUM" Gradient chạy sáng liên tục + nhấp nháy glow + dấu nháy | */
+@keyframes textShimmer {
+    0% {
+        background-position: 0% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+@keyframes brandGlowBlink {
+    0%, 100% {
+        filter: drop-shadow(0 0 2px rgba(255, 193, 7, 0.25));
+    }
+    50% {
+        filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.75));
+    }
+}
+
+@keyframes cursorBlink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+
+.brand-shimmer-text {
+    display: inline-block;
+    font-weight: 800;
+    background: linear-gradient(90deg, #002B5B 0%, #d97706 30%, #FFC107 50%, #d97706 70%, #002B5B 100%);
+    background-size: 200% auto;
+    color: var(--primary-navy);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShimmer 3s linear infinite, brandGlowBlink 2.2s ease-in-out infinite;
+}
+
+.typing-cursor {
+    display: inline-block;
+    font-weight: 800;
+    color: var(--accent-amber);
+    margin-left: 2px;
+    animation: cursorBlink 0.9s step-end infinite;
+}
+
+/* Thanh thống kê nhanh ngang màn hình */
+.stats-bar-wrapper {
+    background: var(--bg-clean-white);
+    border-radius: 32px;
+    padding: 0.65rem;
+    box-shadow: var(--shadow-md-block);
+    border: 1px solid var(--border-subtle);
+    border-bottom: 4px solid var(--accent-amber);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.15rem 1.35rem;
+    border-right: 1px solid var(--border-subtle);
+    border-radius: 22px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    cursor: default;
+}
+
+.stat-item:last-child {
+    border-right: none;
+}
+
+.stat-item:hover {
+    background-color: rgba(0, 43, 91, 0.03);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background-color: rgba(0, 43, 91, 0.08);
+    color: var(--primary-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Khi hover vào từng ô thống kê: icon phóng to nhẹ scale(1.12), nền đổi xanh #002B5B, icon chuyển vàng #FFC107 */
+.stat-item:hover .stat-icon {
+    transform: scale(1.12);
+    background-color: var(--primary-navy);
+    color: var(--accent-amber);
+    box-shadow: 0 8px 18px rgba(0, 43, 91, 0.22);
+}
+
+.stat-value {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    line-height: 1.15;
+}
+
+.stat-label {
+    font-size: 0.82rem;
+    color: var(--text-muted-custom);
+    font-weight: 500;
+}
+
+/* ===================================================================
+   TIÊU ĐỀ PHÂN MỤC DÙNG CHUNG
+=================================================================== */
+.section-label-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background-color: rgba(0, 43, 91, 0.09);
+    color: var(--primary-navy);
+    padding: 0.38rem 1rem;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.section-main-heading {
+    font-size: 2.05rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    letter-spacing: -0.4px;
+    line-height: 1.25;
+}
+
+/* ===================================================================
+   3. KHỐI 1: GIẢI BÓNG ĐÁ SINH VIÊN (KHỐI XANH #002B5B BO GÓC LỚN + 2 ẢNH)
+=================================================================== */
+.block-tournament-dolearn {
+    padding: 30px 0;
+    background-color: var(--bg-clean-white);
+}
+
+.tournament-block-container {
+    background-color: var(--primary-navy);
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(135deg, #002B5B 0%, #0A3D78 100%);
+    background-size: 48px 48px, 48px 48px, 100% 100%;
+    border-radius: var(--block-radius-lg);
+    padding: 3.75rem 3.25rem;
+    box-shadow: var(--shadow-lg-block);
+    position: relative;
+    overflow: hidden;
+}
+
+.block-tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background-color: rgba(255, 193, 7, 0.18);
+    border: 1px solid rgba(255, 193, 7, 0.45);
+    color: var(--accent-amber);
+    padding: 0.4rem 1.05rem;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+/* Hiệu ứng 2A: Badge "GIẢI ĐẤU TRUYỀN THỐNG HỌC ĐƯỜNG" phát sáng nhịp thở 2s/lần & icon lắc nhẹ */
+@keyframes badgeGlowPulse {
+    0%, 100% {
+        box-shadow: 0 0 6px rgba(255, 193, 7, 0.2);
+        border-color: rgba(255, 193, 7, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 193, 7, 0.65), inset 0 0 8px rgba(255, 193, 7, 0.25);
+        border-color: rgba(255, 193, 7, 0.95);
+    }
+}
+
+@keyframes trophyPulseWiggle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.2) rotate(-10deg);
+    }
+    50% {
+        transform: scale(1.25) rotate(10deg);
+    }
+    75% {
+        transform: scale(1.15) rotate(-5deg);
+    }
+}
+
+.badge-glow-pulse {
+    animation: badgeGlowPulse 2s ease-in-out infinite;
+}
+
+.trophy-pulse-icon {
+    display: inline-block;
+    font-size: 0.95rem;
+    animation: trophyPulseWiggle 2s ease-in-out infinite;
+}
+
+.block-title-white {
+    font-size: 2.05rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.28;
+    margin-bottom: 1rem;
+}
+
+/* Hiệu ứng 2B: Tách dòng trượt lên lần lượt (Staggered Reveal) & Luồng sáng Neon cho "& ĐẠI DIỆN CÁC LỚP" */
+.staggered-tournament-title .stagger-line {
+    display: block;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeInUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.staggered-tournament-title .stagger-line-1 {
+    animation-delay: 0.15s;
+}
+
+.staggered-tournament-title .stagger-line-2 {
+    animation-delay: 0.35s;
+    margin-top: 0.2rem;
+}
+
+@keyframes neonTextPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.35));
+        background-position: 0% center;
+    }
+    50% {
+        filter: drop-shadow(0 0 14px rgba(255, 193, 7, 0.85));
+        background-position: 200% center;
+    }
+}
+
+.neon-gold-text {
+    position: relative;
+    display: inline-block !important;
+    color: var(--accent-amber);
+    background: linear-gradient(110deg, #FFC107 0%, #FFC107 40%, #FFFFFF 50%, #FFC107 60%, #FFC107 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeInUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards, neonTextPulse 2.5s ease-in-out infinite !important;
+}
+
+.block-desc-light {
+    font-size: 0.98rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.68;
+}
+
+.t-highlight-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.95rem 1.15rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px;
+    margin-bottom: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.t-highlight-row:hover {
+    background: rgba(255, 255, 255, 0.13);
+    transform: translateX(4px);
+}
+
+.t-check-icon {
+    color: var(--accent-amber);
+    font-size: 1.35rem;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+/* 2 Thẻ ảnh minh họa giải đấu bên phải Khối 1 (giai-dau-1.jpg & giai-dau-2.jpg) */
+.tournament-photo-card {
+    background: var(--bg-clean-white);
+    border-radius: 26px;
+    overflow: hidden;
+    height: 100%;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.tournament-photo-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 22px 42px rgba(0, 0, 0, 0.32);
+}
+
+.tournament-photo-wrap {
+    position: relative;
+    height: 235px;
+    overflow: hidden;
+    background-color: var(--img-placeholder-bg);
+}
+
+.tournament-photo-card:hover .tournament-photo-img {
+    transform: scale(1.05);
+}
+
+.tournament-photo-body {
+    padding: 1.25rem 1.35rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.class-rep-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.class-rep-faculty {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted-custom);
+    letter-spacing: 0.4px;
+    margin-bottom: 0.25rem;
+}
+
+.class-rep-name {
+    font-size: 1.08rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    margin-bottom: 0.4rem;
+    line-height: 1.35;
+}
+
+.class-rep-captain {
+    font-size: 0.85rem;
+    color: var(--text-muted-custom);
+    line-height: 1.5;
+}
+
+.class-rep-stats {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--border-subtle);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary-navy);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+/* ===================================================================
+   4. KHỐI 2: DANH MỤC SÂN BÓNG & CA TRỐNG (LƯỚI 3 CỘT THẺ CARD)
+=================================================================== */
+.block-pitches-section {
+    padding: 25px 0;
+    background-color: var(--bg-clean-white);
+}
+
+.pitches-rounded-block {
+    background-color: var(--bg-soft-gray);
+    background-image:
+        linear-gradient(to right, rgba(0, 43, 91, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 43, 91, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    border-radius: var(--block-radius-lg);
+    padding: 4rem 3rem;
+    border: 1px solid rgba(0, 43, 91, 0.06);
+}
+
+/* Hiệu ứng 3: Thanh thông báo nhanh dưới tiêu đề Danh mục sân */
+.smart-tip-banner {
+    background: linear-gradient(90deg, rgba(0, 43, 91, 0.96) 0%, rgba(10, 61, 120, 0.96) 100%);
+    color: #ffffff;
+    border-radius: 50px;
+    padding: 0.75rem 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 8px 20px rgba(0, 43, 91, 0.12);
+    border: 1px solid rgba(255, 193, 7, 0.35);
+}
+
+.tip-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 193, 7, 0.22);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.tip-text {
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.tip-text strong {
+    color: var(--accent-amber);
+}
+
+.pitch-card {
+    background: var(--bg-clean-white);
+    border: 1px solid var(--border-subtle);
+    border-radius: 26px;
+    overflow: hidden;
+    height: 100%;
+    box-shadow: var(--shadow-sm-block);
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.pitch-card:hover {
+    transform: translateY(-7px);
+    box-shadow: var(--shadow-md-block);
+    border-color: rgba(0, 43, 91, 0.25);
+}
+
+.pitch-card-featured {
+    border: 2px solid var(--accent-amber);
+}
+
+/* Chiều cao cố định 220px & overflow: hidden cho ảnh 3 sân bóng */
+.pitch-img-wrapper {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+    background-color: var(--img-placeholder-bg);
+}
+
+.pitch-card:hover .pitch-img {
+    transform: scale(1.05);
+}
+
+.pitch-type-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background-color: var(--primary-navy);
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.32rem 0.85rem;
+    border-radius: 50px;
+}
+
+.pitch-type-badge.badge-7v7 {
+    background-color: var(--accent-amber);
+    color: var(--primary-navy);
+}
+
+.pitch-status-badge {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 0.3rem 0.85rem;
+    border-radius: 50px;
+    backdrop-filter: blur(6px);
+    display: inline-flex;
+    align-items: center;
+}
+
+.status-available {
+    background-color: rgba(16, 185, 129, 0.92);
+    color: #ffffff;
+}
+
+.status-hot {
+    background-color: rgba(220, 38, 38, 0.92);
+    color: #ffffff;
+}
+
+.pitch-card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.pitch-location {
+    font-size: 0.8rem;
+    color: var(--text-muted-custom);
+    font-weight: 600;
+}
+
+.pitch-rating {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary-navy);
+    background: var(--bg-soft-gray);
+    padding: 0.18rem 0.6rem;
+    border-radius: 50px;
+}
+
+.pitch-title {
+    font-size: 1.18rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    margin: 0.35rem 0 0.5rem 0;
+}
+
+.pitch-desc {
+    font-size: 0.88rem;
+    color: var(--text-muted-custom);
+    line-height: 1.55;
+    margin-bottom: 1rem;
+}
+
+.pitch-slots-box {
+    background-color: var(--bg-soft-gray);
+    border-radius: 16px;
+    padding: 0.85rem;
+}
+
+.slots-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--primary-navy);
+    margin-bottom: 0.45rem;
+    text-transform: uppercase;
+}
+
+/* Hiệu ứng 1: Nút khung giờ có thể click chọn (.slot-pill & .slot-pill.active) */
+.slot-pill {
+    font-size: 0.76rem;
+    font-weight: 600;
+    background: #ffffff;
+    color: var(--primary-navy);
+    border: 1.5px solid rgba(0, 43, 91, 0.2);
+    padding: 0.28rem 0.75rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    user-select: none;
+}
+
+.slot-pill:hover {
+    border-color: var(--primary-navy);
+    background-color: rgba(0, 43, 91, 0.06);
+    transform: translateY(-1px);
+}
+
+.slot-pill.active {
+    background-color: var(--accent-amber) !important;
+    color: var(--primary-navy) !important;
+    border-color: var(--accent-amber) !important;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.45);
+    transform: translateY(-1px);
+}
+
+.pitch-pricing-table {
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 0;
+    margin-top: auto;
+}
+
+.price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.84rem;
+    padding: 0.25rem 0;
+    color: var(--text-body);
+}
+
+.price-tag {
+    color: var(--primary-navy);
+    font-weight: 700;
+}
+
+.price-tag.highlight {
+    color: #b45309;
+    background: rgba(255, 193, 7, 0.22);
+    padding: 0.12rem 0.55rem;
+    border-radius: 50px;
+}
+
+/* ===================================================================
+   5. KHỐI 3: GÓC ẢNH THANH XUÂN & TIN TỨC PHONG TRÀO
+=================================================================== */
+.block-youth-news-section {
+    background-color: var(--bg-clean-white);
+    padding: 25px 0 65px 0;
+}
+
+.youth-news-rounded-block {
+    background-color: var(--bg-soft-warm);
+    background-image:
+        linear-gradient(to right, rgba(255, 193, 7, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 193, 7, 0.12) 1px, transparent 1px);
+    background-size: 48px 48px;
+    border-radius: var(--block-radius-lg);
+    padding: 4rem 3rem;
+    border: 1px solid rgba(255, 193, 7, 0.28);
+}
+
+/* Card Tin tức giải đấu (2 bài viết ngang) */
+.news-featured-card {
+    background: var(--bg-clean-white);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    overflow: hidden;
+    height: 100%;
+    box-shadow: var(--shadow-sm-block);
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.news-featured-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md-block);
+    border-color: rgba(0, 43, 91, 0.2);
+}
+
+.news-img-wrap {
+    position: relative;
+    height: 230px;
+    overflow: hidden;
+    background-color: var(--img-placeholder-bg);
+}
+
+@media (min-width: 768px) {
+    .news-img-wrap {
+        height: 100%;
+        min-height: 225px;
+    }
+}
+
+.news-featured-card:hover .news-img {
+    transform: scale(1.05);
+}
+
+.news-category-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--primary-navy);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.28rem 0.75rem;
+    border-radius: 50px;
+}
+
+.news-card-body {
+    padding: 1.4rem 1.45rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.news-meta {
+    font-size: 0.78rem;
+    color: var(--text-muted-custom);
+    margin-bottom: 0.45rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.news-title {
+    font-size: 1.08rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    line-height: 1.4;
+    margin-bottom: 0.55rem;
+}
+
+.news-excerpt {
+    font-size: 0.87rem;
+    color: var(--text-muted-custom);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+}
+
+.news-readmore {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--primary-navy);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.25s ease;
+}
+
+.news-readmore:hover {
+    color: #b45309;
+    transform: translateX(4px);
+}
+
+/* Card Album khoảnh khắc các tập thể lớp (4 cột: lop-1.jpg -> lop-4.jpg) */
+.youth-moment-card {
+    background: var(--bg-clean-white);
+    border: 1px solid var(--border-subtle);
+    border-radius: 22px;
+    overflow: hidden;
+    height: 100%;
+    box-shadow: var(--shadow-sm-block);
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+}
+
+.youth-moment-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-md-block);
+    border-color: rgba(0, 43, 91, 0.22);
+}
+
+.youth-img-box {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background-color: var(--img-placeholder-bg);
+}
+
+.youth-moment-card:hover .youth-img {
+    transform: scale(1.05);
+}
+
+/* Hiệu ứng 4: Lớp phủ "Xem ảnh lớn" khi hover vào 4 thẻ ảnh lớp */
+.youth-zoom-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 43, 91, 0.52);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+}
+
+.youth-moment-card:hover .youth-zoom-overlay {
+    opacity: 1;
+}
+
+.zoom-badge {
+    background-color: var(--accent-amber);
+    color: var(--primary-navy);
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 0.45rem 1rem;
+    border-radius: 50px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transform: translateY(8px);
+    transition: transform 0.3s ease;
+}
+
+.youth-moment-card:hover .zoom-badge {
+    transform: translateY(0);
+}
+
+.youth-class-tag {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 43, 91, 0.9);
+    color: var(--accent-amber);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    z-index: 3;
+}
+
+.youth-card-content {
+    padding: 1.15rem 1.2rem;
+}
+
+.youth-card-title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    margin-bottom: 0.35rem;
+}
+
+.youth-card-text {
+    font-size: 0.84rem;
+    color: var(--text-muted-custom);
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+/* Lightbox Modal Xem ảnh phóng to */
+.lightbox-modal-content {
+    background-color: var(--primary-navy);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 26px;
+    box-shadow: 0 25px 55px rgba(0, 0, 0, 0.45);
+}
+
+.lightbox-img-wrapper {
+    border-radius: 18px;
+    overflow: hidden;
+    background-color: #00152e;
+    max-height: 68vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-full-img {
+    width: 100%;
+    max-height: 68vh;
+    object-fit: contain;
+    display: block;
+}
+
+/* ===================================================================
+   6. FOOTER (CHÂN TRANG BO GÓC TRÊN ĐỒNG BỘ MÀU #002B5B)
+=================================================================== */
+.app-footer {
+    background-color: var(--primary-navy);
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    border-radius: var(--block-radius-lg) var(--block-radius-lg) 0 0;
+    overflow: hidden;
+}
+
+.footer-top {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.5rem;
+    position: relative;
+}
+
+.footer-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 34px;
+    height: 3px;
+    background-color: var(--accent-amber);
+    border-radius: 2px;
+}
+
+.footer-desc {
+    line-height: 1.65;
+}
+
+.footer-link {
+    color: rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    transition: all 0.25s ease;
+    display: inline-block;
+}
+
+.footer-link:hover {
+    color: var(--accent-amber);
+    transform: translateX(4px);
+}
+
+.footer-social-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.footer-social-btn:hover {
+    background: var(--accent-amber);
+    color: var(--primary-navy);
+    transform: translateY(-2px);
+}
+
+.footer-help-box {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px !important;
+}
+
+.footer-bottom {
+    background-color: rgba(0, 20, 45, 0.65);
+}
+
+/* ===================================================================
+   7. RESPONSIVE (MÁY TÍNH BẢNG & ĐIỆN THOẠI)
+=================================================================== */
+@media (max-width: 991.98px) {
+    :root {
+        --block-radius-lg: 42px;
+    }
+    .hero-clean-title {
+        font-size: 2.15rem;
+    }
+    .stat-item {
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    .tournament-block-container,
+    .pitches-rounded-block,
+    .youth-news-rounded-block {
+        padding: 2.5rem 1.75rem;
+    }
+    .block-title-white,
+    .section-main-heading {
+        font-size: 1.65rem;
+    }
+    .smart-tip-banner {
+        border-radius: 20px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    :root {
+        --block-radius-lg: 32px;
+    }
+    .hero-clean-section {
+        padding: 45px 0 25px 0;
+    }
+    .hero-clean-title {
+        font-size: 1.7rem;
+    }
+    .tournament-block-container,
+    .pitches-rounded-block,
+    .youth-news-rounded-block {
+        padding: 2rem 1.25rem;
+    }
+    .stat-item {
+        border-right: none;
+        padding: 0.9rem 1rem;
+    }
+    .btn-nav-login span,
+    .btn-nav-register span {
+        font-size: 0.82rem;
+    }
+    .btn-nav-login,
+    .btn-nav-register {
+        padding: 0.4rem 0.75rem;
+    }
+}

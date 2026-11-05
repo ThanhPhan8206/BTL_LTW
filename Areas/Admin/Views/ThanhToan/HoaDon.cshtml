@@ -1,0 +1,212 @@
+@model QLSanBong.Areas.Admin.Models.AdminHoaDonDetailViewModel
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = $"Hóa đơn #{Model.MaHoaDon} - UTC STADIUM Admin";
+}
+
+<div class="container-fluid px-0">
+    <!-- Action Top Bar (Ẩn khi in) -->
+    <div class="d-flex align-items-center justify-content-between mb-4 no-print">
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại Danh sách Thanh toán
+        </a>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-controller="DatSan" asp-action="Details" asp-route-id="@Model.DatSanId" class="btn btn-outline-primary rounded-pill px-3">
+                <i class="bi bi-calendar2-check me-1"></i> Xem Chi Tiết Đơn Đặt
+            </a>
+            <button type="button" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" onclick="window.print()">
+                <i class="bi bi-printer-fill me-1"></i> In Hóa Đơn
+            </button>
+        </div>
+    </div>
+
+    <!-- Khung Hóa Đơn A4 -->
+    <div class="admin-card invoice-box bg-white p-4 p-md-5 mx-auto shadow-sm" style="max-width: 860px; border-radius: 12px; border: 1px solid #e2e8f0;">
+        <!-- Header Hóa Đơn -->
+        <div class="row align-items-center pb-4 mb-4 border-bottom">
+            <div class="col-8">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="fs-4 fw-bold text-navy" style="color: #002B5B; letter-spacing: -0.5px;">
+                        <i class="bi bi-shield-shaded text-warning me-1"></i> UTC STADIUM
+                    </span>
+                </div>
+                <div class="fw-semibold text-secondary small text-uppercase">TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI</div>
+                <div class="text-muted small mt-1">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> Số 3 Phố Cầu Giấy, P. Láng Thượng, Q. Đống Đa, TP. Hà Nội<br />
+                    <i class="bi bi-telephone-fill text-primary me-1"></i> Hotline: 0988.686.868 | Email: stadium@utc.edu.vn
+                </div>
+            </div>
+            <div class="col-4 text-end">
+                <span class="badge bg-light text-navy border px-3 py-2 fs-6 fw-bold">
+                    HÓA ĐƠN ĐIỆN TỬ
+                </span>
+                <div class="small text-muted mt-2">Mã HĐ: <strong class="text-dark font-monospace">@Model.MaHoaDon</strong></div>
+                <div class="small text-muted">Ngày xuất: @(Model.NgayXuat.HasValue ? Model.NgayXuat.Value.ToString("dd/MM/yyyy HH:mm") : DateTime.Now.ToString("dd/MM/yyyy HH:mm"))</div>
+            </div>
+        </div>
+
+        <!-- Tiêu đề chính -->
+        <div class="text-center my-3">
+            <h3 class="fw-bold text-uppercase mb-1" style="color: #002B5B; letter-spacing: 1px;">HÓA ĐƠN DỊCH VỤ SÂN BÓNG</h3>
+            <p class="text-muted small">Mã đơn đặt sân: <strong class="text-primary font-monospace">#@Model.DatSanId</strong></p>
+        </div>
+
+        <!-- Thông tin Khách hàng & Sân bóng -->
+        <div class="row g-3 py-3 mb-4 rounded-3 p-3" style="background-color: #f8fafc; border: 1px solid #eef2f6;">
+            <div class="col-md-6 border-end">
+                <div class="text-uppercase small fw-bold text-muted mb-2">Thông tin khách hàng</div>
+                <div class="fw-bold text-dark fs-6">@Model.TenKhachHang</div>
+                <div class="small text-muted mt-1"><i class="bi bi-telephone me-1"></i> SĐT: @(string.IsNullOrEmpty(Model.SoDienThoai) ? "---" : Model.SoDienThoai)</div>
+                <div class="small text-muted"><i class="bi bi-envelope me-1"></i> Email: @(string.IsNullOrEmpty(Model.Email) ? "---" : Model.Email)</div>
+            </div>
+            <div class="col-md-6 ps-md-4">
+                <div class="text-uppercase small fw-bold text-muted mb-2">Thông tin sân đấu</div>
+                <div class="fw-bold text-dark fs-6">@Model.TenSan <span class="badge bg-primary-subtle text-primary ms-1">@Model.LoaiSan</span></div>
+                <div class="small text-muted mt-1"><i class="bi bi-calendar-event me-1"></i> Ngày đá: <strong>@Model.NgayDat.ToString("dd/MM/yyyy")</strong></div>
+                <div class="small text-muted"><i class="bi bi-clock me-1"></i> Khung giờ: <strong>@Model.KhungGioDisplay</strong></div>
+                <div class="small text-muted">Trạng thái: <span class="badge bg-success-subtle text-success">@Model.TrangThaiDon</span></div>
+            </div>
+        </div>
+
+        <!-- Bảng Chi Tiết Dịch Vụ & Tiền Sân -->
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light text-center">
+                    <tr class="small text-uppercase fw-bold text-secondary">
+                        <th style="width: 50px;">STT</th>
+                        <th class="text-start">Nội Dung / Khoản Mục</th>
+                        <th style="width: 80px;">ĐVT</th>
+                        <th style="width: 70px;">SL</th>
+                        <th style="width: 140px;" class="text-end">Đơn Giá</th>
+                        <th style="width: 150px;" class="text-end">Thành Tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Tiền thuê sân -->
+                    <tr>
+                        <td class="text-center font-monospace">1</td>
+                        <td>
+                            <div class="fw-bold text-dark">Tiền thuê sân thi đấu (@Model.TenSan)</div>
+                            <small class="text-muted">Khung giờ: @Model.KhungGioDisplay ngày @Model.NgayDat.ToString("dd/MM/yyyy")</small>
+                        </td>
+                        <td class="text-center">Trận</td>
+                        <td class="text-center">1</td>
+                        <td class="text-end font-monospace">@Model.TienSan.ToString("N0") đ</td>
+                        <td class="text-end fw-bold font-monospace">@Model.TienSan.ToString("N0") đ</td>
+                    </tr>
+
+                    <!-- Các dịch vụ đi kèm -->
+                    @if (Model.DichVus != null && Model.DichVus.Any())
+                    {
+                        var stt = 2;
+                        foreach (var dv in Model.DichVus)
+                        {
+                            <tr>
+                                <td class="text-center font-monospace">@stt</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@dv.TenDichVu</div>
+                                    <small class="text-muted">Dịch vụ tiện ích tại sân</small>
+                                </td>
+                                <td class="text-center">@dv.DonViTinh</td>
+                                <td class="text-center font-monospace">@dv.SoLuong</td>
+                                <td class="text-end font-monospace">@dv.DonGia.ToString("N0") đ</td>
+                                <td class="text-end fw-bold font-monospace">@dv.ThanhTien.ToString("N0") đ</td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bảng Tổng Kết Tài Chính -->
+        <div class="row justify-content-end mb-4">
+            <div class="col-md-6">
+                <div class="p-3 rounded-3" style="background-color: #f8fafc; border: 1px solid #eef2f6;">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Tiền thuê sân:</span>
+                        <span class="font-monospace fw-semibold">@Model.TienSan.ToString("N0") đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Tổng tiền dịch vụ:</span>
+                        <span class="font-monospace fw-semibold">@Model.TongTienDichVu.ToString("N0") đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-top border-bottom fs-6 fw-bold">
+                        <span class="text-navy" style="color: #002B5B;">TỔNG TIỀN ĐƠN:</span>
+                        <span class="text-primary font-monospace fs-5">@Model.TongTien.ToString("N0") đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2 small">
+                        <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Đã thanh toán:</span>
+                        <span class="text-success font-monospace fw-bold">@Model.DaThanhToan.ToString("N0") đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1 small">
+                        <span class="text-danger fw-bold"><i class="bi bi-exclamation-circle-fill me-1"></i> Còn lại phải thu:</span>
+                        <span class="text-danger font-monospace fw-bold">@Model.ConLai.ToString("N0") đ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chữ Ký & Xác Nhận -->
+        <div class="row text-center mt-5 pt-3">
+            <div class="col-4">
+                <div class="fw-bold text-dark small text-uppercase">Khách hàng</div>
+                <div class="text-muted fst-italic small mb-5">(Ký và ghi rõ họ tên)</div>
+                <div class="fw-semibold text-secondary">@Model.TenKhachHang</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold text-dark small text-uppercase">Thu ngân / Nhân viên</div>
+                <div class="text-muted fst-italic small mb-5">(Ký và ghi rõ họ tên)</div>
+                <div class="fw-semibold text-secondary">Ban Quản Lý Sân</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold text-dark small text-uppercase">Đại diện UTC Stadium</div>
+                <div class="text-muted fst-italic small mb-5">(Ký tên và đóng dấu)</div>
+                <div class="fw-bold text-navy" style="color: #002B5B;">BAN QUẢN LÝ</div>
+            </div>
+        </div>
+
+        <!-- Chân trang hóa đơn -->
+        <div class="text-center text-muted small mt-5 pt-4 border-top">
+            <p class="mb-0">Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ tại cụm sân bóng đá <strong>UTC STADIUM</strong>!</p>
+            <p class="mb-0 text-secondary" style="font-size: 11px;">Hóa đơn điện tử khởi tạo từ hệ thống Quản lý sân bóng UTC STADIUM - Đại học Giao Thông Vận Tải</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        /* Ẩn các thành phần admin khi in */
+        .no-print,
+        .admin-sidebar,
+        .admin-topbar,
+        .admin-header,
+        nav,
+        footer,
+        .btn {
+            display: none !important;
+        }
+
+        body, html {
+            background-color: #ffffff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .admin-content, .container-fluid, .main-panel {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+        }
+
+        .invoice-box {
+            box-shadow: none !important;
+            border: none !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 15px !important;
+            margin: 0 !important;
+        }
+    }
+</style>
+

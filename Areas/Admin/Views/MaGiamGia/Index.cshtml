@@ -1,0 +1,508 @@
+@model QLSanBong.Areas.Admin.Models.AdminMaGiamGiaListViewModel
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Quản lý Mã giảm giá (Voucher) - UTC STADIUM Admin";
+}
+
+<!-- Page Header Banner -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-navy text-white fw-bold rounded-pill px-3 py-1" style="background-color: #002B5B;">
+                <i class="bi bi-ticket-perforated-fill text-warning me-1"></i> MODULE 6
+            </span>
+            <span class="text-muted small">Chiến dịch Khuyến mãi &amp; Tri ân sinh viên</span>
+        </div>
+        <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Quản Lý Mã Giảm Giá (Voucher)</h2>
+        <p class="text-muted small mb-0">Thiết lập các mã voucher theo %, giảm trực tiếp tiền mặt, kiểm soát hiệu lực và gửi mã qua Email cho khách.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-outline-primary rounded-pill px-3 fw-semibold shadow-sm"
+                data-bs-toggle="modal" data-bs-target="#modalGuiVoucher">
+            <i class="bi bi-send-fill me-1 text-primary"></i> Gửi Voucher Cho Khách
+        </button>
+        <button type="button" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm" style="background-color: #002B5B; border-color: #002B5B;"
+                data-bs-toggle="modal" data-bs-target="#modalCreateVoucher">
+            <i class="bi bi-plus-circle-fill me-1 text-warning"></i> Tạo Voucher Mới
+        </button>
+    </div>
+</div>
+
+<!-- 3 Thẻ Thống Kê Tổng Quan -->
+<div class="row g-3 mb-4">
+    <!-- Tổng voucher -->
+    <div class="col-sm-4">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Tổng số chiến dịch</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B;">
+                    <i class="bi bi-tags-fill fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold" style="color: #002B5B;">
+                @Model.TongVoucher
+            </div>
+            <span class="small text-muted">Toàn bộ mã đã phát hành</span>
+        </div>
+    </div>
+
+    <!-- Đang còn hiệu lực -->
+    <div class="col-sm-4">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Đang có hiệu lực</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(16, 185, 129, 0.12); color: #047857;">
+                    <i class="bi bi-check2-circle fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-success">
+                @Model.ConHieuLuc
+            </div>
+            <span class="small text-muted">Khách hàng có thể nhập khi đặt sân</span>
+        </div>
+    </div>
+
+    <!-- Đã hết hạn / vô hiệu hóa -->
+    <div class="col-sm-4">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Hết hạn / Vô hiệu hóa</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(239, 68, 68, 0.12); color: #B91C1C;">
+                    <i class="bi bi-clock-history fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-danger">
+                @Model.HetHieuLuc
+            </div>
+            <span class="small text-muted">Quá hạn hoặc đã chủ động tắt</span>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Thông báo -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 rounded-3 shadow-sm mb-4" role="alert">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <div>@TempData["SuccessMessage"]</div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 rounded-3 shadow-sm mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div>@TempData["ErrorMessage"]</div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Bộ Lọc Tìm Kiếm -->
+<div class="admin-card p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" value="@Model.Search" class="form-control border-start-0 ps-0" placeholder="Tìm theo mã code (VD: UTC10, SINHVIEN20K...)" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select name="trangThai" class="form-select">
+                <option value="all" selected="@(string.IsNullOrEmpty(Model.TrangThai) || Model.TrangThai == "all")">-- Tất cả trạng thái --</option>
+                <option value="Còn hiệu lực" selected="@(Model.TrangThai == "Còn hiệu lực")">Còn hiệu lực</option>
+                <option value="Hết hiệu lực" selected="@(Model.TrangThai == "Hết hiệu lực")">Hết hiệu lực</option>
+                <option value="Chưa bắt đầu" selected="@(Model.TrangThai == "Chưa bắt đầu")">Chưa bắt đầu</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary rounded-pill px-3 w-100" style="background-color: #002B5B; border-color: #002B5B;">
+                <i class="bi bi-filter me-1"></i> Lọc Voucher
+            </button>
+            @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.TrangThai))
+            {
+                <a asp-action="Index" class="btn btn-light rounded-pill px-3 border" title="Xóa bộ lọc">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            }
+        </div>
+    </form>
+</div>
+
+<!-- Bảng Danh Sách Mã Giảm Giá -->
+<div class="admin-card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr class="small text-uppercase fw-bold text-secondary">
+                    <th style="width: 60px;" class="text-center">ID</th>
+                    <th style="width: 160px;">Mã Code</th>
+                    <th style="width: 150px;">Mức Giảm</th>
+                    <th style="width: 150px;" class="text-end">Đơn Tối Thiểu</th>
+                    <th>Thời Gian Hiệu Lực</th>
+                    <th style="width: 140px;" class="text-center">Trạng Thái</th>
+                    <th style="width: 200px;" class="text-center">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        var status = item.TrangThaiHienTai;
+                        var isExpired = status == "Hết hiệu lực";
+                        <tr>
+                            <td class="text-center font-monospace text-muted small">#@item.Id</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge font-monospace fs-6 px-3 py-2 border shadow-sm @(isExpired ? "bg-light text-muted" : "bg-warning-subtle text-dark border-warning")">
+                                        <i class="bi bi-ticket-detailed me-1"></i> @item.MaCode
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                @if (item.PhanTramGiam.HasValue && item.PhanTramGiam > 0)
+                                {
+                                    <span class="fw-bold text-danger fs-6">Giảm @item.PhanTramGiam%</span>
+                                }
+                                else if (item.SoTienGiam.HasValue && item.SoTienGiam > 0)
+                                {
+                                    <span class="fw-bold text-success fs-6">Giảm @item.SoTienGiam.Value.ToString("N0") đ</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Ưu đãi</span>
+                                }
+                            </td>
+                            <td class="text-end font-monospace text-secondary">
+                                @(item.GiaTriDonToiThieu.HasValue && item.GiaTriDonToiThieu > 0 ? $"{item.GiaTriDonToiThieu.Value:N0} đ" : "0 đ")
+                            </td>
+                            <td>
+                                <div class="small">
+                                    <div><i class="bi bi-calendar-check text-success me-1"></i> Từ: <strong>@item.HieuLucTu.ToString("dd/MM/yyyy HH:mm")</strong></div>
+                                    <div><i class="bi bi-calendar-x text-danger me-1"></i> Đến: <strong>@item.HieuLucDen.ToString("dd/MM/yyyy HH:mm")</strong></div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                @if (status == "Còn hiệu lực")
+                                {
+                                    <span class="badge bg-success-subtle text-success px-2 py-1">
+                                        <i class="bi bi-check-circle me-1"></i> Còn hiệu lực
+                                    </span>
+                                }
+                                else if (status == "Hết hiệu lực")
+                                {
+                                    <span class="badge bg-danger-subtle text-danger px-2 py-1">
+                                        <i class="bi bi-x-circle me-1"></i> Hết hiệu lực
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info-subtle text-info px-2 py-1">
+                                        <i class="bi bi-clock me-1"></i> Chưa bắt đầu
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div class="d-inline-flex gap-1">
+                                    <!-- Nút Sửa -->
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" 
+                                            title="Chỉnh sửa voucher"
+                                            onclick="openEditModal(@item.Id, '@item.MaCode', @(item.PhanTramGiam ?? 0), @(item.SoTienGiam ?? 0), '@item.HieuLucTu.ToString("yyyy-MM-ddTHH:mm")', '@item.HieuLucDen.ToString("yyyy-MM-ddTHH:mm")', @(item.GiaTriDonToiThieu ?? 0))">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <!-- Nút Vô hiệu hóa (Tắt mã) -->
+                                    @if (!isExpired)
+                                    {
+                                        <form asp-action="VoHieuHoa" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-warning rounded-circle" title="Vô hiệu hóa (Tắt mã ngay)" onclick="return confirm('Bạn có chắc muốn vô hiệu hóa mã này ngay lập tức?')">
+                                                <i class="bi bi-slash-circle"></i>
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <!-- Nút Gia hạn -->
+                                    <button type="button" class="btn btn-sm btn-outline-success rounded-circle" title="Gia hạn thời gian hiệu lực"
+                                            onclick="openGiaHanModal(@item.Id, '@item.MaCode')">
+                                        <i class="bi bi-calendar-plus"></i>
+                                    </button>
+
+                                    <!-- Nút Gửi mã riêng cho khách -->
+                                    <button type="button" class="btn btn-sm btn-outline-info rounded-circle" title="Gửi mã này cho khách hàng"
+                                            onclick="openDirectSendModal(@item.Id, '@item.MaCode')">
+                                        <i class="bi bi-send"></i>
+                                    </button>
+
+                                    <!-- Nút Xóa -->
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Xóa voucher" onclick="return confirm('Bạn có chắc muốn xóa vĩnh viễn voucher này?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                            Không tìm thấy mã giảm giá nào phù hợp với điều kiện tìm kiếm.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm Voucher Mới -->
+<div class="modal fade" id="modalCreateVoucher" tabindex="-1" aria-labelledby="modalCreateVoucherLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header text-white" style="background-color: #002B5B;">
+                    <h5 class="modal-title fw-bold" id="modalCreateVoucherLabel">
+                        <i class="bi bi-ticket-perforated me-1 text-warning"></i> Tạo Mã Giảm Giá Mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Mã Voucher (Code) <span class="text-danger">*</span></label>
+                        <input type="text" name="maCode" class="form-control text-uppercase font-monospace fw-bold" placeholder="VD: SINHVIEN2026, BANQUANLY10..." required />
+                        <div class="form-text">Mã sẽ được tự động viết hoa và không dấu.</div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Phần trăm giảm (%)</label>
+                            <input type="number" name="phanTramGiam" class="form-control" placeholder="VD: 10, 20" min="0" max="100" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Số tiền giảm trực tiếp (VNĐ)</label>
+                            <input type="number" name="soTienGiam" class="form-control" placeholder="VD: 50000" min="0" step="5000" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Giá trị đơn tối thiểu (VNĐ)</label>
+                        <input type="number" name="giaTriDonToiThieu" class="form-control" placeholder="VD: 200000 (Để 0 nếu áp dụng mọi đơn)" min="0" step="10000" />
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Hiệu lực từ <span class="text-danger">*</span></label>
+                            <input type="datetime-local" name="hieuLucTu" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Hiệu lực đến <span class="text-danger">*</span></label>
+                            <input type="datetime-local" name="hieuLucDen" class="form-control" value="@DateTime.Now.AddDays(14).ToString("yyyy-MM-ddTHH:mm")" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold" style="background-color: #002B5B; border-color: #002B5B;">
+                        <i class="bi bi-check2-circle me-1"></i> Tạo Mã Voucher
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Voucher -->
+<div class="modal fade" id="modalEditVoucher" tabindex="-1" aria-labelledby="modalEditVoucherLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="edit_id" name="id" />
+                <div class="modal-header text-white" style="background-color: #002B5B;">
+                    <h5 class="modal-title fw-bold" id="modalEditVoucherLabel">
+                        <i class="bi bi-pencil-square me-1 text-warning"></i> Chỉnh Sửa Mã Giảm Giá
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Mã Voucher (Code) <span class="text-danger">*</span></label>
+                        <input type="text" id="edit_maCode" name="maCode" class="form-control text-uppercase font-monospace fw-bold" required />
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Phần trăm giảm (%)</label>
+                            <input type="number" id="edit_phanTramGiam" name="phanTramGiam" class="form-control" min="0" max="100" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Số tiền giảm (VNĐ)</label>
+                            <input type="number" id="edit_soTienGiam" name="soTienGiam" class="form-control" min="0" step="5000" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Giá trị đơn tối thiểu (VNĐ)</label>
+                        <input type="number" id="edit_giaTriDonToiThieu" name="giaTriDonToiThieu" class="form-control" min="0" step="10000" />
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Hiệu lực từ <span class="text-danger">*</span></label>
+                            <input type="datetime-local" id="edit_hieuLucTu" name="hieuLucTu" class="form-control" required />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold small">Hiệu lực đến <span class="text-danger">*</span></label>
+                            <input type="datetime-local" id="edit_hieuLucDen" name="hieuLucDen" class="form-control" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold" style="background-color: #002B5B; border-color: #002B5B;">
+                        <i class="bi bi-save me-1"></i> Lưu Thay Đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Gia Hạn Voucher -->
+<div class="modal fade" id="modalGiaHanVoucher" tabindex="-1" aria-labelledby="modalGiaHanVoucherLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow">
+            <form asp-action="GiaHan" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="giahan_id" name="id" />
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold fs-6" id="modalGiaHanVoucherLabel">
+                        <i class="bi bi-calendar-plus me-1"></i> Gia Hạn Voucher
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-3">
+                    <p class="small text-muted mb-2">Gia hạn thời gian hiệu lực cho mã: <strong id="giahan_maCode" class="text-primary font-monospace"></strong></p>
+                    <label class="form-label fw-semibold small">Gia hạn thêm:</label>
+                    <select name="soNgay" class="form-select">
+                        <option value="3">3 Ngày</option>
+                        <option value="7" selected>7 Ngày (1 tuần)</option>
+                        <option value="14">14 Ngày (2 tuần)</option>
+                        <option value="30">30 Ngày (1 tháng)</option>
+                    </select>
+                </div>
+                <div class="modal-footer bg-light p-2">
+                    <button type="button" class="btn btn-sm btn-secondary rounded-pill" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold">Xác Nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Gửi Mã Voucher Cho Khách Hàng -->
+<div class="modal fade" id="modalGuiVoucher" tabindex="-1" aria-labelledby="modalGuiVoucherLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form asp-action="GuiVoucherChoKhach" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header text-white" style="background-color: #002B5B;">
+                    <h5 class="modal-title fw-bold" id="modalGuiVoucherLabel">
+                        <i class="bi bi-send-check me-1 text-warning"></i> Gửi Mã Voucher Cho Khách Hàng
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Chọn Voucher cần gửi <span class="text-danger">*</span></label>
+                        <select id="send_voucherId" name="maGiamGiaId" class="form-select font-monospace fw-bold" required>
+                            @if (Model.Items != null)
+                            {
+                                foreach (var v in Model.Items.Where(i => i.TrangThaiHienTai == "Còn hiệu lực"))
+                                {
+                                    var discount = v.PhanTramGiam.HasValue ? $"{v.PhanTramGiam}%" : $"{v.SoTienGiam:N0} đ";
+                                    <option value="@v.Id">@v.MaCode (Giảm @discount - HSD: @v.HieuLucDen.ToString("dd/MM/yyyy"))</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Đối tượng người nhận <span class="text-danger">*</span></label>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="checkGuiTatCa" name="guiTatCa" value="true" onchange="toggleCustomerSelect(this)">
+                            <label class="form-check-label fw-bold text-primary" for="checkGuiTatCa">
+                                <i class="bi bi-people-fill me-1"></i> Gửi cho toàn bộ khách hàng hoạt động (@Model.DanhSachKhachHang.Count khách)
+                            </label>
+                        </div>
+
+                        <div id="wrapperSelectCustomer">
+                            <select name="nguoiDungId" id="selectCustomer" class="form-select">
+                                <option value="">-- Chọn khách hàng cụ thể --</option>
+                                @foreach (var kh in Model.DanhSachKhachHang)
+                                {
+                                    <option value="@kh.Id">@kh.HoTen - @kh.SoDienThoai (@kh.Email)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info py-2 small mb-0">
+                        <i class="bi bi-envelope-check me-1"></i> Hệ thống sẽ tự động lưu thông báo vào hòm thư trên Web của khách và gửi kèm một Email thông báo mã ưu đãi tới Gmail của khách hàng.
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold" style="background-color: #002B5B; border-color: #002B5B;">
+                        <i class="bi bi-send-fill me-1"></i> Phát Hành &amp; Gửi Ngay
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openEditModal(id, code, phanTram, soTien, tu, den, donToiThieu) {
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_maCode').value = code;
+        document.getElementById('edit_phanTramGiam').value = phanTram > 0 ? phanTram : '';
+        document.getElementById('edit_soTienGiam').value = soTien > 0 ? soTien : '';
+        document.getElementById('edit_hieuLucTu').value = tu;
+        document.getElementById('edit_hieuLucDen').value = den;
+        document.getElementById('edit_giaTriDonToiThieu').value = donToiThieu > 0 ? donToiThieu : '';
+        var editModal = new bootstrap.Modal(document.getElementById('modalEditVoucher'));
+        editModal.show();
+    }
+
+    function openGiaHanModal(id, code) {
+        document.getElementById('giahan_id').value = id;
+        document.getElementById('giahan_maCode').innerText = code;
+        var modal = new bootstrap.Modal(document.getElementById('modalGiaHanVoucher'));
+        modal.show();
+    }
+
+    function openDirectSendModal(voucherId, code) {
+        var sel = document.getElementById('send_voucherId');
+        if (sel) {
+            sel.value = voucherId;
+        }
+        var modal = new bootstrap.Modal(document.getElementById('modalGuiVoucher'));
+        modal.show();
+    }
+
+    function toggleCustomerSelect(checkbox) {
+        var wrapper = document.getElementById('wrapperSelectCustomer');
+        var select = document.getElementById('selectCustomer');
+        if (checkbox.checked) {
+            wrapper.style.display = 'none';
+            select.removeAttribute('required');
+        } else {
+            wrapper.style.display = 'block';
+        }
+    }
+</script>
+

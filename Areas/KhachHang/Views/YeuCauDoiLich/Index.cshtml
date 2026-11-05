@@ -1,0 +1,127 @@
+@model List<QLSanBong.Areas.KhachHang.Models.RescheduleHistoryItemModel>
+@{
+    ViewData["Title"] = "Quản lý yêu cầu đổi lịch sân - UTC STADIUM";
+}
+
+<div class="container-fluid px-3 px-lg-5">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="text-decoration-none">Lịch đặt của tôi</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Yêu cầu đổi lịch</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0" style="color: #002B5B;">
+                <i class="bi bi-arrow-repeat text-warning me-2"></i>Danh Sách Yêu Cầu Đổi Giờ &amp; Ngày Đá
+            </h2>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="btn btn-outline-secondary rounded-pill px-3 py-2 small fw-semibold">
+                <i class="bi bi-calendar-check me-1"></i> Xem tất cả lịch đặt
+            </a>
+            <a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="btn btn-warning fw-bold text-dark rounded-pill px-4 py-2 small shadow-sm">
+                <i class="bi bi-plus-circle-fill me-1"></i> Đặt sân mới
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 px-4 py-3 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                <span class="fw-semibold">@TempData["SuccessMessage"]</span>
+            </div>
+            <button type="button" class="btn-close btn-sm shadow-none" data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-uppercase text-muted">
+                        <tr>
+                            <th style="width: 70px;">Mã YC</th>
+                            <th>Mã đơn</th>
+                            <th>Lịch thi đấu hiện tại</th>
+                            <th>Lịch thi đấu muốn đổi sang</th>
+                            <th>Lý do xin đổi</th>
+                            <th>Ngày gửi</th>
+                            <th class="text-center" style="width: 140px;">Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        @foreach (var item in Model)
+                        {
+                            var badgeClass = "badge-status-choduyet";
+                            if (item.TrangThai.Contains("Duyệt", StringComparison.OrdinalIgnoreCase) || item.TrangThai.Contains("Chấp thuận", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeClass = "badge-status-daduyet";
+                            }
+                            else if (item.TrangThai.Contains("Từ chối", StringComparison.OrdinalIgnoreCase) || item.TrangThai.Contains("Hủy", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeClass = "badge-status-dahuy";
+                            }
+
+                            <tr>
+                                <td><span class="fw-bold text-primary">#@item.YeuCauId</span></td>
+                                <td>
+                                    <a asp-area="KhachHang" asp-controller="DatSan" asp-action="ChiTietHoaDon" asp-route-id="@item.DatSanId" class="fw-bold text-decoration-none">
+                                        Đơn #@item.DatSanId
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">@item.TenSanCu</div>
+                                    <div class="text-muted" style="font-size: 0.76rem;">
+                                        @item.NgayDatCu.ToString("dd/MM/yyyy") &bull; @item.KhungGioCu
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-primary">
+                                        <i class="bi bi-arrow-right-short text-warning"></i>@item.TenSanMoi
+                                    </div>
+                                    <div class="text-success fw-semibold" style="font-size: 0.76rem;">
+                                        @item.NgayDatMoi.ToString("dd/MM/yyyy") &bull; @item.KhungGioMoi
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-muted" style="max-width: 260px; line-height: 1.4;">
+                                        @(item.LyDo ?? "Có việc đột xuất")
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-muted" style="font-size: 0.74rem;">
+                                        @(item.NgayTao.HasValue ? item.NgayTao.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="@badgeClass">@item.TrangThai</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+            <div class="py-4">
+                <i class="bi bi-arrow-repeat fs-1 text-muted opacity-50"></i>
+                <h5 class="fw-bold mt-3 mb-2" style="color: #002B5B;">Chưa có yêu cầu đổi lịch nào</h5>
+                <p class="text-muted small mb-4" style="max-width: 500px; margin: 0 auto;">
+                    Khi có việc đột xuất, bạn có thể vào danh sách <strong>Lịch đặt của tôi</strong> và nhấn nút <strong>Đổi lịch</strong> (trước giờ đá tối thiểu 2 tiếng theo Time-lock Rule) để gửi yêu cầu chuyển ca.
+                </p>
+                <a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="btn btn-warning fw-bold text-dark rounded-pill px-4 shadow-sm">
+                    <i class="bi bi-journal-text me-1"></i> Xem lịch đặt hiện có
+                </a>
+            </div>
+        </div>
+    }
+</div>
+

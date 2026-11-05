@@ -1,0 +1,484 @@
+/* ===================================================================
+   GIAO DIỆN PHÂN HỆ KHÁCH HÀNG - UTC STADIUM (khachhang.css)
+   Bảng màu đồng bộ:
+   - Navy: #002B5B & #0A3D78
+   - Accent: #FFC107 & #e5ac00
+   - Background: #F4F7FB
+   - Card Background: #ffffff
+=================================================================== */
+
+:root {
+    --utc-navy: #002B5B;
+    --utc-navy-light: #0A3D78;
+    --utc-amber: #FFC107;
+    --utc-amber-hover: #e5ac00;
+    --utc-bg-soft: #F4F7FB;
+    --utc-border: #e2e8f0;
+    --utc-text-dark: #1e293b;
+    --utc-text-muted: #64748b;
+}
+
+body.customer-body {
+    background-color: var(--utc-bg-soft);
+    color: var(--utc-text-dark);
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ===================================================================
+   NAVBAR PHÂN HỆ KHÁCH HÀNG (CỐ ĐỊNH KHI CUỘN & Z-INDEX CAO)
+=================================================================== */
+header.sticky-top,
+.customer-header-sticky {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1030 !important;
+    background-color: var(--utc-navy) !important;
+}
+
+.customer-navbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1030 !important;
+    background-color: var(--utc-navy) !important;
+    padding: 0.65rem 0;
+    box-shadow: 0 4px 20px rgba(0, 43, 91, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.customer-brand-logo {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: var(--utc-amber);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.customer-brand-name {
+    font-size: 1.28rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.customer-brand-subtext {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--utc-amber);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.customer-menu-link {
+    color: rgba(255, 255, 255, 0.82) !important;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.5rem 0.95rem !important;
+    border-radius: 10px;
+    transition: all 0.22s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.customer-menu-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.customer-menu-link.active {
+    color: var(--utc-navy) !important;
+    background-color: var(--utc-amber) !important;
+    font-weight: 700;
+    box-shadow: 0 3px 12px rgba(255, 193, 7, 0.35);
+}
+
+/* Dropdown avatar người dùng */
+.customer-user-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    transition: all 0.25s ease;
+}
+
+.customer-user-btn:hover,
+.customer-user-btn:focus {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--utc-amber);
+    color: #ffffff;
+}
+
+.customer-avatar-img {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border: 2px solid var(--utc-amber);
+}
+
+.customer-avatar-initial {
+    width: 36px;
+    height: 36px;
+    background-color: var(--utc-amber);
+    color: var(--utc-navy);
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.customer-greeting-sub {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1;
+}
+
+.customer-greeting-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #ffffff;
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.customer-dropdown-menu {
+    min-width: 240px;
+}
+
+/* ===================================================================
+   KHỐI 1: WELCOME BANNER KHÁCH HÀNG
+=================================================================== */
+.customer-welcome-banner {
+    background: linear-gradient(135deg, #002B5B 0%, #0A3D78 60%, #0c4a8e 100%);
+    border-radius: 28px;
+    padding: 2.2rem 2.4rem;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 36px rgba(0, 43, 91, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.customer-welcome-banner::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(255, 193, 7, 0.15) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.customer-stat-chip {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.customer-stat-chip:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.customer-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.customer-stat-number {
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #ffffff;
+}
+
+.customer-stat-label {
+    font-size: 0.74rem;
+    color: rgba(255, 255, 255, 0.72);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* ===================================================================
+   KHỐI 2: THANH BỘ LỌC & ĐẶT LỊCH NHANH
+=================================================================== */
+.customer-filter-bar {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 8px 24px rgba(0, 43, 91, 0.06);
+    border: 1px solid var(--utc-border);
+}
+
+.customer-filter-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--utc-navy);
+    letter-spacing: 0.4px;
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.customer-filter-input {
+    border-radius: 12px;
+    border: 1.5px solid var(--utc-border);
+    padding: 0.6rem 0.9rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--utc-text-dark);
+    transition: all 0.22s ease;
+}
+
+.customer-filter-input:focus {
+    border-color: var(--utc-navy);
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.25);
+    outline: none;
+}
+
+.customer-btn-search {
+    background-color: var(--utc-amber);
+    color: var(--utc-navy);
+    border: 2px solid var(--utc-amber);
+    font-weight: 800;
+    font-size: 0.9rem;
+    border-radius: 12px;
+    padding: 0.6rem 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.35);
+}
+
+.customer-btn-search:hover {
+    background-color: var(--utc-amber-hover);
+    border-color: var(--utc-amber-hover);
+    color: var(--utc-navy);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 193, 7, 0.45);
+}
+
+/* ===================================================================
+   KHỐI 3: DANH SÁCH SÂN BÓNG (CỘT TRÁI - 8 PHẦN)
+=================================================================== */
+.customer-pitch-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--utc-border);
+    box-shadow: 0 6px 18px rgba(0, 43, 91, 0.05);
+    transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.28s ease;
+}
+
+.customer-pitch-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 32px rgba(0, 43, 91, 0.12);
+}
+
+.customer-pitch-thumb-wrap {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.customer-pitch-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.customer-pitch-card:hover .customer-pitch-thumb {
+    transform: scale(1.05);
+}
+
+.customer-pitch-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 43, 91, 0.88);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.customer-pitch-status {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(16, 185, 129, 0.92);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 50px;
+}
+
+.customer-pitch-body {
+    padding: 1.25rem;
+}
+
+.customer-pitch-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--utc-navy);
+    margin-bottom: 0.35rem;
+}
+
+.customer-pitch-desc {
+    font-size: 0.82rem;
+    color: var(--utc-text-muted);
+    line-height: 1.5;
+    margin-bottom: 0.85rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.customer-pitch-price-val {
+    font-size: 1.22rem;
+    font-weight: 800;
+    color: #b45309;
+}
+
+.customer-pitch-price-sub {
+    font-size: 0.74rem;
+    color: var(--utc-text-muted);
+}
+
+/* ===================================================================
+   KHỐI 3: LỊCH ĐẶT GẦN ĐÂY & THÔNG BÁO (CỘT PHẢI - 4 PHẦN)
+=================================================================== */
+.customer-sidebar-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    border: 1px solid var(--utc-border);
+    box-shadow: 0 6px 18px rgba(0, 43, 91, 0.05);
+    padding: 1.35rem;
+}
+
+.customer-sidebar-title {
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: var(--utc-navy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--utc-border);
+}
+
+.customer-booking-item {
+    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    background-color: #f8fafc;
+    border: 1px solid var(--utc-border);
+    margin-bottom: 0.65rem;
+    transition: all 0.2s ease;
+}
+
+.customer-booking-item:hover {
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 43, 91, 0.08);
+    transform: translateX(3px);
+}
+
+.badge-status-choduyet {
+    background-color: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 50px;
+}
+
+.badge-status-daduyet {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 50px;
+}
+
+.badge-status-dahuy {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 50px;
+}
+
+.customer-notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    transition: background 0.2s ease;
+}
+
+.customer-notif-item.unread {
+    background-color: rgba(255, 193, 7, 0.12);
+    border-left: 3px solid var(--utc-amber);
+}
+
+.customer-notif-item:hover {
+    background-color: #f1f5f9;
+}
+
+.customer-notif-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    color: var(--utc-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .customer-welcome-banner {
+        padding: 1.6rem 1.4rem;
+    }
+}
+

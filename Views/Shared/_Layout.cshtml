@@ -1,50 +1,256 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - QLSanBong</title>
-    <script type="importmap"></script>
+    <title>@(ViewData["Title"] ?? "Trang chủ - Hệ Thống Đặt Sân UTC STADIUM")</title>
+
+    <!-- Favicon UTC STADIUM -->
+    <link rel="icon" type="image/png" href="~/uploads/sanbong/logo.png" />
+    <link rel="shortcut icon" type="image/png" href="~/uploads/sanbong/logo.png" />
+
+    <!-- Google Fonts: Be Vietnam Pro -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Site CSS chung & CSS Trang chủ -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/client/trangchu.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/QLSanBong.styles.css" asp-append-version="true" />
+
+    <!-- Section Styles riêng cho từng View -->
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QLSanBong</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+<body class="d-flex flex-column min-vh-100 mb-0">
+    <!-- 1. Navbar / Header tối giản: Nền xanh dương đậm (#002B5B), Trái: Logo + UTC STADIUM, Phải: CHỈ 2 nút Đăng nhập & Đăng ký -->
+    <header class="sticky-top">
+        <nav class="navbar app-navbar">
+            <div class="container d-flex align-items-center justify-content-between">
+                <!-- Góc trái: Ảnh Logo & Tên thương hiệu UTC STADIUM -->
+                <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/">
+                    <img src="~/uploads/sanbong/logo.png" alt="Logo UTC STADIUM" class="brand-logo-img"
+                        onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect width=%22100%25%22 height=%22100%25%22 rx=%2216%22 fill=%22%23FFC107%22/><text x=%2250%25%22 y=%2255%25%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2222%22 fill=%22%23002B5B%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>UTC</text></svg>';" />
+                    <div class="d-flex flex-column">
+                        <span class="brand-name">UTC STADIUM</span>
+                        <span class="brand-subtext d-none d-sm-inline">SÂN BÓNG SINH VIÊN</span>
+                    </div>
+                </a>
+
+                <!-- Góc phải: Hiển thị 2 nút Đăng nhập & Đăng ký (khi chưa đăng nhập) hoặc Thông tin tài khoản & Đăng xuất (khi đã đăng nhập) -->
+                <div class="d-flex align-items-center gap-2">
+                    @if (User.Identity?.IsAuthenticated == true)
+
+                    {
+                        @if (User.IsInRole("Admin") || User.IsInRole("Quản trị viên") || User.IsInRole("Quản trị"))
+
+                        {
+                            <a class="btn btn-nav-register d-inline-flex align-items-center gap-2" href="/Admin/Dashboard">
+                                <i class="bi bi-speedometer2"></i>
+                                <span class="d-none d-md-inline">Quản trị</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-nav-register d-inline-flex align-items-center gap-2" href="/KhachHang/Home">
+                                <i class="bi bi-grid-1x2-fill"></i>
+                                <span class="d-none d-md-inline">Khu vực Khách</span>
+                            </a>
+                        }
+                        <span class="nav-user-pill d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-person-circle text-warning"></i>
+                            <span class="fw-bold text-white small">@User.Identity.Name</span>
+                        </span>
+                        <a class="btn btn-nav-login d-inline-flex align-items-center gap-2" href="/Account/Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Đăng xuất</span>
+                        </a>
+                    }
+
+                    else
+
+                    {
+                        <a class="btn btn-nav-login d-inline-flex align-items-center gap-2" href="/Account/Login">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>Đăng nhập</span>
+                        </a>
+                        <a class="btn btn-nav-register d-inline-flex align-items-center gap-2" href="/Account/Register">
+                            <i class="bi bi-person-plus-fill"></i>
+                            <span>Đăng ký</span>
+                        </a>
+                    }
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - QLSanBong - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+
+        var isAuthPage = string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase)
+
+        || (ViewData["HideFooter"] as bool? == true);
+    }
+
+    @if (!isAuthPage && TempData["SuccessMessage"] != null)
+
+    {
+        <div class="container mt-3">
+            <div class="alert alert-success alert-dismissible fade show rounded-pill px-4 py-2 d-flex align-items-center justify-content-between shadow-sm mb-0"
+                role="alert">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                    <span class="fw-semibold small">@TempData["SuccessMessage"]</span>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
         </div>
-    </footer>
+    }
+
+    <!-- Nội dung chính -->
+    <main role="main" class="flex-grow-1 @(isAuthPage ? "d-flex flex-column" : "")">
+        @RenderBody()
+    </main>
+
+    @if (!isAuthPage)
+
+    {
+        <!-- 6. Footer (Chân trang): Nền xanh dương đậm (#002B5B), bo góc trên, gắn lại ảnh logo ~/uploads/sanbong/logo.png -->
+        <footer class="app-footer text-white mt-auto">
+            <div class="footer-top py-5">
+                <div class="container">
+                    <div class="row g-4">
+                        <!-- Cột 1: Logo & Giới thiệu hệ thống -->
+                        <div class="col-lg-4 col-md-6">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <img src="~/uploads/sanbong/logo.png" alt="Logo UTC STADIUM" class="brand-logo-img"
+                                    onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect width=%22100%25%22 height=%22100%25%22 rx=%2216%22 fill=%22%23FFC107%22/><text x=%2250%25%22 y=%2255%25%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2222%22 fill=%22%23002B5B%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>UTC</text></svg>';" />
+                                <div class="d-flex flex-column">
+                                    <span class="brand-name text-white">UTC STADIUM</span>
+                                    <span class="brand-subtext">SÂN BÓNG SINH VIÊN</span>
+                                </div>
+                            </div>
+                            <p class="footer-desc text-white-50 mb-3">
+                                Hệ thống quản lý đặt sân bóng đá và kết nối giải đấu sinh viên trực tuyến UTC STADIUM.
+                                Kiến tạo không gian rèn luyện thể chất hiện đại, gắn kết phong trào thể thao giữa các chi
+                                đoàn và khoa viện.
+                            </p>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="footer-social-btn" aria-label="Facebook"><i
+                                        class="bi bi-facebook"></i></a>
+                                <a href="#" class="footer-social-btn" aria-label="Youtube"><i class="bi bi-youtube"></i></a>
+                                <a href="#" class="footer-social-btn" aria-label="Tiktok"><i class="bi bi-tiktok"></i></a>
+                                <a href="#" class="footer-social-btn" aria-label="Instagram"><i
+                                        class="bi bi-instagram"></i></a>
+                            </div>
+                        </div>
+
+                        <!-- Cột 2: Thông tin liên hệ & Địa chỉ sân -->
+                        <div class="col-lg-4 col-md-6">
+                            <h6 class="footer-title">Địa chỉ &amp; Thông tin liên hệ</h6>
+                            <ul class="list-unstyled footer-list mb-0">
+                                <li class="d-flex align-items-start gap-2 mb-2">
+                                    <i class="bi bi-geo-alt-fill text-warning mt-1"></i>
+                                    <span class="text-white-50">Khu liên hợp Thể thao Sinh viên, Số 3 Cầu Giấy, Đống Đa, Hà
+                                        Nội</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-telephone-fill text-warning"></i>
+                                    <span class="text-white-50">Hotline đặt sân: (024) 3766.8899 - 0988.686.868</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-envelope-fill text-warning"></i>
+                                    <span class="text-white-50">Email: utcstadium@utc.edu.vn</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-clock-fill text-warning"></i>
+                                    <span class="text-white-50">Giờ hoạt động: 05:30 - 23:00 (Tất cả các ngày trong
+                                        tuần)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Cột 3: Liên kết nhanh -->
+                        <div class="col-lg-2 col-md-6">
+                            <h6 class="footer-title">Liên kết nhanh</h6>
+                            <ul class="list-unstyled footer-list mb-0">
+                                <li class="mb-2">
+                                    <a href="#giai-dau" class="footer-link">
+                                        <i class="bi bi-chevron-right text-warning me-1"></i>Giải đấu sinh viên
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#danh-muc-san" class="footer-link">
+                                        <i class="bi bi-chevron-right text-warning me-1"></i>Danh mục sân &amp; Giá
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#goc-anh-tin-tuc" class="footer-link">
+                                        <i class="bi bi-chevron-right text-warning me-1"></i>Góc ảnh &amp; Tin tức
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="/Account/Login" class="footer-link">
+                                        <i class="bi bi-chevron-right text-warning me-1"></i>Đăng nhập hệ thống
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/Account/Register" class="footer-link">
+                                        <i class="bi bi-chevron-right text-warning me-1"></i>Đăng ký thành viên
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Cột 4: Hỗ trợ đặt giải đấu lớp/khoa -->
+                        <div class="col-lg-2 col-md-6">
+                            <h6 class="footer-title">Ban tổ chức giải</h6>
+                            <div class="p-3 rounded-3 footer-help-box">
+                                <p class="small text-white-50 mb-2">
+                                    Hỗ trợ các Chi đoàn, Khoa/Viện đăng ký tổ chức giải bóng đá học đường trọn gói.
+                                </p>
+                                <a href="/Account/Login"
+                                    class="btn btn-sm btn-warning w-100 fw-bold text-dark d-inline-flex align-items-center justify-content-center gap-1 rounded-pill">
+                                    <i class="bi bi-calendar2-check-fill"></i>
+                                    <span>Đặt Lịch Ngay</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bản quyền -->
+            <div class="footer-bottom py-3">
+                <div
+                    class="container d-flex flex-column flex-md-row align-items-center justify-content-between text-center text-md-start gap-2">
+                    <p class="mb-0 small text-white-50">
+                        &copy; 2026 <strong class="text-white">UTC STADIUM</strong> - Hệ thống Quản lý Sân bóng đá &amp;
+                        Giải đấu Sinh viên.
+                    </p>
+                    <div class="small text-white-50">
+                        Thiết kế theo phong cách phân khối hiện đại &bull;
+                    </div>
+                </div>
+            </div>
+        </footer>
+    }
+
+    <!-- Thư viện Javascript -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

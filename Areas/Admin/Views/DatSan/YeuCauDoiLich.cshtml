@@ -1,0 +1,224 @@
+@model List<QLSanBong.Areas.Admin.Models.AdminRescheduleItemViewModel>
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Quản Lý Yêu Cầu Đổi Lịch Đặt Sân - UTC STADIUM Admin";
+    var currentStatus = ViewBag.CurrentTrangThai as string ?? "all";
+}
+
+<div class="d-flex flex-column gap-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="text-decoration-none text-muted">Bảng điều khiển</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="DatSan" asp-action="Index" class="text-decoration-none text-muted">Quản lý đặt sân</a></li>
+                    <li class="breadcrumb-item active fw-semibold" aria-current="page" style="color: #002B5B;">Yêu cầu đổi lịch</li>
+                </ol>
+            </nav>
+            <h3 class="fw-bold mb-1" style="color: #002B5B;">
+                <i class="bi bi-arrow-repeat text-warning me-2"></i>Duyệt Yêu Cầu Đổi Ca &amp; Dời Ngày Đá
+            </h3>
+            <p class="text-muted small mb-0">
+                Xử lý các đơn xin dời ca thi đấu từ sinh viên. Hệ thống tự động kiểm tra trùng ca &amp; lịch bảo trì trước khi chấp thuận.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Danh Sách Đơn
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="YeuCauDoiLich" asp-route-trangThai="all"
+           class="btn btn-sm rounded-pill px-3 fw-bold @(currentStatus == "all" ? "btn-primary" : "btn-light border")"
+           style="@(currentStatus == "all" ? "background-color: #002B5B;" : "")">
+            Tất cả (@Model.Count)
+        </a>
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="YeuCauDoiLich" asp-route-trangThai="Chờ duyệt"
+           class="btn btn-sm rounded-pill px-3 fw-bold @(currentStatus == "Chờ duyệt" ? "btn-warning text-dark" : "btn-light border")">
+            Chờ duyệt (@ViewBag.CountChoDuyet)
+        </a>
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="YeuCauDoiLich" asp-route-trangThai="Đã duyệt"
+           class="btn btn-sm rounded-pill px-3 fw-bold @(currentStatus == "Đã duyệt" ? "btn-success" : "btn-light border")">
+            Đã duyệt (@ViewBag.CountDaDuyet)
+        </a>
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="YeuCauDoiLich" asp-route-trangThai="Từ chối"
+           class="btn btn-sm rounded-pill px-3 fw-bold @(currentStatus == "Từ chối" ? "btn-danger" : "btn-light border")">
+            Từ chối (@ViewBag.CountTuChoi)
+        </a>
+    </div>
+
+    <!-- Bảng danh sách so sánh chi tiết yêu cầu đổi lịch -->
+    <div class="admin-card">
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">MÃ Y/C</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th style="background-color: #FEF3C7; color: #92400E; width: 220px;">LỊCH CŨ BAN ĐẦU</th>
+                        <th style="background-color: #DBEAFE; color: #1E40AF; width: 220px;">LỊCH MỚI ĐỀ XUẤT</th>
+                        <th>LÝ DO XIN ĐỔI</th>
+                        <th class="text-center">TRẠNG THÁI</th>
+                        <th class="text-end" style="width: 170px;">THAO TÁC ADMIN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var y in Model)
+                        {
+                            var badgeClass = y.TrangThai switch
+                            {
+                                "Đã duyệt" => "admin-badge-active",
+                                "Từ chối" => "admin-badge-locked",
+                                _ => "admin-badge-warning"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="fw-bold" style="color: #002B5B;">#@y.Id</div>
+                                    <a asp-area="Admin" asp-controller="DatSan" asp-action="Details" asp-route-id="@y.DatSanId"
+                                       class="small text-muted text-decoration-underline" style="font-size: 0.75rem;">
+                                        Đơn gốc #@y.DatSanId
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@y.TenNguoiDung</div>
+                                    <div class="small text-muted"><i class="bi bi-telephone me-1"></i>@y.SoDienThoai</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Gửi lúc: @(y.NgayTao?.ToString("HH:mm dd/MM") ?? "N/A")</div>
+                                </td>
+
+                                <!-- CỘT SO SÁNH 1: LỊCH CŨ -->
+                                <td style="background-color: #FFFDF5; border-left: 2px solid #F59E0B;">
+                                    <div class="fw-bold text-dark small">@y.TenSanCu</div>
+                                    <div class="text-muted small"><i class="bi bi-calendar3 me-1"></i>@y.NgayCu.ToString("dd/MM/yyyy")</div>
+                                    <div class="small text-muted"><i class="bi bi-clock me-1"></i>@y.KhungGioCu</div>
+                                </td>
+
+                                <!-- CỘT SO SÁNH 2: LỊCH MỚI -->
+                                <td style="background-color: #F8FAFF; border-left: 2px solid #3B82F6;">
+                                    <div class="fw-bold text-primary small">@y.TenSanMoi</div>
+                                    <div class="fw-bold text-primary small"><i class="bi bi-calendar-check me-1"></i>@y.NgayMoi.ToString("dd/MM/yyyy")</div>
+                                    <div class="fw-bold text-primary small"><i class="bi bi-clock-fill me-1"></i>@y.KhungGioMoi</div>
+                                </td>
+
+                                <td>
+                                    <div class="small text-dark" style="max-width: 200px; line-height: 1.4;">
+                                        @(string.IsNullOrEmpty(y.LyDo) ? "Khách xin đổi ca" : y.LyDo)
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="admin-badge @badgeClass">@y.TrangThai</span>
+                                </td>
+                                <td class="text-end">
+                                    @if (y.TrangThai == "Chờ duyệt")
+                                    {
+                                        <div class="d-inline-flex gap-1 justify-content-end">
+                                            <!-- Nút Duyệt đổi lịch -->
+                                            <form asp-area="Admin" asp-controller="DatSan" asp-action="DuyetDoiLich" asp-route-id="@y.Id" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Xác nhận DUYỆT đổi lịch cho đơn #@y.DatSanId? Hệ thống sẽ kiểm tra trùng lịch và tự động gửi Gmail cho khách.');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold" title="Chấp thuận đổi lịch">
+                                                    <i class="bi bi-check-lg me-1"></i>Duyệt
+                                                </button>
+                                            </form>
+
+                                            <!-- Nút Từ chối -->
+                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 btn-reject-reschedule"
+                                                    data-id="@y.Id" data-datsanid="@y.DatSanId" data-name="@y.TenNguoiDung" title="Từ chối yêu cầu">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-muted border small py-1 px-3">Đã giải quyết</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 opacity-50"></i>
+                                <p class="mt-2 mb-0">Hiện chưa có yêu cầu đổi lịch nào trong danh mục này.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Từ Chối Đổi Lịch -->
+<div class="modal fade" id="rejectRescheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form asp-area="Admin" asp-controller="DatSan" asp-action="TuChoiDoiLich" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="rejectRescheduleId" />
+
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger">
+                        <i class="bi bi-x-octagon-fill me-2"></i>Từ Chối Yêu Cầu Đổi Lịch
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <div class="modal-body py-3">
+                    <div class="p-3 bg-light rounded-3 mb-3 small border">
+                        <div>Yêu cầu: <strong id="rescheduleReqText"></strong></div>
+                        <div>Người yêu cầu: <strong id="rescheduleCustomerText"></strong></div>
+                    </div>
+
+                    <label class="form-label fw-bold small text-dark">Lý do từ chối (Gửi qua Gmail cho khách) <span class="text-danger">*</span></label>
+                    <textarea name="lyDo" rows="3" class="form-control rounded-3" required
+                              placeholder="Ví dụ: Khung giờ mới đã có đội bóng khác đặt cọc trước hoặc vướng lịch sự kiện..."></textarea>
+                </div>
+
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-4 fw-bold">
+                        <i class="bi bi-x-circle me-1"></i> Xác Nhận Từ Chối &amp; Bắn Mail
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalEl = document.getElementById('rejectRescheduleModal');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                const btns = document.querySelectorAll('.btn-reject-reschedule');
+                const idInput = document.getElementById('rejectRescheduleId');
+                const reqText = document.getElementById('rescheduleReqText');
+                const custText = document.getElementById('rescheduleCustomerText');
+
+                btns.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const id = this.getAttribute('data-id');
+                        const datSanId = this.getAttribute('data-datsanid');
+                        const name = this.getAttribute('data-name');
+
+                        idInput.value = id;
+                        reqText.textContent = '#' + id + ' (Đơn gốc: #' + datSanId + ')';
+                        custText.textContent = name;
+                        modal.show();
+                    });
+                });
+            }
+        });
+    </script>
+}

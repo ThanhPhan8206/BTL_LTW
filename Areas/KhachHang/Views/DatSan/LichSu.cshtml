@@ -1,0 +1,370 @@
+@model QLSanBong.Areas.KhachHang.Models.BookingHistoryViewModel
+@{
+    ViewData["Title"] = "Quản lý lịch đặt sân & Lịch sử thi đấu - UTC STADIUM";
+}
+
+<div class="container-fluid px-3 px-lg-5">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Lịch đặt của tôi</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0" style="color: #002B5B;">
+                <i class="bi bi-calendar2-range-fill text-warning me-2"></i>Lịch Đặt &amp; Quản Lý Ca Thi Đấu
+            </h2>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-area="KhachHang" asp-controller="YeuCauDoiLich" asp-action="Index" class="btn btn-outline-primary rounded-pill px-3 py-2 small fw-semibold">
+                <i class="bi bi-arrow-repeat me-1"></i> Xem yêu cầu đổi lịch
+            </a>
+            <a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="btn btn-warning fw-bold text-dark rounded-pill px-4 py-2 small shadow-sm">
+                <i class="bi bi-plus-circle-fill me-1"></i> Đặt thêm ca mới
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 px-4 py-3 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                <span class="fw-semibold">@TempData["SuccessMessage"]</span>
+            </div>
+            <button type="button" class="btn-close btn-sm shadow-none" data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 px-4 py-3 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                <span class="fw-semibold">@TempData["ErrorMessage"]</span>
+            </div>
+            <button type="button" class="btn-close btn-sm shadow-none" data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    }
+
+    <!-- Hàng thẻ thống kê nhanh -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">Tổng số ca đã đặt</div>
+                        <div class="fs-3 fw-bold" style="color: #002B5B;">@Model.TongSoDon</div>
+                    </div>
+                    <div class="rounded-3 p-3" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B;">
+                        <i class="bi bi-calendar-check fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">Đơn chờ duyệt</div>
+                        <div class="fs-3 fw-bold text-warning-emphasis">@Model.SoDonChoDuyet</div>
+                    </div>
+                    <div class="rounded-3 p-3" style="background-color: #fef3c7; color: #b45309;">
+                        <i class="bi bi-hourglass-split fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">Đã xác nhận / Duyệt</div>
+                        <div class="fs-3 fw-bold text-success">@Model.SoDonDaDuyet</div>
+                    </div>
+                    <div class="rounded-3 p-3" style="background-color: #d1fae5; color: #065f46;">
+                        <i class="bi bi-check2-circle fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">Đã hủy / Từ chối</div>
+                        <div class="fs-3 fw-bold text-danger">@Model.SoDonDaHuy</div>
+                    </div>
+                    <div class="rounded-3 p-3" style="background-color: #fee2e2; color: #991b1b;">
+                        <i class="bi bi-x-circle fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thông báo quy định Time-lock Rule -->
+    <div class="alert alert-info rounded-4 p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2 shadow-sm">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-exclamation fs-4 text-primary"></i>
+            <div>
+                <strong>Quy định Time-lock Rule:</strong> Sinh viên được quyền <em>Đổi lịch</em> hoặc <em>Hủy sân</em> tự động trước giờ bóng lăn tối thiểu <strong>2 tiếng</strong>. Sát giờ thi đấu hệ thống sẽ tự động khóa để đảm bảo công tác chuẩn bị mặt sân.
+            </div>
+        </div>
+        <span class="badge bg-primary text-white rounded-pill px-3 py-1">Hotline: 0988.686.868</span>
+    </div>
+
+    <!-- Danh sách các đơn đặt sân -->
+    @if (Model.DanhSachDonDat.Any())
+    {
+        <div class="d-flex flex-column gap-3">
+            @foreach (var item in Model.DanhSachDonDat)
+            {
+                var statusClass = "badge-status-choduyet";
+                if (item.TrangThaiDatSan.Contains("Duyệt", StringComparison.OrdinalIgnoreCase) ||
+                    item.TrangThaiDatSan.Contains("Thành công", StringComparison.OrdinalIgnoreCase) ||
+                    item.TrangThaiDatSan.Contains("Đã đặt cọc", StringComparison.OrdinalIgnoreCase))
+                {
+                    statusClass = "badge-status-daduyet";
+                }
+                else if (item.TrangThaiDatSan.Contains("Hủy", StringComparison.OrdinalIgnoreCase) ||
+                         item.TrangThaiDatSan.Contains("Từ chối", StringComparison.OrdinalIgnoreCase))
+                {
+                    statusClass = "badge-status-dahuy";
+                }
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <div class="row g-3 align-items-center">
+                        <!-- Cột 1: Ảnh sân & Thông tin cơ bản -->
+                        <div class="col-lg-3 col-md-4">
+                            <div class="d-flex gap-3 align-items-center">
+                                <img src="@item.AnhSan" alt="@item.TenSan" class="rounded-3 shadow-sm"
+                                     style="width: 100px; height: 75px; object-fit: cover;"
+                                     onerror="this.onerror=null;this.src='/uploads/sanbong/san-5-so-1.jpg';" />
+                                <div>
+                                    <span class="badge bg-light text-dark border rounded-pill small mb-1">#@item.DatSanId</span>
+                                    <h5 class="fw-bold mb-1" style="color: #002B5B;">@item.TenSan</h5>
+                                    <div class="text-muted small">@item.LoaiSan</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cột 2: Thời gian & Dịch vụ -->
+                        <div class="col-lg-3 col-md-4">
+                            <div class="small">
+                                <div class="mb-1">
+                                    <i class="bi bi-calendar3 text-warning me-1"></i>
+                                    <strong>@item.NgayDat.ToString("dd/MM/yyyy")</strong>
+                                </div>
+                                <div class="text-muted mb-1">
+                                    <i class="bi bi-clock me-1"></i>Ca thi đấu: <strong>@item.KhungGioDisplay</strong>
+                                </div>
+                                @if (item.DanhSachDichVu.Any())
+                                {
+                                    <div class="text-muted" style="font-size: 0.76rem;">
+                                        <i class="bi bi-bag-plus me-1 text-primary"></i>@string.Join(", ", item.DanhSachDichVu)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Cột 3: Chi phí & Trạng thái thanh toán -->
+                        <div class="col-lg-3 col-md-4">
+                            <div class="small">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Tổng tiền:</span>
+                                    <strong class="text-dark fs-6">@item.TongTien.ToString("N0") đ</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Đã thanh toán:</span>
+                                    <span class="text-success fw-bold">@item.DaThanhToan.ToString("N0") đ</span>
+                                </div>
+                                @if (item.ConLai > 0)
+                                {
+                                    <div class="d-flex justify-content-between text-danger fw-semibold" style="font-size: 0.78rem;">
+                                        <span>Còn lại tại sân:</span>
+                                        <span>@item.ConLai.ToString("N0") đ</span>
+                                    </div>
+                                }
+                                <div class="mt-1 d-flex gap-1 flex-wrap">
+                                    <span class="@statusClass">@item.TrangThaiDatSan</span>
+                                    <span class="badge bg-light text-secondary border small">@item.TrangThaiThanhToan</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cột 4: Nút hành động & Quy tắc Time-lock -->
+                        <div class="col-lg-3 col-md-12 text-lg-end">
+                            <!-- Hiển thị nhãn Time-lock -->
+                            <div class="mb-2">
+                                @if (item.CanRescheduleOrCancel)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle small py-1 px-2">
+                                        <i class="bi bi-unlock-fill me-1"></i>@item.TimeLockStatusText
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle small py-1 px-2" title="@item.LockReason">
+                                        <i class="bi bi-lock-fill me-1"></i>@item.TimeLockStatusText
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="d-flex gap-1 justify-content-lg-end flex-wrap">
+                                <!-- NÚT VIẾT ĐÁNH GIÁ (RÀNG BUỘC CHẶT CHẼ: VERIFIED BOOKING ONLY - CHỈ KHI TRẠNG THÁI "HOÀN THÀNH") -->
+                                @if (string.Equals(item.TrangThaiDatSan, "Hoàn thành", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    if (!item.DaDanhGia)
+                                    {
+                                        <a asp-area="KhachHang" asp-controller="DanhGia" asp-action="VietDanhGia" asp-route-datSanId="@item.DatSanId"
+                                           class="btn btn-sm btn-warning fw-bold text-dark rounded-pill px-3 shadow-sm" title="Viết đánh giá chất lượng sân">
+                                            <i class="bi bi-star-fill text-dark me-1"></i>Viết đánh giá
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill py-2 px-3 small fw-bold d-inline-flex align-items-center">
+                                            <i class="bi bi-star-fill text-warning me-1"></i>Đã đánh giá (@(item.SoSaoDanhGia ?? 5)★)
+                                        </span>
+                                    }
+                                }
+
+                                <!-- Xem nhận xét thực tế của sân -->
+                                <a asp-area="KhachHang" asp-controller="DanhGia" asp-action="SanBong" asp-route-id="@item.SanBongId"
+                                   class="btn btn-sm btn-outline-secondary rounded-pill px-2" title="Xem đánh giá sân">
+                                    <i class="bi bi-chat-quote"></i>
+                                </a>
+
+                                <!-- Xem Hóa đơn chi tiết -->
+                                <a asp-area="KhachHang" asp-controller="DatSan" asp-action="ChiTietHoaDon" asp-route-id="@item.DatSanId"
+                                   class="btn btn-sm btn-outline-secondary rounded-pill px-3" title="Xem hóa đơn">
+                                    <i class="bi bi-receipt"></i> Bill
+                                </a>
+
+                                <!-- Nút Thanh toán cọc nếu chưa thanh toán -->
+                                @if (item.DaThanhToan < item.TongTien && !item.TrangThaiDatSan.Contains("Hủy"))
+                                {
+                                    <a asp-area="KhachHang" asp-controller="DatSan" asp-action="ThanhToan" asp-route-id="@item.DatSanId"
+                                       class="btn btn-sm btn-primary rounded-pill px-3" title="Thanh toán cọc">
+                                        <i class="bi bi-qr-code"></i> Quét QR
+                                    </a>
+                                }
+
+                                <!-- Nút Đổi lịch (Ràng buộc Time-lock) -->
+                                @if (item.CanRescheduleOrCancel)
+                                {
+                                    <a asp-area="KhachHang" asp-controller="YeuCauDoiLich" asp-action="TaoYeuCau" asp-route-datSanId="@item.DatSanId"
+                                       class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                        <i class="bi bi-arrow-repeat me-1"></i>Đổi lịch
+                                    </a>
+
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 btn-open-cancel"
+                                            data-id="@item.DatSanId"
+                                            data-name="@item.TenSan"
+                                            data-date="@item.NgayDat.ToString("dd/MM/yyyy")">
+                                        <i class="bi bi-x-circle me-1"></i>Hủy
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-sm btn-light text-muted rounded-pill px-3 border" disabled title="@item.LockReason">
+                                        <i class="bi bi-lock me-1"></i>Đổi lịch
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-light text-muted rounded-pill px-3 border" disabled title="@item.LockReason">
+                                        <i class="bi bi-lock me-1"></i>Hủy
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+            <div class="py-4">
+                <i class="bi bi-calendar-x fs-1 text-muted opacity-50"></i>
+                <h5 class="fw-bold mt-3 mb-2" style="color: #002B5B;">Bạn chưa có lịch đặt sân nào</h5>
+                <p class="text-muted small mb-4">Hãy tra cứu các khung giờ trống và đặt lịch ngay để cùng đồng đội ra sân rèn luyện thể chất.</p>
+                <a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="btn btn-warning fw-bold text-dark rounded-pill px-4 shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Đặt sân bóng ngay
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- ===============================================================
+     MODAL XÁC NHẬN HỦY ĐẶT SÂN
+=============================================================== -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold" id="cancelModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác Nhận Hủy Đặt Sân
+                </h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form asp-area="KhachHang" asp-controller="DatSan" asp-action="HuyDatSan" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="cancelDatSanId" />
+
+                <div class="modal-body p-4">
+                    <p class="mb-3">
+                        Bạn có chắc chắn muốn hủy đơn đặt sân <strong id="cancelPitchName" class="text-danger"></strong> vào ngày <strong id="cancelDate"></strong>?
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Lý do hủy đơn (Tùy chọn):</label>
+                        <textarea name="lyDoHuy" class="form-control rounded-3" rows="3" placeholder="Ví dụ: Đội bóng bận lịch học đột xuất, thời tiết mưa lớn..."></textarea>
+                    </div>
+
+                    <div class="alert alert-warning py-2 small mb-0 rounded-3">
+                        <i class="bi bi-info-circle me-1"></i> Theo quy định của UTC STADIUM, tiền đặt cọc có thể được bảo lưu sang ca thi đấu khác nếu hủy hợp lệ trước 2 tiếng.
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light p-3 border-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Đồng Ý Hủy Đơn
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cancelModalEl = document.getElementById("cancelModal");
+            const cancelModal = cancelModalEl ? new bootstrap.Modal(cancelModalEl) : null;
+
+            document.querySelectorAll(".btn-open-cancel").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const id = this.getAttribute("data-id");
+                    const name = this.getAttribute("data-name");
+                    const date = this.getAttribute("data-date");
+
+                    document.getElementById("cancelDatSanId").value = id;
+                    document.getElementById("cancelPitchName").textContent = name;
+                    document.getElementById("cancelDate").textContent = date;
+
+                    if (cancelModal) {
+                        cancelModal.show();
+                    }
+                });
+            });
+        });
+    </script>
+}
+

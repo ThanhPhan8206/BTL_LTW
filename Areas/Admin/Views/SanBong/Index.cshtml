@@ -1,0 +1,311 @@
+@model QLSanBong.Areas.Admin.Models.AdminSanBongListViewModel
+@{
+    ViewData["Title"] = "Quản lý Sân bóng & Bảo trì - UTC STADIUM";
+}
+
+<!-- Page Header Banner -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-navy text-white fw-bold rounded-pill px-3 py-1" style="background-color: #002B5B;">
+                <i class="bi bi-dribbble me-1 text-warning"></i> MODULE 2
+            </span>
+            <span class="text-muted small">Hạ tầng &amp; Mặt sân thi đấu</span>
+        </div>
+        <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Quản Lý Sân Bóng &amp; Lịch Bảo Trì</h2>
+        <p class="text-muted small mb-0">Quản lý cụm sân, tình trạng cỏ, hệ thống chiếu sáng và điều phối lịch bảo dưỡng định kỳ.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a asp-area="Admin" asp-controller="SanBong" asp-action="BaoTri" class="btn btn-outline-warning text-dark fw-bold rounded-pill px-3 shadow-sm">
+            <i class="bi bi-wrench-adjustable me-1 text-warning"></i> Lịch Bảo Trì
+        </a>
+        <a asp-area="Admin" asp-controller="SanBong" asp-action="Create" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm" style="background-color: #002B5B; border-color: #002B5B;">
+            <i class="bi bi-plus-lg me-1 text-warning"></i> Thêm Sân Mới
+        </a>
+    </div>
+</div>
+
+<!-- Status Summary Counters -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Sân 5 người</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B;">
+                    <i class="bi bi-grid-fill fs-5"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold" style="color: #002B5B;">
+                @Model.TotalSan5 <span class="fs-6 text-muted fw-normal">sân</span>
+            </div>
+            <span class="small text-muted">Cụm sân cỏ mini</span>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Sân 7 người</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(16, 185, 129, 0.12); color: #047857;">
+                    <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-success">
+                @Model.TotalSan7 <span class="fs-6 text-muted fw-normal">sân</span>
+            </div>
+            <span class="small text-muted">Sân tiêu chuẩn giải đấu</span>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Sân 11 người</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(59, 130, 246, 0.12); color: #1D4ED8;">
+                    <i class="bi bi-bounding-box-circles fs-5"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-primary">
+                @Model.TotalSan11 <span class="fs-6 text-muted fw-normal">sân</span>
+            </div>
+            <span class="small text-muted">Sân kích thước chuẩn QG</span>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Đang bảo trì</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(245, 158, 11, 0.12); color: #B45309;">
+                    <i class="bi bi-tools fs-5"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-warning">
+                @Model.TotalDangBaoTri <span class="fs-6 text-muted fw-normal">lịch</span>
+            </div>
+            <span class="small text-muted">Mặt cỏ &amp; hệ thống đèn</span>
+        </div>
+    </div>
+</div>
+
+<!-- Toolbar Bộ Lọc & Tìm Kiếm -->
+<div class="admin-filter-bar mb-4">
+    <form asp-area="Admin" asp-controller="SanBong" asp-action="Index" method="get" class="row g-2 align-items-center">
+        <!-- Input Search -->
+        <div class="col-lg-4 col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" name="search" value="@Model.Search" class="form-control bg-light border-start-0"
+                       placeholder="Tìm theo tên sân hoặc mô tả..." />
+            </div>
+        </div>
+
+        <!-- Filter Loại Sân -->
+        <div class="col-lg-3 col-md-3">
+            <select name="loaiSan" class="form-select bg-light">
+                <option value="">-- Tất cả loại sân --</option>
+                <option value="5" selected="@(Model.LoaiSan == "5")">Sân 5 người</option>
+                <option value="7" selected="@(Model.LoaiSan == "7")">Sân 7 người</option>
+                <option value="11" selected="@(Model.LoaiSan == "11")">Sân 11 người</option>
+            </select>
+        </div>
+
+        <!-- Filter Trạng thái -->
+        <div class="col-lg-3 col-md-4">
+            <select name="trangThai" class="form-select bg-light">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Sẵn sàng" selected="@(Model.TrangThai == "Sẵn sàng")">Sẵn sàng / Hoạt động</option>
+                <option value="Bảo trì" selected="@(Model.TrangThai == "Bảo trì")">Đang bảo trì</option>
+                <option value="Ngừng hoạt động" selected="@(Model.TrangThai == "Ngừng hoạt động")">Ngừng hoạt động</option>
+            </select>
+        </div>
+
+        <!-- Nút Submit & Reset -->
+        <div class="col-lg-2 col-md-12 d-flex gap-2">
+            <button type="submit" class="btn btn-primary rounded-pill px-3 fw-semibold w-100" style="background-color: #002B5B; border-color: #002B5B;">
+                <i class="bi bi-funnel me-1"></i> Lọc
+            </button>
+            <a asp-area="Admin" asp-controller="SanBong" asp-action="Index" class="btn btn-light rounded-pill px-3 border" title="Xóa bộ lọc">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Bảng Danh Sách Sân Bóng -->
+<div class="admin-card">
+    @if (!Model.Items.Any())
+    {
+        <div class="text-center py-5">
+            <div class="rounded-circle d-inline-flex p-3 mb-2" style="background-color: #F1F5F9; color: #64748B;">
+                <i class="bi bi-inbox fs-2"></i>
+            </div>
+            <h6 class="fw-bold text-dark">Không tìm thấy sân bóng phù hợp</h6>
+            <p class="text-muted small mb-0">Thử thay đổi từ khóa hoặc điều kiện lọc của bạn.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th>HÌNH ẢNH</th>
+                        <th>TÊN SÂN BÓNG</th>
+                        <th>LOẠI SÂN</th>
+                        <th class="text-center">ĐƠN ĐÃ ĐẶT</th>
+                        <th class="text-center">TRẠNG THÁI</th>
+                        <th class="text-end" style="width: 220px;">THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pitch in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <span class="fw-bold text-muted">#@pitch.Id</span>
+                            </td>
+                            <td>
+                                <img src="@(string.IsNullOrEmpty(pitch.AnhSan) ? "/uploads/sanbong/san-5-so-1.jpg" : pitch.AnhSan)"
+                                     alt="@pitch.TenSan" class="rounded-3 shadow-sm border" style="width: 58px; height: 42px; object-fit: cover;"
+                                     onerror="this.onerror=null;this.src='/uploads/sanbong/san-5-so-1.jpg';" />
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark fs-6">@pitch.TenSan</div>
+                                <div class="small text-muted text-truncate" style="max-width: 250px;">
+                                    @(string.IsNullOrEmpty(pitch.MoTa) ? "Mặt cỏ nhân tạo cao cấp đạt chuẩn thi đấu sinh viên" : pitch.MoTa)
+                                </div>
+                                @if (pitch.DangBaoTri)
+                                {
+                                    <div class="small text-warning fw-semibold mt-1">
+                                        <i class="bi bi-cone-striped me-1"></i>@pitch.ThongTinBaoTriHienTai
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-navy border fw-bold px-3 py-1">
+                                    <i class="bi bi-people me-1"></i>@pitch.LoaiSan
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border fw-bold px-3 py-1">
+                                    @pitch.TongDonDat đơn
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                @if (pitch.DangBaoTri)
+                                {
+                                    <span class="admin-badge admin-badge-warning">
+                                        <i class="bi bi-cone-striped"></i> Đang bảo trì
+                                    </span>
+                                }
+                                else if (pitch.TrangThai == "Ngừng hoạt động")
+                                {
+                                    <span class="admin-badge admin-badge-locked">
+                                        <i class="bi bi-slash-circle"></i> Ngừng hoạt động
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="admin-badge admin-badge-active">
+                                        <i class="bi bi-check-circle-fill"></i> Sẵn sàng
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <!-- Nút Sửa -->
+                                    <a asp-area="Admin" asp-controller="SanBong" asp-action="Edit" asp-route-id="@pitch.Id"
+                                       class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1" title="Chỉnh sửa thông tin">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    <!-- Nút Lịch Bảo Trì -->
+                                    <a asp-area="Admin" asp-controller="SanBong" asp-action="BaoTri" asp-route-sanBongId="@pitch.Id"
+                                       class="btn btn-sm btn-outline-warning rounded-pill px-2 py-1" title="Đặt lịch bảo trì mặt sân">
+                                        <i class="bi bi-wrench"></i>
+                                    </a>
+
+                                    <!-- Nút Ngừng hoạt động / Kích hoạt lại -->
+                                    @if (pitch.TrangThai == "Ngừng hoạt động")
+                                    {
+                                        <form asp-area="Admin" asp-controller="SanBong" asp-action="KichHoat" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@pitch.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2 py-1" title="Kích hoạt lại sân">
+                                                <i class="bi bi-play-fill"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-area="Admin" asp-controller="SanBong" asp-action="NgungHoatDong" method="post" class="d-inline"
+                                              onsubmit="return confirm('Bạn có chắc muốn NGỪNG HOẠT ĐỘNG sân \'@pitch.TenSan\'? Sân sẽ tạm ẩn khỏi giao diện khách hàng.');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@pitch.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" title="Tạm ngừng hoạt động">
+                                                <i class="bi bi-pause-fill"></i>
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <!-- Nút Xóa (Kèm quy tắc xóa mềm) -->
+                                    <form asp-area="Admin" asp-controller="SanBong" asp-action="Delete" method="post" class="d-inline"
+                                          onsubmit="return confirm('Bạn có chắc muốn XÓA sân \'@pitch.TenSan\'? Nếu sân đã phát sinh đơn đặt, hệ thống sẽ tự động chuyển sang chế độ xóa mềm để bảo vệ dữ liệu.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@pitch.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1" title="Xóa sân">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phân trang 10 dòng/trang -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 mt-4 pt-3 border-top">
+                <span class="text-muted small">
+                    Hiển thị trang <strong>@Model.CurrentPage</strong> / <strong>@Model.TotalPages</strong> (Tổng @Model.TotalItems sân)
+                </span>
+
+                <nav aria-label="Sân bóng pagination">
+                    <ul class="pagination admin-pagination mb-0">
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a class="page-link" asp-area="Admin" asp-controller="SanBong" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.Search" asp-route-loaiSan="@Model.LoaiSan" asp-route-trangThai="@Model.TrangThai">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-area="Admin" asp-controller="SanBong" asp-action="Index"
+                                   asp-route-page="@i" asp-route-search="@Model.Search" asp-route-loaiSan="@Model.LoaiSan" asp-route-trangThai="@Model.TrangThai">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a class="page-link" asp-area="Admin" asp-controller="SanBong" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.Search" asp-route-loaiSan="@Model.LoaiSan" asp-route-trangThai="@Model.TrangThai">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    }
+</div>
+

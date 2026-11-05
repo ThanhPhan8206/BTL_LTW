@@ -1,0 +1,185 @@
+@model QLSanBong.Areas.KhachHang.Models.PitchReviewsViewModel
+@{
+    ViewData["Title"] = $"Đánh Giá & Nhận Xét Thực Tế - {Model.TenSan}";
+}
+
+<div class="container-fluid px-3 px-lg-5 py-4">
+    <!-- Breadcrumb điều hướng -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Danh sách sân</a></li>
+            <li class="breadcrumb-item active fw-semibold" aria-current="page" style="color: #002B5B;">Đánh giá @Model.TenSan</li>
+        </ol>
+    </nav>
+
+    <!-- Thẻ Header sân bóng & Thống kê điểm số trung bình -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4">
+        <div class="row g-0">
+            <div class="col-md-4 col-xl-3">
+                <img src="@Model.AnhSan" alt="@Model.TenSan"
+                     class="w-100 h-100 object-fit-cover"
+                     style="min-height: 220px;"
+                     onerror="this.onerror=null;this.src='/uploads/sanbong/san-5-so-1.jpg';" />
+            </div>
+
+            <div class="col-md-8 col-xl-9 p-4 p-lg-5 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold">
+                                @Model.LoaiSan
+                            </span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">
+                                <i class="bi bi-shield-check me-1"></i>100% Đánh giá thật (Verified)
+                            </span>
+                        </div>
+
+                        @if (Model.CoDonChoDanhGia && Model.DatSanIdChoDanhGia.HasValue)
+                        {
+                            <a asp-area="KhachHang" asp-controller="DanhGia" asp-action="VietDanhGia" asp-route-datSanId="@Model.DatSanIdChoDanhGia.Value"
+                               class="btn btn-warning fw-bold text-dark rounded-pill px-4 shadow-sm">
+                                <i class="bi bi-pencil-square me-1"></i> Viết đánh giá cho sân này
+                            </a>
+                        }
+                    </div>
+
+                    <h2 class="fw-extrabold mb-1" style="color: #002B5B;">@Model.TenSan</h2>
+                    <p class="text-muted small mb-3">Đơn giá tham khảo: <strong class="text-danger fs-6">@Model.GiaThamKhao.ToString("N0") đ/ca</strong></p>
+                </div>
+
+                <!-- Thống kê điểm số và thanh phân bố sao -->
+                <div class="row align-items-center g-3 pt-3 border-top">
+                    <!-- Khối điểm trung bình -->
+                    <div class="col-sm-4 text-center text-sm-start border-end-sm">
+                        <div class="display-4 fw-extrabold text-warning lh-1">
+                            @Model.DiemTrungBinh.ToString("0.0")
+                        </div>
+                        <div class="my-1">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Round(Model.DiemTrungBinh))
+                                {
+                                    <i class="bi bi-star-fill text-warning fs-5"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star text-muted fs-5"></i>
+                                }
+                            }
+                        </div>
+                        <div class="text-muted small">
+                            Dựa trên <strong>@Model.TongSoDanhGia</strong> lượt đánh giá đã xác thực
+                        </div>
+                    </div>
+
+                    <!-- Thanh tỷ lệ sao -->
+                    <div class="col-sm-8">
+                        @for (int s = 5; s >= 1; s--)
+                        {
+                            int count = s switch
+                            {
+                                5 => Model.Sao5Count,
+                                4 => Model.Sao4Count,
+                                3 => Model.Sao3Count,
+                                2 => Model.Sao2Count,
+                                _ => Model.Sao1Count
+                            };
+                            int pct = Model.TongSoDanhGia > 0 ? (int)Math.Round((double)count / Model.TongSoDanhGia * 100) : 0;
+
+                            <div class="d-flex align-items-center gap-2 mb-1 small">
+                                <span class="text-muted text-nowrap" style="width: 45px;">@s <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1" style="height: 7px; background-color: #E2E8F0;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: @pct%" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <span class="text-muted text-nowrap" style="width: 35px; text-align: right;">@count</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách đánh giá chi tiết -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="fw-bold mb-0" style="color: #002B5B;">
+            <i class="bi bi-chat-square-quote-fill text-warning me-2"></i>Nhận Xét Từ Người Chơi Thực Tế (@Model.DanhSachDanhGia.Count)
+        </h4>
+        <a asp-area="KhachHang" asp-controller="DatSan" asp-action="TaoDon" asp-route-sanBongId="@Model.SanBongId"
+           class="btn btn-outline-primary rounded-pill px-4 fw-semibold small">
+            <i class="bi bi-calendar-plus me-1"></i> Đặt sân này
+        </a>
+    </div>
+
+    @if (Model.DanhSachDanhGia.Any())
+    {
+        <div class="d-flex flex-column gap-3">
+            @foreach (var review in Model.DanhSachDanhGia)
+            {
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white @(review.IsCurrentUser ? "border-start border-4 border-warning" : "")">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm"
+                                 style="width: 48px; height: 48px; min-width: 48px; background-color: #002B5B; font-size: 1.1rem;">
+                                @(string.IsNullOrWhiteSpace(review.TenNguoiDung) ? "U" : review.TenNguoiDung.Trim().Split(' ').Last().Substring(0, 1).ToUpper())
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 class="fw-bold mb-0 text-dark">@review.TenNguoiDung</h6>
+                                    @if (review.IsCurrentUser)
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill small">
+                                            Đánh giá của bạn
+                                        </span>
+                                    }
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small">
+                                        <i class="bi bi-patch-check-fill me-1"></i>Đã đá tại sân (Verified)
+                                    </span>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <i class="bi bi-clock me-1"></i>@review.ThoiGianTuongDoi
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Số sao -->
+                        <div class="d-flex gap-1 text-warning">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= review.SoSao)
+                                {
+                                    <i class="bi bi-star-fill fs-6"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star text-muted fs-6"></i>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Nội dung bình luận -->
+                    <div class="p-3 rounded-3" style="background-color: #F8FAFC; border: 1px solid #E2E8F0; font-size: 0.95rem; line-height: 1.6; color: #1E293B;">
+                        @review.BinhLuan
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+            <div class="py-4">
+                <i class="bi bi-star fs-1 text-warning opacity-50"></i>
+                <h5 class="fw-bold mt-3 mb-2" style="color: #002B5B;">Chưa có nhận xét nào cho sân này</h5>
+                <p class="text-muted small mb-4">Hãy là một trong những đội bóng đầu tiên trải nghiệm mặt sân và gửi đánh giá để nhận ưu đãi từ UTC STADIUM!</p>
+                <a asp-area="KhachHang" asp-controller="DatSan" asp-action="TaoDon" asp-route-sanBongId="@Model.SanBongId"
+                   class="btn btn-warning fw-bold text-dark rounded-pill px-4 shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Đặt sân ngay
+                </a>
+            </div>
+        </div>
+    }
+</div>
+

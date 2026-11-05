@@ -1,8 +1,763 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Trang chủ - Hệ Thống Đặt Sân UTC STADIUM";
+    var fallbackSvg = "this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23e2e8f0%22/><text x=%2250%25%22 y=%2250%25%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2222%22 fill=%22%23002B5B%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>UTC STADIUM</text></svg>';";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- ===================================================================
+     PHẦN MỞ ĐẦU TRANG CHỦ (KHÔNG DÙNG ẢNH BANNER - NỀN TRẮNG THOÁNG ĐÃNG STYLE DOLEARN)
+=================================================================== -->
+<section class="hero-clean-section">
+    <div class="container">
+        <div class="hero-clean-center text-center mx-auto">
+            <!-- 1. Badge "Cổng thể thao" (Fade-in Up delay 0.1s) -->
+            <div class="hero-clean-badge mb-3 fade-in-up fade-delay-1">
+                <i class="bi bi-mortarboard-fill text-warning"></i>
+                <span>Cổng Thể Thao &amp; Đặt Lịch Sân Bóng Sinh Viên</span>
+            </div>
+
+            <!-- 2. Tiêu đề lớn kèm khối chữ "GIẢI ĐẤU SINH VIÊN" nền vàng hiệu ứng ánh sáng lướt (Fade-in Up delay 0.2s) -->
+            <h1 class="hero-clean-title fade-in-up fade-delay-2">
+                HỆ THỐNG ĐẶT SÂN VÀ KẾT NỐI <span class="text-highlight-navy shimmer-highlight">GIẢI ĐẤU SINH VIÊN</span>
+            </h1>
+
+            <!-- 3. Đoạn mô tả (Hiệu ứng blurFadeInUp + Nhấn mạnh từ khóa nhấp nháy & Typing cursor) -->
+            <p class="hero-clean-subtitle mx-auto blur-fade-in-up fade-delay-3">
+                Nền tảng trực tuyến giúp sinh viên tra cứu khung giờ trống
+                <span class="realtime-keyword"><span class="realtime-blink-dot"></span>theo thời gian thực</span>,
+                đặt lịch thi đấu nhanh chóng và kết nối phong trào bóng đá sôi động giữa các chi đoàn, khoa viện tại
+                <span class="brand-shimmer-text">UTC STADIUM</span>.<span class="typing-cursor" aria-hidden="true">|</span>
+            </p>
+
+            <!-- 4. Hai nút bấm hành động (Fade-in Up delay 0.4s) -->
+            <div class="d-flex flex-wrap justify-content-center gap-3 mb-5 fade-in-up fade-delay-4">
+                <a href="#danh-muc-san" class="btn btn-cta-accent">
+                    <i class="bi bi-calendar2-check-fill cta-icon"></i>
+                    <span>Đặt sân ngay</span>
+                </a>
+                <a href="#giai-dau" class="btn btn-cta-outline-navy">
+                    <i class="bi bi-trophy-fill text-warning cta-icon"></i>
+                    <span>Tìm hiểu giải đấu</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 5. Thanh số liệu thống kê nhanh ngang màn hình (Fade-in Up delay 0.55s) -->
+        <div class="stats-bar-wrapper fade-in-up fade-delay-5">
+            <div class="row g-0 row-cols-2 row-cols-lg-4">
+                <div class="col stat-item">
+                    <div class="stat-icon"><i class="bi bi-grid-1x2-fill"></i></div>
+                    <div>
+                        <div class="stat-value">
+                            <span class="counter-number" data-target="6" data-pad="2">00</span> Sân
+                        </div>
+                        <div class="stat-label">Tổng số sân cỏ chuẩn thi đấu</div>
+                    </div>
+                </div>
+                <div class="col stat-item">
+                    <div class="stat-icon"><i class="bi bi-trophy-fill"></i></div>
+                    <div>
+                        <div class="stat-value">
+                            <span class="counter-number" data-target="8" data-pad="2">00</span> Giải đấu
+                        </div>
+                        <div class="stat-label">Giải bóng đá sinh viên trong năm</div>
+                    </div>
+                </div>
+                <div class="col stat-item">
+                    <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                    <div>
+                        <div class="stat-value">
+                            <span class="counter-number" data-target="120" data-suffix="+">0</span> Đội
+                        </div>
+                        <div class="stat-label">Đội bóng đại diện các lớp</div>
+                    </div>
+                </div>
+                <div class="col stat-item">
+                    <div class="stat-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <div>
+                        <div class="stat-value">
+                            <span class="counter-number" data-target="100" data-suffix="%">0</span> Online
+                        </div>
+                        <div class="stat-label">Giữ ca &amp; xác nhận lịch 24/7</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     KHỐI 1: GIỚI THIỆU GIẢI BÓNG ĐÁ SINH VIÊN (KHỐI NỀN XANH #002B5B BO GÓC LỚN)
+=================================================================== -->
+<section id="giai-dau" class="block-tournament-dolearn reveal-on-scroll">
+    <div class="container">
+        <div class="tournament-block-container">
+            <div class="row align-items-center g-4 g-lg-5">
+                <!-- Cột trái: Văn bản giới thiệu giải đấu thường niên & 2 nút hành động -->
+                <div class="col-lg-5">
+                    <div class="block-tag-pill badge-glow-pulse">
+                        <i class="bi bi-award-fill trophy-pulse-icon"></i>
+                        <span>GIẢI ĐẤU TRUYỀN THỐNG HỌC ĐƯỜNG</span>
+                    </div>
+
+                    <h2 class="block-title-white staggered-tournament-title">
+                        <span class="stagger-line stagger-line-1">GIẢI BÓNG ĐÁ SINH VIÊN THƯỜNG NIÊN</span>
+                        <span class="stagger-line stagger-line-2 neon-gold-text">&amp; ĐẠI DIỆN CÁC LỚP</span>
+                    </h2>
+
+                    <p class="block-desc-light">
+                        Quy tụ hàng chục đội bóng xuất sắc đại diện cho các Chi đoàn và Khoa/Viện, giải bóng đá sinh viên thường niên là ngày hội thể thao lớn nhất năm học — nơi thổi bùng đam mê sân cỏ, rèn luyện bản lĩnh và gắn kết tình đồng đội.
+                    </p>
+
+                    <div class="tournament-highlights-list my-4">
+                        <div class="t-highlight-row">
+                            <span class="t-check-icon"><i class="bi bi-shield-check"></i></span>
+                            <div>
+                                <h6 class="mb-1 text-white fw-bold">Tổ chức bài bản &amp; Chuyên nghiệp</h6>
+                                <p class="mb-0 small text-white-50">Hệ thống sân bãi đạt chuẩn, tổ trọng tài công tâm cùng đội ngũ y tế túc trực xuyên suốt mùa giải.</p>
+                            </div>
+                        </div>
+                        <div class="t-highlight-row">
+                            <span class="t-check-icon"><i class="bi bi-people"></i></span>
+                            <div>
+                                <h6 class="mb-1 text-white fw-bold">Lan tỏa tinh thần Fair-Play các lớp</h6>
+                                <p class="mb-0 small text-white-50">Kết nối giao lưu giữa các khóa, lưu giữ những kỷ niệm thanh xuân sôi nổi dưới màu cờ sắc áo tập thể lớp.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2 Nút: "Đặt sân ngay" (Vàng #FFC107) & "Tìm hiểu giải đấu" -->
+                    <div class="d-flex flex-wrap align-items-center gap-3 pt-2">
+                        <a href="#danh-muc-san" class="btn btn-cta-accent">
+                            <i class="bi bi-calendar2-check-fill cta-icon"></i>
+                            <span>Đặt sân ngay</span>
+                        </a>
+                        <a href="#goc-anh-tin-tuc" class="btn btn-cta-outline-light">
+                            <i class="bi bi-journal-richtext text-warning cta-icon"></i>
+                            <span>Tìm hiểu giải đấu</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Hiển thị 2 thẻ ảnh minh họa giải đấu (giai-dau-1.jpg & giai-dau-2.jpg) -->
+                <div class="col-lg-7">
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <!-- Thẻ ảnh giải đấu 1: Tuyển Quân -->
+                        <div class="col">
+                            <div class="tournament-photo-card">
+                                <div class="tournament-photo-wrap">
+                                    <img src="~/uploads/sanbong/giai-dau-1.jpg"
+                                         alt="Tuyển Quân Đội Tuyển Bóng Đá Đoàn Trường & Các Liên Chi"
+                                         class="tournament-photo-img"
+                                         onerror="@fallbackSvg" />
+                                    <span class="class-rep-badge bg-warning text-dark">
+                                        🔥 Đang mở đăng ký
+                                    </span>
+                                </div>
+                                <div class="tournament-photo-body">
+                                    <div class="class-rep-faculty">ĐOÀN THANH NIÊN - HỘI SINH VIÊN</div>
+                                    <h5 class="class-rep-name">Tuyển Quân Đội Tuyển Bóng Đá Đoàn Trường &amp; Các Liên Chi</h5>
+                                    <p class="class-rep-captain mb-2">
+                                        Cơ hội khoác áo đội tuyển nòng cốt, đại diện sinh viên UTC tranh tài tại các giải đấu thể thao sinh viên cấp Thành phố.
+                                    </p>
+                                    <div class="class-rep-stats">
+                                        <span><i class="bi bi-fire text-danger me-1"></i>Đội tuyển nòng cốt</span>
+                                        <span>&bull;</span>
+                                        <span>Sinh viên UTC</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thẻ ảnh giải đấu 2: Hội Thao -->
+                        <div class="col">
+                            <div class="tournament-photo-card">
+                                <div class="tournament-photo-wrap">
+                                    <img src="~/uploads/sanbong/giai-dau-2.jpg"
+                                         alt="Hội Thao Sinh Viên UTC - Kết Nối Sức Trẻ Các Khoa Viện"
+                                         class="tournament-photo-img"
+                                         onerror="@fallbackSvg" />
+                                    <span class="class-rep-badge bg-info text-dark">
+                                        🏆 Hội Thao Sinh Viên
+                                    </span>
+                                </div>
+                                <div class="tournament-photo-body">
+                                    <div class="class-rep-faculty">NGÀY HỘI THỂ THAO TRUYỀN THỐNG</div>
+                                    <h5 class="class-rep-name">Hội Thao Sinh Viên UTC - Kết Nối Sức Trẻ Các Khoa Viện</h5>
+                                    <p class="class-rep-captain mb-2">
+                                        Nơi hội tụ những tập thể lớp đoàn kết, cháy hết mình vì màu cờ sắc áo trên sân cỏ trường Đại học Giao thông Vận tải.
+                                    </p>
+                                    <div class="class-rep-stats">
+                                        <span><i class="bi bi-award-fill text-warning me-1"></i>Truyền thống UTC</span>
+                                        <span>&bull;</span>
+                                        <span>Fair-Play</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     KHỐI 2: DANH MỤC SÂN BÓNG & CA TRỐNG (LƯỚI 3 CỘT THẺ CARD)
+=================================================================== -->
+<section id="danh-muc-san" class="block-pitches-section reveal-on-scroll">
+    <div class="container">
+        <div class="pitches-rounded-block">
+            <!-- Tiêu đề phân mục -->
+            <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-4 gap-3">
+                <div>
+                    <div class="section-label-pill">
+                        <i class="bi bi-pin-map-fill"></i>
+                        <span>Hệ Thống Sân Cỏ Nhân Tạo Tiêu Chuẩn</span>
+                    </div>
+                    <h2 class="section-main-heading mb-0">
+                        DANH MỤC SÂN BÓNG &amp; CA TRỐNG
+                    </h2>
+                </div>
+                <p class="text-muted mb-0" style="max-width: 460px;">
+                    Giá thuê niêm yết minh bạch theo từng khung giờ, ưu đãi trợ giá đặc biệt dành riêng cho sinh viên và các giải đấu chi đoàn.
+                </p>
+            </div>
+
+            <!-- Hiệu ứng 3: Thanh thông báo nhanh dưới tiêu đề Danh mục sân -->
+            <div class="smart-tip-banner mb-4">
+                <span class="tip-icon-badge">💡</span>
+                <div class="tip-text">
+                    <strong>Mẹo đặt sân:</strong> Chọn trực tiếp khung giờ trống bên dưới mỗi sân để giữ ca nhanh chỉ trong 30 giây - Miễn phí nước uống cho giải đấu cấp Chi đoàn!
+                </div>
+            </div>
+
+            <!-- Lưới 3 cột thẻ Card sân bóng -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <!-- Sân số 1 (Sân 5): ~/uploads/sanbong/san-5-so-1.jpg -->
+                <div class="col reveal-on-scroll">
+                    <div class="pitch-card">
+                        <div class="pitch-img-wrapper">
+                            <img src="~/uploads/sanbong/san-5-so-1.jpg"
+                                 alt="Sân số 1 - Sân 5 người"
+                                 class="pitch-img"
+                                 onerror="@fallbackSvg" />
+                            <span class="pitch-type-badge">Sân 5 Người</span>
+                            <span class="pitch-status-badge status-available">
+                                <span class="live-pulse-dot"></span>
+                                <span>Còn 3 ca trống hôm nay</span>
+                            </span>
+                        </div>
+
+                        <div class="pitch-card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="pitch-location"><i class="bi bi-geo-alt-fill text-warning me-1"></i>Khu A - Cạnh Nhà Đa Năng</span>
+                                <span class="pitch-rating"><i class="bi bi-star-fill text-warning me-1"></i>4.9</span>
+                            </div>
+                            <h4 class="pitch-title">Sân Bóng Số 1 (Sân 5 Người)</h4>
+                            <p class="pitch-desc">
+                                Mặt cỏ nhân tạo sợi kim cương êm ái, hệ thống đèn LED chống chói, phù hợp đá tập và giao hữu nhóm lớp.
+                            </p>
+
+                            <!-- Khung giờ ca trống (Click chọn nhanh) -->
+                            <div class="pitch-slots-box mb-3">
+                                <div class="slots-label">Ca trống nổi bật hôm nay (Click để chọn):</div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button type="button" class="slot-pill" data-slot="07:00 - 08:30">07:00 - 08:30</button>
+                                    <button type="button" class="slot-pill" data-slot="16:00 - 17:30">16:00 - 17:30</button>
+                                    <button type="button" class="slot-pill" data-slot="20:30 - 22:00">20:30 - 22:00</button>
+                                </div>
+                            </div>
+
+                            <!-- Giá thuê theo khung giờ -->
+                            <div class="pitch-pricing-table mb-3">
+                                <div class="price-row">
+                                    <span><i class="bi bi-brightness-alt-high me-1 text-warning"></i>Ca Sáng (06:00 - 11:30)</span>
+                                    <strong class="price-tag">180.000đ / ca</strong>
+                                </div>
+                                <div class="price-row">
+                                    <span><i class="bi bi-sun me-1 text-warning"></i>Ca Chiều (13:30 - 17:30)</span>
+                                    <strong class="price-tag">220.000đ / ca</strong>
+                                </div>
+                                <div class="price-row">
+                                    <span><i class="bi bi-moon-stars me-1 text-primary"></i>Ca Tối (17:30 - 22:30)</span>
+                                    <strong class="price-tag highlight">300.000đ / ca</strong>
+                                </div>
+                            </div>
+
+                            <a href="/Account/Login" class="btn btn-cta-accent w-100 justify-content-center btn-book-pitch">
+                                <i class="bi bi-calendar2-plus-fill cta-icon"></i>
+                                <span class="btn-book-text">Đặt sân ngay</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sân số 2 (Sân 5): ~/uploads/sanbong/san-5-so-2.jpg -->
+                <div class="col reveal-on-scroll">
+                    <div class="pitch-card">
+                        <div class="pitch-img-wrapper">
+                            <img src="~/uploads/sanbong/san-5-so-2.jpg"
+                                 alt="Sân số 2 - Sân 5 người"
+                                 class="pitch-img"
+                                 onerror="@fallbackSvg" />
+                            <span class="pitch-type-badge">Sân 5 Người</span>
+                            <span class="pitch-status-badge status-available">
+                                <span class="live-pulse-dot"></span>
+                                <span>Còn 4 ca trống hôm nay</span>
+                            </span>
+                        </div>
+
+                        <div class="pitch-card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="pitch-location"><i class="bi bi-geo-alt-fill text-warning me-1"></i>Khu B - Sân Ký Túc Xá</span>
+                                <span class="pitch-rating"><i class="bi bi-star-fill text-warning me-1"></i>4.8</span>
+                            </div>
+                            <h4 class="pitch-title">Sân Bóng Số 2 (Sân 5 Người)</h4>
+                            <p class="pitch-desc">
+                                Không gian thoáng mát, lưới chắn bóng cao 8m an toàn, có khu vực ghế nghỉ có mái che cho cổ động viên các lớp.
+                            </p>
+
+                            <!-- Khung giờ ca trống (Click chọn nhanh) -->
+                            <div class="pitch-slots-box mb-3">
+                                <div class="slots-label">Ca trống nổi bật hôm nay (Click để chọn):</div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button type="button" class="slot-pill" data-slot="08:30 - 10:00">08:30 - 10:00</button>
+                                    <button type="button" class="slot-pill" data-slot="14:30 - 16:00">14:30 - 16:00</button>
+                                    <button type="button" class="slot-pill" data-slot="17:30 - 19:00">17:30 - 19:00</button>
+                                    <button type="button" class="slot-pill" data-slot="20:30 - 22:00">20:30 - 22:00</button>
+                                </div>
+                            </div>
+
+                            <!-- Giá thuê theo khung giờ -->
+                            <div class="pitch-pricing-table mb-3">
+                                <div class="price-row">
+                                    <span><i class="bi bi-brightness-alt-high me-1 text-warning"></i>Ca Sáng (06:00 - 11:30)</span>
+                                    <strong class="price-tag">180.000đ / ca</strong>
+                                </div>
+                                <div class="price-row">
+                                    <span><i class="bi bi-sun me-1 text-warning"></i>Ca Chiều (13:30 - 17:30)</span>
+                                    <strong class="price-tag">220.000đ / ca</strong>
+                                </div>
+                                <div class="price-row">
+                                    <span><i class="bi bi-moon-stars me-1 text-primary"></i>Ca Tối (17:30 - 22:30)</span>
+                                    <strong class="price-tag highlight">300.000đ / ca</strong>
+                                </div>
+                            </div>
+
+                            <a href="/Account/Login" class="btn btn-cta-accent w-100 justify-content-center btn-book-pitch">
+                                <i class="bi bi-calendar2-plus-fill cta-icon"></i>
+                                <span class="btn-book-text">Đặt sân ngay</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sân số 3 (Sân 7): ~/uploads/sanbong/san-7-so-1.jpg -->
+                <div class="col reveal-on-scroll">
+                    <div class="pitch-card pitch-card-featured">
+                        <div class="pitch-img-wrapper">
+                            <img src="~/uploads/sanbong/san-7-so-1.jpg"
+                                 alt="Sân số 3 - Sân 7 người"
+                                 class="pitch-img"
+                                 onerror="@fallbackSvg" />
+                            <span class="pitch-type-badge badge-7v7">Sân 7 Người</span>
+                            <span class="pitch-status-badge status-hot">
+                                <span class="live-pulse-dot pulse-gold"></span>
+                                <span>Còn 2 ca vàng hôm nay</span>
+                            </span>
+                        </div>
+
+                        <div class="pitch-card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <span class="pitch-location"><i class="bi bi-geo-alt-fill text-warning me-1"></i>Sân Trung Tâm - Khán Đài A</span>
+                                <span class="pitch-rating"><i class="bi bi-star-fill text-warning me-1"></i>5.0</span>
+                            </div>
+                            <h4 class="pitch-title">Sân Bóng Số 3 (Sân 7 Người)</h4>
+                            <p class="pitch-desc">
+                                Sân tiêu chuẩn tổ chức các trận cầu đinh giải sinh viên, tích hợp khán đài cổ vũ rộng rãi và bảng điểm điện tử.
+                            </p>
+
+                            <!-- Khung giờ ca trống (Click chọn nhanh) -->
+                            <div class="pitch-slots-box mb-3">
+                                <div class="slots-label">Ca trống nổi bật hôm nay (Click để chọn):</div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button type="button" class="slot-pill" data-slot="16:00 - 17:30">16:00 - 17:30</button>
+                                    <button type="button" class="slot-pill" data-slot="19:00 - 20:30">19:00 - 20:30</button>
+                                </div>
+                            </div>
+
+                            <!-- Giá thuê theo khung giờ -->
+                            <div class="pitch-pricing-table mb-3">
+                                <div class="price-row">
+                                    <span><i class="bi bi-brightness-alt-high me-1 text-warning"></i>Ca Sáng (06:00 - 11:30)</span>
+                                    <strong class="price-tag">320.000đ / ca</strong>
+                                </div>
+                                <div class="price-row">
+                                    <span><i class="bi bi-sun me-1 text-warning"></i>Ca Chiều (13:30 - 17:30)</span>
+                                    <strong class="price-tag">400.000đ / ca</strong>
+                                </div>
+                                <div class="price-row">
+                                    <span><i class="bi bi-moon-stars me-1 text-primary"></i>Ca Tối (17:30 - 22:30)</span>
+                                    <strong class="price-tag highlight">500.000đ / ca</strong>
+                                </div>
+                            </div>
+
+                            <a href="/Account/Login" class="btn btn-cta-accent w-100 justify-content-center btn-book-pitch">
+                                <i class="bi bi-calendar2-plus-fill cta-icon"></i>
+                                <span class="btn-book-text">Đặt sân ngay</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     KHỐI 3: GÓC ẢNH THANH XUÂN & TIN TỨC PHONG TRÀO
+=================================================================== -->
+<section id="goc-anh-tin-tuc" class="block-youth-news-section reveal-on-scroll">
+    <div class="container">
+        <div class="youth-news-rounded-block">
+            <div class="text-center mx-auto mb-5" style="max-width: 740px;">
+                <div class="section-label-pill">
+                    <i class="bi bi-camera-reels-fill"></i>
+                    <span>Nhịp Đập Sân Cỏ Sinh Viên</span>
+                </div>
+                <h2 class="section-main-heading">
+                    GÓC ẢNH THANH XUÂN &amp; TIN TỨC PHONG TRÀO
+                </h2>
+                <p class="text-muted mb-0">
+                    Cập nhật bản tin mới nhất từ các giải đấu học đường và cùng nhìn lại những khoảnh khắc rực rỡ nhất của các tập thể lớp trên sân cỏ.
+                </p>
+            </div>
+
+            <!-- Phần 1: Tin tức giải đấu (2 bài viết ngang có ảnh: tin-tuc-1.jpg & tin-tuc-2.jpg) -->
+            <div class="row g-4 mb-5">
+                <!-- Tin tức 1 -->
+                <div class="col-lg-6 reveal-on-scroll">
+                    <article class="news-featured-card">
+                        <div class="row g-0 h-100">
+                            <div class="col-md-5">
+                                <div class="news-img-wrap">
+                                    <img src="~/uploads/sanbong/tin-tuc-1.jpg"
+                                         alt="Chính Thức Công Bố Bảng Thi Đấu Giải Bóng Đá Nam Sinh Viên Khoa CNTT"
+                                         class="news-img"
+                                         onerror="@fallbackSvg" />
+                                    <span class="news-category-badge">Tin Giải Đấu</span>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="news-card-body">
+                                    <div class="news-meta">
+                                        <span><i class="bi bi-calendar3 me-1"></i>02/11/2026</span>
+                                        <span>&bull;</span>
+                                        <span>Liên Chi Đoàn CNTT</span>
+                                    </div>
+                                    <h5 class="news-title">
+                                        Chính Thức Công Bố Bảng Thi Đấu Giải Bóng Đá Nam Sinh Viên Khoa CNTT
+                                    </h5>
+                                    <p class="news-excerpt">
+                                        Lễ bốc thăm chia bảng đã khép lại với sự góp mặt của các chi đoàn mạnh nhất. Xem ngay lịch thi đấu vòng bảng và các cặp đấu tâm điểm tuần này...
+                                    </p>
+                                    <a href="/Account/Login" class="news-readmore">
+                                        Đọc tiếp bài viết <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Tin tức 2 -->
+                <div class="col-lg-6 reveal-on-scroll">
+                    <article class="news-featured-card">
+                        <div class="row g-0 h-100">
+                            <div class="col-md-5">
+                                <div class="news-img-wrap">
+                                    <img src="~/uploads/sanbong/tin-tuc-2.jpg"
+                                         alt="Sôi Động Giải Bóng Đá Sinh Viên CNTT & Chính Sách Trợ Giá Sân Tập 20%"
+                                         class="news-img"
+                                         onerror="@fallbackSvg" />
+                                    <span class="news-category-badge bg-warning text-dark">Ưu Đãi Sân Tập</span>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="news-card-body">
+                                    <div class="news-meta">
+                                        <span><i class="bi bi-calendar3 me-1"></i>28/10/2026</span>
+                                        <span>&bull;</span>
+                                        <span>Ban Quản Lý UTC STADIUM</span>
+                                    </div>
+                                    <h5 class="news-title">
+                                        Sôi Động Giải Bóng Đá Sinh Viên CNTT &amp; Chính Sách Trợ Giá Sân Tập 20%
+                                    </h5>
+                                    <p class="news-excerpt">
+                                        Đồng hành cùng mùa giải năm nay, UTC STADIUM hỗ trợ giảm ngay 20% phí thuê sân khung giờ ban ngày cho các đội bóng đăng ký tập luyện định kỳ...
+                                    </p>
+                                    <a href="/Account/Login" class="news-readmore">
+                                        Đọc tiếp bài viết <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <!-- Phần 2: Album khoảnh khắc các tập thể lớp (Lưới 4 cột thẻ ảnh: lop-1.jpg -> lop-4.jpg - Click mở Lightbox Modal) -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h4 class="fw-bold mb-0" style="color: #002B5B;">
+                    <i class="bi bi-images text-warning me-2"></i>Album Khoảnh Khắc Các Tập Thể Lớp
+                </h4>
+                <span class="small text-muted"><i class="bi bi-zoom-in me-1"></i>Nhấn vào ảnh để xem kích thước lớn</span>
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+                <!-- Thẻ 1: lop-1.jpg - K64 CNTT1 -->
+                <div class="col reveal-on-scroll">
+                    <div class="youth-moment-card youth-lightbox-trigger"
+                         data-img="/uploads/sanbong/lop-1.jpg"
+                         data-tag="K64 - CNTT1"
+                         data-title="Kỷ Niệm Ngày Bế Mạc & Trao Giải"
+                         data-desc="Tập thể đội bóng và cổ động viên K64 - CNTT1 cùng nhau lưu giữ khoảnh khắc đáng nhớ sau một mùa giải rực lửa.">
+                        <div class="youth-img-box">
+                            <img src="~/uploads/sanbong/lop-1.jpg"
+                                 alt="Kỷ Niệm Ngày Bế Mạc & Trao Giải - K64 CNTT1"
+                                 class="youth-img"
+                                 onerror="@fallbackSvg" />
+                            <div class="youth-zoom-overlay">
+                                <span class="zoom-badge"><i class="bi bi-zoom-in me-1"></i>Xem ảnh lớn</span>
+                            </div>
+                            <span class="youth-class-tag">K64 - CNTT1</span>
+                        </div>
+                        <div class="youth-card-content">
+                            <h6 class="youth-card-title">Kỷ Niệm Ngày Bế Mạc &amp; Trao Giải</h6>
+                            <p class="youth-card-text">
+                                Tập thể đội bóng và cổ động viên K64 - CNTT1 cùng nhau lưu giữ khoảnh khắc đáng nhớ sau một mùa giải rực lửa.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 2: lop-2.jpg - K63 Kinh Tế Vận Tải -->
+                <div class="col reveal-on-scroll">
+                    <div class="youth-moment-card youth-lightbox-trigger"
+                         data-img="/uploads/sanbong/lop-2.jpg"
+                         data-tag="K63 - Kinh Tế Vận Tải"
+                         data-title="Tập Thể Đoàn Kết Trên Sân Cỏ"
+                         data-desc="Màu áo trắng truyền thống của liên quân K63 - Kinh Tế Vận Tải rạng rỡ trong ngày hội thể thao sinh viên toàn trường.">
+                        <div class="youth-img-box">
+                            <img src="~/uploads/sanbong/lop-2.jpg"
+                                 alt="Tập Thể Đoàn Kết Trên Sân Cỏ - K63 Kinh Tế Vận Tải"
+                                 class="youth-img"
+                                 onerror="@fallbackSvg" />
+                            <div class="youth-zoom-overlay">
+                                <span class="zoom-badge"><i class="bi bi-zoom-in me-1"></i>Xem ảnh lớn</span>
+                            </div>
+                            <span class="youth-class-tag">K63 - Kinh Tế Vận Tải</span>
+                        </div>
+                        <div class="youth-card-content">
+                            <h6 class="youth-card-title">Tập Thể Đoàn Kết Trên Sân Cỏ</h6>
+                            <p class="youth-card-text">
+                                Màu áo trắng truyền thống của liên quân K63 - Kinh Tế Vận Tải rạng rỡ trong ngày hội thể thao sinh viên toàn trường.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 3: lop-3.jpg - K64 Điện - Điện Tử -->
+                <div class="col reveal-on-scroll">
+                    <div class="youth-moment-card youth-lightbox-trigger"
+                         data-img="/uploads/sanbong/lop-3.jpg"
+                         data-tag="K64 - Điện - Điện Tử"
+                         data-title="Sẵn Sàng Trước Giờ Bóng Lăn"
+                         data-desc="Đội hình ra sân đầy nhiệt huyết và gắn kết của các cầu thủ K64 - Điện - Điện Tử trong trận cầu giao hữu cuối tuần.">
+                        <div class="youth-img-box">
+                            <img src="~/uploads/sanbong/lop-3.jpg"
+                                 alt="Sẵn Sàng Trước Giờ Bóng Lăn - K64 Điện - Điện Tử"
+                                 class="youth-img"
+                                 onerror="@fallbackSvg" />
+                            <div class="youth-zoom-overlay">
+                                <span class="zoom-badge"><i class="bi bi-zoom-in me-1"></i>Xem ảnh lớn</span>
+                            </div>
+                            <span class="youth-class-tag">K64 - Điện - Điện Tử</span>
+                        </div>
+                        <div class="youth-card-content">
+                            <h6 class="youth-card-title">Sẵn Sàng Trước Giờ Bóng Lăn</h6>
+                            <p class="youth-card-text">
+                                Đội hình ra sân đầy nhiệt huyết và gắn kết của các cầu thủ K64 - Điện - Điện Tử trong trận cầu giao hữu cuối tuần.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 4: lop-4.jpg - K62 Công Trình -->
+                <div class="col reveal-on-scroll">
+                    <div class="youth-moment-card youth-lightbox-trigger"
+                         data-img="/uploads/sanbong/lop-4.jpg"
+                         data-tag="K62 - Công Trình"
+                         data-title="Hậu Phương Vững Chắc Của Đội Bóng"
+                         data-desc="Sự góp mặt tiếp lửa của dàn cổ động viên nhiệt thành luôn là nguồn động lực lớn nhất cho các cầu thủ trên sân.">
+                        <div class="youth-img-box">
+                            <img src="~/uploads/sanbong/lop-4.jpg"
+                                 alt="Hậu Phương Vững Chắc Của Đội Bóng - K63 Công Nghệ Thông Tin"
+                                 class="youth-img"
+                                 onerror="@fallbackSvg" />
+                            <div class="youth-zoom-overlay">
+                                <span class="zoom-badge"><i class="bi bi-zoom-in me-1"></i>Xem ảnh lớn</span>
+                            </div>
+                            <span class="youth-class-tag">K63 - Công Nghệ Thông Tin</span>
+                        </div>
+                        <div class="youth-card-content">
+                            <h6 class="youth-card-title">Hậu Phương Vững Chắc Của Đội Bóng</h6>
+                            <p class="youth-card-text">
+                                Sự góp mặt tiếp lửa của dàn cổ động viên nhiệt thành luôn là nguồn động lực lớn nhất cho các cầu thủ trên sân.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     HIỆU ỨNG 4: LIGHTBOX MODAL XEM ẢNH PHÓNG TO GÓC ẢNH THANH XUÂN
+=================================================================== -->
+<div class="modal fade" id="youthLightboxModal" tabindex="-1" aria-labelledby="youthLightboxModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content lightbox-modal-content">
+            <div class="modal-header border-0 pb-2">
+                <span id="lightboxClassTag" class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill">K64 - CNTT1</span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body p-3 pt-1">
+                <div class="lightbox-img-wrapper">
+                    <img id="lightboxImage" src="" alt="Ảnh phóng to tập thể lớp" class="lightbox-full-img" onerror="@fallbackSvg" />
+                </div>
+                <div class="pt-3 px-1">
+                    <h5 id="lightboxTitle" class="fw-bold text-white mb-1"></h5>
+                    <p id="lightboxDesc" class="text-white-50 mb-0 small"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. Hiệu ứng đếm số tăng dần (Count-Up Animation) cho Thanh thống kê
+            const counters = document.querySelectorAll(".counter-number");
+            const duration = 1500;
+
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute("data-target"), 10) || 0;
+                const pad = parseInt(counter.getAttribute("data-pad"), 10) || 0;
+                const suffix = counter.getAttribute("data-suffix") || "";
+                const startTime = performance.now();
+
+                function updateCount(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const currentVal = Math.floor(easeOut * target);
+
+                    let formatted = currentVal.toString();
+                    if (pad > 0) {
+                        formatted = formatted.padStart(pad, "0");
+                    }
+                    counter.textContent = formatted + suffix;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(updateCount);
+                    } else {
+                        let finalFormatted = target.toString();
+                        if (pad > 0) {
+                            finalFormatted = finalFormatted.padStart(pad, "0");
+                        }
+                        counter.textContent = finalFormatted + suffix;
+                    }
+                }
+
+                setTimeout(() => requestAnimationFrame(updateCount), 350);
+            });
+
+            // 2. Hiệu ứng Scroll Reveal khi cuộn trang xuống các khối bên dưới
+            const revealElements = document.querySelectorAll(".reveal-on-scroll");
+            if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("is-visible");
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.12,
+                    rootMargin: "0px 0px -40px 0px"
+                });
+
+                revealElements.forEach(el => observer.observe(el));
+            } else {
+                revealElements.forEach(el => el.classList.add("is-visible"));
+            }
+
+            // 3. Hiệu ứng Chọn nhanh ca trống trong Card sân bóng
+            const pitchCards = document.querySelectorAll(".pitch-card");
+            pitchCards.forEach(card => {
+                const slotBtns = card.querySelectorAll(".slot-pill");
+                const bookBtnText = card.querySelector(".btn-book-text");
+
+                slotBtns.forEach(btn => {
+                    btn.addEventListener("click", function () {
+                        const selectedSlot = this.getAttribute("data-slot");
+                        const wasActive = this.classList.contains("active");
+
+                        // Bỏ trạng thái active của các ca khác trong cùng 1 card sân
+                        slotBtns.forEach(b => b.classList.remove("active"));
+
+                        if (!wasActive) {
+                            this.classList.add("active");
+                            if (bookBtnText) {
+                                bookBtnText.textContent = "Đặt ngay ca " + selectedSlot;
+                            }
+                        } else {
+                            if (bookBtnText) {
+                                bookBtnText.textContent = "Đặt sân ngay";
+                            }
+                        }
+                    });
+                });
+            });
+
+            // 4. Hiệu ứng Xem ảnh phóng to - Lightbox Modal cho Góc ảnh thanh xuân
+            const lightboxModalEl = document.getElementById("youthLightboxModal");
+            if (lightboxModalEl && typeof bootstrap !== "undefined") {
+                const lightboxModal = new bootstrap.Modal(lightboxModalEl);
+                const modalImg = document.getElementById("lightboxImage");
+                const modalTag = document.getElementById("lightboxClassTag");
+                const modalTitle = document.getElementById("lightboxTitle");
+                const modalDesc = document.getElementById("lightboxDesc");
+
+                document.querySelectorAll(".youth-lightbox-trigger").forEach(card => {
+                    card.addEventListener("click", function () {
+                        const imgSrc = this.getAttribute("data-img");
+                        const tag = this.getAttribute("data-tag");
+                        const title = this.getAttribute("data-title");
+                        const desc = this.getAttribute("data-desc");
+
+                        if (modalImg) modalImg.src = imgSrc;
+                        if (modalTag) modalTag.textContent = tag;
+                        if (modalTitle) modalTitle.textContent = title;
+                        if (modalDesc) modalDesc.textContent = desc;
+
+                        lightboxModal.show();
+                    });
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,525 @@
+@model QLSanBong.Areas.KhachHang.Models.CustomerHomeViewModel
+@{
+    ViewData["Title"] = "Trang chủ & Bộ lọc sân trống - UTC STADIUM";
+}
+
+<div class="container-fluid px-3 px-lg-5">
+    <!-- ===============================================================
+         KHỐI 1: WELCOME BANNER CÁ NHÂN HÓA + 3 Ô THỐNG KÊ NHANH
+    =============================================================== -->
+    <section class="customer-welcome-banner mb-4">
+        <div class="row align-items-center g-4">
+            <div class="col-xl-7 col-lg-6">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3" style="background: rgba(255, 193, 7, 0.2); border: 1px solid rgba(255, 193, 7, 0.45); color: #FFC107; font-size: 0.75rem; font-weight: 700;">
+                    <i class="bi bi-patch-check-fill"></i>
+                    <span>CỔNG THỂ THAO SINH VIÊN UTC</span>
+                </div>
+
+                <h1 class="fw-extrabold mb-2 text-white" style="font-size: clamp(1.6rem, 2.8vw, 2.2rem);">
+                    Chào mừng trở lại, @Model.HoTen!
+                </h1>
+
+                <p class="text-white-50 mb-4" style="font-size: 0.92rem; line-height: 1.6; max-width: 620px;">
+                    Hệ thống đặt sân bóng đá sinh viên trực tuyến tại <strong>UTC STADIUM</strong>. Bộ lọc tự động loại trừ sân đang bảo trì hoặc đã kín lịch để bạn tìm được ca thi đấu lý tưởng nhất.
+                </p>
+
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <a href="#khu-vuc-dat-san" class="btn customer-btn-search text-decoration-none">
+                        <i class="bi bi-lightning-charge-fill fs-5"></i>
+                        <span>Đặt Sân Mới Ngay</span>
+                    </a>
+                    <a asp-area="KhachHang" asp-controller="Account" asp-action="Profile" class="btn btn-outline-light rounded-pill px-3 py-2 fw-semibold" style="font-size: 0.88rem;">
+                        <i class="bi bi-person-badge me-1"></i> Hồ sơ của tôi
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3 Ô Thống kê cá nhân nổi bật -->
+            <div class="col-xl-5 col-lg-6">
+                <div class="row g-3">
+                    <div class="col-sm-4 col-6">
+                        <div class="customer-stat-chip">
+                            <div class="customer-stat-icon" style="background-color: rgba(59, 130, 246, 0.25); color: #60a5fa;">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                            <div>
+                                <div class="customer-stat-number">@Model.SoCaSapDienRa</div>
+                                <div class="customer-stat-label">Ca sắp đá</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 col-6">
+                        <div class="customer-stat-chip">
+                            <div class="customer-stat-icon" style="background-color: rgba(255, 193, 7, 0.25); color: #FFC107;">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                            <div>
+                                <div class="customer-stat-number">@Model.SoDonChoDuyet</div>
+                                <div class="customer-stat-label">Chờ duyệt</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 col-12">
+                        <div class="customer-stat-chip">
+                            <div class="customer-stat-icon" style="background-color: rgba(16, 185, 129, 0.25); color: #34d399;">
+                                <i class="bi bi-ticket-perforated"></i>
+                            </div>
+                            <div>
+                                <div class="customer-stat-number">@Model.UuDaiHienCo</div>
+                                <div class="customer-stat-label">Ưu đãi sẵn có</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===============================================================
+         KHỐI 2: THANH BỘ LỌC TÌM KIẾM SÂN TRỐNG THÔNG MINH
+    =============================================================== -->
+    <section class="customer-filter-bar mb-4" id="khu-vuc-dat-san">
+        <form asp-area="KhachHang" asp-controller="Home" asp-action="Index" method="get" class="row g-3 align-items-end">
+            <!-- 1. Ngày đặt -->
+            <div class="col-xl-3 col-md-6">
+                <label class="customer-filter-label" for="ngayLoc">
+                    <i class="bi bi-calendar-date text-warning"></i>
+                    <span>Ngày thi đấu</span>
+                </label>
+                <input type="date" id="ngayLoc" name="ngayLoc"
+                       class="form-control customer-filter-input"
+                       value="@Model.NgayLoc.ToString("yyyy-MM-dd")"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <!-- 2. Loại sân (5, 7, 11) -->
+            <div class="col-xl-2 col-md-6">
+                <label class="customer-filter-label" for="loaiSanLoc">
+                    <i class="bi bi-dribbble text-warning"></i>
+                    <span>Loại sân bóng</span>
+                </label>
+                <select id="loaiSanLoc" name="loaiSanLoc" class="form-select customer-filter-input">
+                    <option value="" selected="@(string.IsNullOrEmpty(Model.LoaiSanLoc) || Model.LoaiSanLoc == "Tất cả")">Tất cả loại sân</option>
+                    <option value="5" selected="@(Model.LoaiSanLoc == "5")">Sân 5 người</option>
+                    <option value="7" selected="@(Model.LoaiSanLoc == "7")">Sân 7 người</option>
+                    <option value="11" selected="@(Model.LoaiSanLoc == "11")">Sân 11 người</option>
+                </select>
+            </div>
+
+            <!-- 3. Khung giờ ca đá -->
+            <div class="col-xl-3 col-md-6">
+                <label class="customer-filter-label" for="khungGioLocId">
+                    <i class="bi bi-clock-history text-warning"></i>
+                    <span>Khung giờ ưu tiên</span>
+                </label>
+                <select id="khungGioLocId" name="khungGioLocId" class="form-select customer-filter-input">
+                    <option value="">-- Tất cả khung giờ trống --</option>
+                    @if (Model.DanhSachKhungGio.Any())
+                    {
+                        foreach (var slot in Model.DanhSachKhungGio)
+                        {
+                            <option value="@slot.Id" selected="@(Model.KhungGioLocId == slot.Id)">
+                                Ca @slot.GioBatDau.ToString("HH:mm") - @slot.GioKetThuc.ToString("HH:mm")
+                            </option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="1">Ca Sáng: 06:00 - 07:30</option>
+                        <option value="2">Ca Chiều: 16:00 - 17:30</option>
+                        <option value="3">Ca Vàng Đèn: 17:30 - 19:00</option>
+                        <option value="4">Ca Tối: 19:00 - 20:30</option>
+                    }
+                </select>
+            </div>
+
+            <!-- 4. Giá tối đa -->
+            <div class="col-xl-2 col-md-6">
+                <label class="customer-filter-label" for="giaToiDa">
+                    <i class="bi bi-tag text-warning"></i>
+                    <span>Mức giá tối đa</span>
+                </label>
+                <input type="number" id="giaToiDa" name="giaToiDa"
+                       class="form-control customer-filter-input"
+                       placeholder="Vd: 350000"
+                       step="50000"
+                       min="0"
+                       value="@(Model.GiaToiDa.HasValue ? Model.GiaToiDa.Value.ToString("0") : "")" />
+            </div>
+
+            <!-- 5. Nút bấm Lọc & Đặt lại -->
+            <div class="col-xl-2 col-md-12 d-flex gap-2">
+                <button type="submit" class="btn customer-btn-search flex-grow-1">
+                    <i class="bi bi-search"></i>
+                    <span>Lọc Sân Trống</span>
+                </button>
+                @if (Model.NgayLoc.Date != DateTime.Today || !string.IsNullOrEmpty(Model.LoaiSanLoc) || Model.GiaToiDa.HasValue || Model.KhungGioLocId.HasValue)
+                {
+                    <a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-3 d-flex align-items-center justify-content-center px-3" title="Xóa bộ lọc">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                }
+            </div>
+        </form>
+    </section>
+
+    <!-- ===============================================================
+         KHỐI 3: NỘI DUNG CHIA 2 CỘT (CỘT TRÁI 8 PHẦN / CỘT PHẢI 4 PHẦN)
+    =============================================================== -->
+    <div class="row g-4">
+        <!-- ===========================================================
+             CỘT TRÁI (8 PHẦN): DANH SÁCH THẺ SÂN BÓNG KHẢ DỤNG
+        =========================================================== -->
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h4 class="fw-bold mb-0" style="color: #002B5B;">
+                    <i class="bi bi-grid-fill text-warning me-2"></i>Sân Bóng Sẵn Sàng Đặt Lịch
+                </h4>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-white text-dark border px-3 py-2 rounded-pill small fw-semibold">
+                        <span class="text-success">&bull;</span> @Model.DanhSachSan.Count sân phù hợp
+                    </span>
+                    <span class="small text-muted d-none d-sm-inline">
+                        Ngày @Model.NgayLoc.ToString("dd/MM/yyyy")
+                    </span>
+                </div>
+            </div>
+
+            @if (Model.DanhSachSan.Any())
+            {
+                <div class="row g-3" id="pitchCardContainer">
+                    @foreach (var pitch in Model.DanhSachSan)
+                    {
+                        <div class="col-md-6 pitch-item-col">
+                            <div class="customer-pitch-card h-100 d-flex flex-column">
+                                <div class="customer-pitch-thumb-wrap">
+                                    <img src="@pitch.AnhSan" alt="@pitch.TenSan" class="customer-pitch-thumb"
+                                         onerror="this.onerror=null;this.src='/uploads/sanbong/san-5-so-1.jpg';" />
+                                    <span class="customer-pitch-badge">
+                                        <i class="bi bi-people-fill me-1"></i>@pitch.LoaiSan
+                                    </span>
+                                    <span class="customer-pitch-status">
+                                        <i class="bi bi-check-circle-fill me-1"></i>@pitch.TrangThai
+                                    </span>
+                                </div>
+
+                                <div class="customer-pitch-body d-flex flex-column flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h5 class="customer-pitch-title mb-0">@pitch.TenSan</h5>
+                                        <a asp-area="KhachHang" asp-controller="DanhGia" asp-action="SanBong" asp-route-id="@pitch.Id"
+                                           class="btn btn-sm btn-outline-warning text-dark py-0 px-2 rounded-pill small fw-bold text-decoration-none" title="Xem nhận xét thực tế">
+                                            <i class="bi bi-star-fill text-warning"></i> @pitch.DiemDanhGiaTrungBinh.ToString("0.0")
+                                        </a>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-1 mb-2 small text-muted">
+                                        <a asp-area="KhachHang" asp-controller="DanhGia" asp-action="SanBong" asp-route-id="@pitch.Id" class="text-decoration-none text-muted">
+                                            <i class="bi bi-chat-quote me-1"></i>@pitch.TongSoDanhGia đánh giá thực tế (Verified)
+                                        </a>
+                                    </div>
+
+                                    <p class="customer-pitch-desc">@pitch.MoTa</p>
+
+                                    <div class="small text-muted mb-3 d-flex align-items-center gap-1">
+                                        <i class="bi bi-shield-check text-success"></i>
+                                        <span>@pitch.DacDiem</span>
+                                    </div>
+
+                                    <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <div class="customer-pitch-price-sub">
+                                                @(pitch.GiaTheoKhungGio.HasValue ? "Giá theo ca đã chọn:" : "Giá thuê sinh viên từ:")
+                                            </div>
+                                            <div class="customer-pitch-price-val">
+                                                @pitch.GiaThamKhao.ToString("N0") <span style="font-size: 0.8rem; font-weight: normal;">đ/ca</span>
+                                            </div>
+                                        </div>
+
+                                        <a asp-area="KhachHang" asp-controller="DatSan" asp-action="TaoDon"
+                                           asp-route-sanBongId="@pitch.Id"
+                                           asp-route-ngayDat="@Model.NgayLoc.ToString("yyyy-MM-dd")"
+                                           asp-route-khungGioId="@Model.KhungGioLocId"
+                                           class="btn btn-warning fw-bold text-dark rounded-pill px-3 py-2 shadow-sm d-inline-flex align-items-center gap-1">
+                                            <i class="bi bi-calendar-plus me-1"></i>Chọn ca đặt
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+                    <div class="py-4">
+                        <i class="bi bi-calendar-x fs-1 text-muted opacity-50"></i>
+                        <h5 class="fw-bold mt-3 mb-2" style="color: #002B5B;">Không tìm thấy sân bóng phù hợp</h5>
+                        <p class="text-muted small mb-4" style="max-width: 500px; margin: 0 auto;">
+                            Tất cả sân thuộc tiêu chí bạn tìm hiện đang trong lịch bảo trì hoặc đã kín lịch đặt trong ngày @Model.NgayLoc.ToString("dd/MM/yyyy"). Vui lòng đổi khung giờ hoặc chọn ngày thi đấu khác.
+                        </p>
+                        <a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="btn btn-warning fw-bold rounded-pill px-4 text-dark shadow-sm">
+                            <i class="bi bi-arrow-repeat me-1"></i> Xem tất cả sân trống
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- ===========================================================
+             CỘT PHẢI (4 PHẦN): LỊCH ĐẶT GẦN ĐÂY & THÔNG BÁO MỚI NHẤT
+        =========================================================== -->
+        <div class="col-lg-4">
+            <!-- 1. Lịch đặt sân gần đây của bạn -->
+            <div class="customer-sidebar-card mb-4">
+                <div class="customer-sidebar-title">
+                    <span><i class="bi bi-calendar2-week-fill text-warning me-2"></i>Lịch Đặt Gần Đây</span>
+                    <a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="text-decoration-none small fw-bold" style="color: #002B5B;">
+                        Xem tất cả <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                @if (Model.LichDatGanDay.Any())
+                {
+                    <div class="customer-booking-list">
+                        @foreach (var booking in Model.LichDatGanDay)
+                        {
+                            var statusText = booking.TrangThai ?? "Chờ duyệt";
+                            var badgeClass = "badge-status-choduyet";
+
+                            if (statusText.Contains("Duyệt", StringComparison.OrdinalIgnoreCase) ||
+                                statusText.Contains("Thành công", StringComparison.OrdinalIgnoreCase) ||
+                                statusText.Contains("Đã xác nhận", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeClass = "badge-status-daduyet";
+                            }
+                            else if (statusText.Contains("Hủy", StringComparison.OrdinalIgnoreCase) ||
+                                     statusText.Contains("Từ chối", StringComparison.OrdinalIgnoreCase))
+                            {
+                                badgeClass = "badge-status-dahuy";
+                            }
+
+                            <div class="customer-booking-item">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="fw-bold small" style="color: #002B5B;">@(booking.SanBong?.TenSan ?? "Sân bóng UTC")</span>
+                                    <span class="@badgeClass">@statusText</span>
+                                </div>
+                                <div class="small text-muted d-flex align-items-center gap-2 mb-1">
+                                    <span><i class="bi bi-calendar3 me-1"></i>@booking.NgayDat.ToString("dd/MM/yyyy")</span>
+                                    <span>&bull;</span>
+                                    <span><i class="bi bi-clock me-1"></i>@(booking.KhungGio != null ? $"{booking.KhungGio.GioBatDau:HH:mm} - {booking.KhungGio.GioKetThuc:HH:mm}" : "Ca thi đấu")</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center pt-1 border-top" style="font-size: 0.78rem;">
+                                    <span class="text-muted">Tổng tiền:</span>
+                                    <strong class="text-warning-emphasis">@booking.TongTien.ToString("N0") đ</strong>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-calendar-x fs-1 text-secondary opacity-50"></i>
+                        <p class="small mt-2 mb-3">Bạn chưa có lịch đặt sân nào gần đây.</p>
+                        <a href="#khu-vuc-dat-san" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="bi bi-plus-circle me-1"></i> Đặt lịch ngay hôm nay
+                        </a>
+                    </div>
+                }
+            </div>
+
+            <!-- 2. Danh sách thông báo mới nhất từ dbo.ThongBao -->
+            <div class="customer-sidebar-card">
+                <div class="customer-sidebar-title">
+                    <span><i class="bi bi-bell-fill text-warning me-2"></i>Thông Báo Mới Nhất</span>
+                    <a asp-area="KhachHang" asp-controller="ThongBao" asp-action="Index" class="text-decoration-none small fw-bold" style="color: #002B5B;">
+                        Xem tất cả <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                @if (Model.ThongBaoGanDay.Any())
+                {
+                    <div class="customer-notif-list">
+                        @foreach (var notif in Model.ThongBaoGanDay)
+                        {
+                            var isUnread = notif.DaDoc != true;
+                            <div class="customer-notif-item @(isUnread ? "unread" : "")">
+                                <div class="customer-notif-icon">
+                                    <i class="bi bi-info-circle-fill text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold small mb-1" style="color: #002B5B;">@notif.TieuDe</div>
+                                    <div class="text-muted small mb-1" style="font-size: 0.78rem; line-height: 1.4;">@notif.NoiDung</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">
+                                        <i class="bi bi-clock me-1"></i>@(notif.NgayTao?.ToString("dd/MM/yyyy HH:mm") ?? "Vừa xong")
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="customer-notif-list">
+                        <div class="customer-notif-item unread">
+                            <div class="customer-notif-icon">
+                                <i class="bi bi-megaphone-fill text-warning"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold small mb-1" style="color: #002B5B;">Chào mừng đến với UTC STADIUM!</div>
+                                <div class="text-muted small mb-1" style="font-size: 0.78rem; line-height: 1.4;">
+                                    Tài khoản sinh viên của bạn đã được kích hoạt thành công. Đặt sân ngay để nhận hỗ trợ bóng và áo pitch miễn phí.
+                                </div>
+                                <div class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i>Hôm nay</div>
+                            </div>
+                        </div>
+
+                        <div class="customer-notif-item">
+                            <div class="customer-notif-icon">
+                                <i class="bi bi-trophy-fill text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold small mb-1" style="color: #002B5B;">Giải bóng đá sinh viên UTC 2026</div>
+                                <div class="text-muted small mb-1" style="font-size: 0.78rem; line-height: 1.4;">
+                                    Đang mở cổng đăng ký thi đấu Hội thao Khoa &amp; Chi đoàn. Liên hệ Ban Quản lý Sân để được hỗ trợ xếp lịch thi đấu.
+                                </div>
+                                <div class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i>2 ngày trước</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===============================================================
+     MODAL ĐẶT CA NHANH TRỰC QUAN (AUTO-FILL DỮ LIỆU TÀI KHOẢN)
+=============================================================== -->
+<div class="modal fade" id="quickBookingModal" tabindex="-1" aria-labelledby="quickBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header text-white" style="background-color: #002B5B;">
+                <h5 class="modal-title fw-bold" id="quickBookingModalLabel">
+                    <i class="bi bi-calendar2-check-fill text-warning me-2"></i>Xác Nhận Giữ Ca Sân
+                </h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="p-3 rounded-3 mb-3" style="background-color: #f8fafc; border: 1px dashed #cbd5e1;">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted small">Tên sân bóng:</span>
+                        <strong id="modalPitchName" style="color: #002B5B;">Sân 5A</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted small">Phân loại:</span>
+                        <span id="modalPitchType" class="badge bg-secondary">Sân 5 người</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small">Đơn giá tham khảo:</span>
+                        <strong id="modalPitchPrice" class="text-warning-emphasis">250.000 đ/ca</strong>
+                    </div>
+                </div>
+
+                <!-- Thông tin tự động điền (Auto-fill) của sinh viên -->
+                <div class="p-2 mb-3 rounded-3" style="background-color: rgba(0, 43, 91, 0.04); font-size: 0.8rem;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-person-check-fill text-primary"></i>
+                        <span>Người đặt: <strong>@Model.HoTen</strong> (@Model.SoDienThoai)</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-muted">Ngày đặt sân</label>
+                    <input type="date" id="modalBookingDate" class="form-control rounded-3"
+                           value="@Model.NgayLoc.ToString("yyyy-MM-dd")"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-muted">Khung giờ thi đấu</label>
+                    <select id="modalBookingSlot" class="form-select rounded-3">
+                        @if (Model.DanhSachKhungGio.Any())
+                        {
+                            foreach (var slot in Model.DanhSachKhungGio)
+                            {
+                                <option value="@slot.Id" selected="@(Model.KhungGioLocId == slot.Id)">
+                                    Ca @slot.GioBatDau.ToString("HH:mm") - @slot.GioKetThuc.ToString("HH:mm")
+                                </option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="1">Ca 1: 06:00 - 07:30</option>
+                            <option value="2">Ca 2: 16:00 - 17:30</option>
+                            <option value="3">Ca 3 (Đèn): 17:30 - 19:00</option>
+                            <option value="4">Ca 4 (Tối): 19:00 - 20:30</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-muted">Ghi chú cho Quản lý sân (Chi đoàn / Nước uống)</label>
+                    <textarea class="form-control rounded-3" rows="2" placeholder="Ví dụ: Thi đấu giao hữu Chi đoàn K63, cần chuẩn bị 1 bình nước và áo pitch..."></textarea>
+                </div>
+
+                <div class="alert alert-info py-2 small mb-0 rounded-3">
+                    <i class="bi bi-info-circle me-1"></i> Yêu cầu đặt ca sẽ được Ban Quản Lý Sân UTC STADIUM duyệt trong vòng 5-15 phút.
+                </div>
+            </div>
+            <div class="modal-footer bg-light p-3 border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-warning fw-bold text-dark rounded-pill px-4 shadow-sm" id="btnConfirmBooking">
+                    <i class="bi bi-check-lg me-1"></i> Gửi Yêu Cầu Đặt Sân
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const bookingModalEl = document.getElementById("quickBookingModal");
+            const bookingModal = bookingModalEl ? new bootstrap.Modal(bookingModalEl) : null;
+
+            document.querySelectorAll(".btn-quick-book").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const name = this.getAttribute("data-name");
+                    const type = this.getAttribute("data-type");
+                    const price = this.getAttribute("data-price");
+                    const date = this.getAttribute("data-date");
+                    const slot = this.getAttribute("data-slot");
+
+                    document.getElementById("modalPitchName").textContent = name;
+                    document.getElementById("modalPitchType").textContent = type;
+                    document.getElementById("modalPitchPrice").textContent = price + " đ/ca";
+
+                    if (date) {
+                        document.getElementById("modalBookingDate").value = date;
+                    }
+                    if (slot && document.getElementById("modalBookingSlot")) {
+                        document.getElementById("modalBookingSlot").value = slot;
+                    }
+
+                    if (bookingModal) {
+                        bookingModal.show();
+                    }
+                });
+            });
+
+            const btnConfirmBooking = document.getElementById("btnConfirmBooking");
+            if (btnConfirmBooking) {
+                btnConfirmBooking.addEventListener("click", function () {
+                    alert("Yêu cầu giữ ca sân đã được gửi thành công! Ban Quản Lý Sân UTC STADIUM sẽ kiểm tra và phản hồi qua thông báo.");
+                    if (bookingModal) {
+                        bookingModal.hide();
+                    }
+                });
+            }
+        });
+    </script>
+}

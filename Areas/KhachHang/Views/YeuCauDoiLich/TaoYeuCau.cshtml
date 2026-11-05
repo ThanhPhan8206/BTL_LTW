@@ -1,0 +1,170 @@
+@model QLSanBong.Areas.KhachHang.Models.RescheduleRequestViewModel
+@{
+    ViewData["Title"] = "Gửi yêu cầu đổi lịch ca đá - UTC STADIUM";
+}
+
+<div class="container-fluid px-3 px-lg-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="text-decoration-none">Lịch đặt</a></li>
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="YeuCauDoiLich" asp-action="Index" class="text-decoration-none">Yêu cầu đổi lịch</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Tạo yêu cầu</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0" style="color: #002B5B;">
+                <i class="bi bi-calendar2-range-fill text-warning me-2"></i>Đổi Giờ / Đổi Ngày Thi Đấu
+            </h2>
+        </div>
+        <a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="btn btn-outline-secondary rounded-pill px-3 py-2 small fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại lịch đặt
+        </a>
+    </div>
+
+    @if (Model.IsTimeLockPassed)
+    {
+        <div class="alert alert-danger rounded-4 p-4 shadow-sm mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-lock-fill fs-2 text-danger"></i>
+                <div>
+                    <h5 class="fw-bold mb-1">KHÔNG THỂ THỰC HIỆN ĐỔI LỊCH TỰ ĐỘNG</h5>
+                    <p class="mb-0 small">@Model.TimeLockWarning</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+    {
+        <div class="alert alert-danger rounded-4 py-3 px-4 shadow-sm mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                <div asp-validation-summary="ModelOnly" class="mb-0 fw-semibold"></div>
+            </div>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Cột trái: Thông tin ca đá hiện tại -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                <span class="badge bg-light text-dark border rounded-pill px-3 py-1 mb-2 small fw-semibold">LỊCH ĐÁ HIỆN TẠI</span>
+                <h4 class="fw-bold mb-1" style="color: #002B5B;">@Model.TenSanHienTai</h4>
+                <div class="text-muted small mb-3">@Model.LoaiSanHienTai</div>
+
+                <div class="p-3 rounded-3 mb-3" style="background-color: #F4F7FB; border: 1px solid #e2e8f0;">
+                    <div class="small mb-2">
+                        <span class="text-muted">Mã đơn đặt:</span>
+                        <strong class="text-primary float-end">#@Model.DatSanId</strong>
+                    </div>
+                    <div class="small mb-2">
+                        <span class="text-muted">Ngày thi đấu:</span>
+                        <strong class="text-dark float-end">@Model.NgayDatHienTai.ToString("dd/MM/yyyy")</strong>
+                    </div>
+                    <div class="small">
+                        <span class="text-muted">Khung giờ:</span>
+                        <strong class="text-dark float-end">@Model.KhungGioHienTai</strong>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-3 mt-auto" style="background-color: #fffbeb; border: 1px dashed #fcd34d;">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-shield-lock-fill text-warning fs-5 mt-1"></i>
+                        <p class="small text-muted mb-0" style="font-size: 0.78rem; line-height: 1.45;">
+                            <strong>Time-lock Rule:</strong> Yêu cầu đổi lịch chỉ được chấp nhận nếu gửi trước giờ bóng lăn tối thiểu 2 tiếng. Ban Quản Lý Sân sẽ duyệt và cập nhật trong vòng 15-30 phút.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Form chọn sân mới, ngày mới và lý do -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <div class="mb-4">
+                    <span class="badge px-3 py-1 rounded-pill mb-2" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B; font-weight: 700; font-size: 0.75rem;">
+                        CHỌN LỊCH MỚI
+                    </span>
+                    <h3 class="fw-bold mb-1" style="color: #002B5B;">Thông Tin Ca Thi Đấu Muốn Đổi Sang</h3>
+                    <p class="text-muted small mb-0">Hệ thống sẽ tự động kiểm tra xem sân mới có bị trùng lịch hoặc bảo trì hay không.</p>
+                </div>
+
+                <form asp-area="KhachHang" asp-controller="YeuCauDoiLich" asp-action="TaoYeuCau" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="DatSanId" />
+                    <input type="hidden" asp-for="TenSanHienTai" />
+                    <input type="hidden" asp-for="LoaiSanHienTai" />
+                    <input type="hidden" asp-for="NgayDatHienTai" />
+                    <input type="hidden" asp-for="KhungGioHienTai" />
+
+                    <div class="row g-3 mb-3">
+                        <!-- Sân bóng mới -->
+                        <div class="col-md-6">
+                            <label asp-for="SanBongMoiId" class="form-label fw-bold small text-muted">Sân bóng mới <span class="text-danger">*</span></label>
+                            <select asp-for="SanBongMoiId" class="form-select rounded-3">
+                                @foreach (var s in Model.DanhSachSan)
+                                {
+                                    <option value="@s.Id" selected="@(Model.SanBongMoiId == s.Id)">
+                                        @s.TenSan (@s.LoaiSan)
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="SanBongMoiId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Ngày đá mới -->
+                        <div class="col-md-6">
+                            <label asp-for="NgayDatMoi" class="form-label fw-bold small text-muted">Ngày thi đấu mới <span class="text-danger">*</span></label>
+                            <input asp-for="NgayDatMoi" type="date" class="form-control rounded-3"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                   value="@Model.NgayDatMoi.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="NgayDatMoi" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Khung giờ mới -->
+                    <div class="mb-3">
+                        <label asp-for="KhungGioMoiId" class="form-label fw-bold small text-muted">Khung giờ thi đấu mới <span class="text-danger">*</span></label>
+                        <select asp-for="KhungGioMoiId" class="form-select rounded-3">
+                            @foreach (var k in Model.DanhSachKhungGio)
+                            {
+                                <option value="@k.Id" selected="@(Model.KhungGioMoiId == k.Id)">
+                                    Ca @k.GioBatDau.ToString("HH:mm") - @k.GioKetThuc.ToString("HH:mm")
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="KhungGioMoiId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Lý do xin đổi lịch -->
+                    <div class="mb-4">
+                        <label asp-for="LyDo" class="form-label fw-bold small text-muted">Lý do xin đổi lịch <span class="text-danger">*</span></label>
+                        <textarea asp-for="LyDo" class="form-control rounded-3" rows="3"
+                                  placeholder="Ví dụ: Đội bóng lớp vướng lịch thi môn Cơ học kết cấu đột xuất, xin phép BQL chuyển ca sang tối hôm sau..."></textarea>
+                        <span asp-validation-for="LyDo" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Nút bấm hành động -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+                        <a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="text-decoration-none small text-muted">
+                            <i class="bi bi-x-circle me-1"></i>Hủy bỏ
+                        </a>
+
+                        <button type="submit" class="btn btn-warning fw-bold text-dark rounded-pill px-4 py-2 shadow-sm d-inline-flex align-items-center gap-2"
+                                disabled="@(Model.IsTimeLockPassed ? "disabled" : null)">
+                            <i class="bi bi-send-check-fill"></i>
+                            <span>Gửi Yêu Cầu Đổi Lịch Đến BQL Sân</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

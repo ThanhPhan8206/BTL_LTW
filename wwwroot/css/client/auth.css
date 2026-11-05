@@ -1,0 +1,495 @@
+/* ===================================================================
+   GIAO DIỆN ĐĂNG NHẬP & ĐĂNG KÝ - UTC STADIUM (auth.css)
+   Tông màu đồng bộ:
+   - Primary (Xanh navy): #002B5B
+   - Accent (Vàng ấm): #FFC107
+   - Nền trang: Trắng & Lưới ô vuông mờ phong cách DOLEARN
+=================================================================== */
+
+:root {
+    --auth-navy: #002B5B;
+    --auth-navy-light: #0A3D78;
+    --auth-amber: #FFC107;
+    --auth-amber-hover: #e5ac00;
+    --auth-bg-soft: #F4F7FB;
+    --auth-border: #cbd5e1;
+    --auth-text-dark: #1e293b;
+    --auth-text-muted: #64748b;
+    --auth-danger: #dc2626;
+}
+
+@keyframes authCardFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes authIconPop {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    40% { transform: scale(1.16) rotate(-8deg); }
+    75% { transform: scale(1.08) rotate(5deg); }
+}
+
+/* Căn giữa tuyệt đối theo chiều dọc & chiều ngang trên màn hình Laptop mà không cần cuộn */
+.auth-page-section {
+    min-height: calc(100vh - 68px);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 18px 0;
+    background-color: var(--auth-bg-soft);
+    background-image:
+        linear-gradient(to right, rgba(0, 43, 91, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 43, 91, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+
+/* Split-screen Card chính */
+.auth-split-card {
+    max-width: 1020px;
+    width: 100%;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 22px 50px rgba(0, 43, 91, 0.15);
+    border: 1px solid rgba(0, 43, 91, 0.08);
+    animation: authCardFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ===================================================================
+   CỘT TRÁI: NỀN XANH NAVY #002B5B + LOGO + KHẨU HIỆU
+=================================================================== */
+.auth-brand-pane {
+    background-color: var(--auth-navy);
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(145deg, #002B5B 0%, #0A3D78 100%);
+    background-size: 44px 44px, 44px 44px, 100% 100%;
+    color: #ffffff;
+    padding: 2.15rem 2.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+
+.auth-brand-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: var(--auth-amber);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.auth-brand-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.auth-brand-subtitle {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--auth-amber);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.auth-slogan-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 193, 7, 0.16);
+    border: 1px solid rgba(255, 193, 7, 0.45);
+    color: var(--auth-amber);
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.3rem 0.85rem;
+    border-radius: 50px;
+    margin-bottom: 0.75rem;
+}
+
+.auth-pane-heading {
+    font-size: 1.48rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.3;
+    margin-bottom: 0.65rem;
+}
+
+.auth-pane-desc {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.58;
+    margin-bottom: 0;
+}
+
+.auth-feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.68rem 0.9rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    margin-bottom: 0.6rem;
+    transition: all 0.25s ease;
+}
+
+.auth-feature-item:hover {
+    background: rgba(255, 255, 255, 0.13);
+    transform: translateX(4px);
+}
+
+.auth-feature-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background-color: var(--auth-amber);
+    color: var(--auth-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.auth-back-home {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.25s ease;
+}
+
+.auth-back-home:hover {
+    color: var(--auth-amber);
+    transform: translateX(-3px);
+}
+
+/* ===================================================================
+   CỘT PHẢI: NỀN TRẮNG - FORM NHẬP LIỆU
+=================================================================== */
+.auth-form-pane {
+    background-color: #ffffff;
+    padding: 2.15rem 2.65rem;
+    display: flex;
+    align-items: center;
+}
+
+.auth-form-inner {
+    width: 100%;
+}
+
+.auth-step-pill {
+    display: inline-block;
+    background-color: rgba(0, 43, 91, 0.08);
+    color: var(--auth-navy);
+    font-size: 0.73rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.26rem 0.8rem;
+    border-radius: 50px;
+    margin-bottom: 0.45rem;
+}
+
+.auth-form-title {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--auth-navy);
+    letter-spacing: -0.4px;
+    margin-bottom: 0.25rem;
+}
+
+.auth-form-subtitle {
+    font-size: 0.88rem;
+    color: var(--auth-text-muted);
+}
+
+/* Các ô Input kèm Icon bên trái & Nút Ẩn/Hiện mật khẩu bên phải */
+.auth-label {
+    display: block;
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: var(--auth-navy);
+    margin-bottom: 0.3rem;
+}
+
+.auth-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.auth-input-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--auth-text-muted);
+    font-size: 1rem;
+    pointer-events: none;
+    transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 0.62rem 0.95rem 0.62rem 2.6rem;
+    font-size: 0.9rem;
+    color: var(--auth-text-dark);
+    background-color: #f8fafc;
+    border: 1.5px solid var(--auth-border);
+    border-radius: 12px;
+    transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                background-color 0.3s ease,
+                transform 0.25s ease;
+}
+
+.auth-input::placeholder {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.auth-input:hover {
+    border-color: #94a3b8;
+    background-color: #ffffff;
+}
+
+/* Hiệu ứng Focus viền sáng mượt mà */
+.auth-input:focus {
+    background-color: #ffffff;
+    border-color: var(--auth-navy);
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.28), 0 4px 12px rgba(0, 43, 91, 0.06);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.auth-input-group:focus-within .auth-input-icon {
+    color: var(--auth-navy);
+    transform: scale(1.12);
+}
+
+/* Nút Ẩn/Hiện mật khẩu */
+.auth-toggle-password {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: var(--auth-text-muted);
+    font-size: 1.05rem;
+    padding: 0.2rem 0.4rem;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+    z-index: 2;
+}
+
+.auth-toggle-password:hover {
+    color: var(--auth-navy);
+    transform: scale(1.08);
+}
+
+/* Trạng thái lỗi Validation trực quan */
+.auth-input.input-validation-error {
+    border-color: var(--auth-danger);
+    background-color: #fef2f2;
+}
+
+.auth-input.input-validation-error:focus {
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+}
+
+.auth-error-msg {
+    display: block;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--auth-danger);
+    margin-top: 0.2rem;
+}
+
+/* Alert thông báo */
+.auth-alert-success {
+    background-color: #ecfdf5;
+    border: 1px solid #6ee7b7;
+    color: #065f46;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.auth-alert-error {
+    background-color: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.auth-alert-error ul {
+    margin-bottom: 0;
+    padding-left: 1.1rem;
+}
+
+/* Checkbox Ghi nhớ đăng nhập */
+.auth-check .form-check-input {
+    cursor: pointer;
+    border-color: #94a3b8;
+}
+
+.auth-check .form-check-input:checked {
+    background-color: var(--auth-navy);
+    border-color: var(--auth-navy);
+}
+
+.auth-check .form-check-label {
+    font-size: 0.84rem;
+    color: var(--auth-text-dark);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Nút Submit "Hoàn Tất Đăng Ký Tài Khoản" & "Đăng Nhập Ngay" đồng bộ màu vàng #FFC107 */
+.auth-btn-submit {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--auth-amber);
+    color: var(--auth-navy);
+    border: 2px solid var(--auth-amber);
+    border-radius: 50px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.96rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    box-shadow: 0 8px 20px rgba(255, 193, 7, 0.38);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.auth-btn-submit:hover {
+    background-color: var(--auth-amber-hover);
+    border-color: var(--auth-amber-hover);
+    color: var(--auth-navy);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(255, 193, 7, 0.55);
+}
+
+.auth-btn-submit:active {
+    transform: translateY(-1px);
+}
+
+.auth-btn-submit:hover i {
+    animation: authIconPop 0.5s ease;
+}
+
+/* Link chuyển đổi Đăng nhập <-> Đăng ký */
+.auth-switch-box {
+    font-size: 0.88rem;
+}
+
+.auth-switch-link {
+    color: var(--auth-navy);
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.auth-switch-link:hover {
+    color: #b45309;
+    transform: translateX(3px);
+}
+
+/* Link Quên mật khẩu trên trang Đăng nhập */
+.auth-forgot-link {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--auth-navy);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.auth-forgot-link:hover {
+    color: #b45309;
+    text-decoration: underline;
+    transform: translateX(2px);
+}
+
+/* Ô nhập mã OTP 6 chữ số nổi bật */
+.auth-otp-input {
+    letter-spacing: 6px;
+    font-weight: 800;
+    font-size: 1.08rem;
+    color: var(--auth-navy);
+}
+
+.auth-otp-input::placeholder {
+    letter-spacing: normal;
+    font-weight: 500;
+}
+
+/* Dòng bản quyền nhỏ gọn ở đáy màn hình Auth */
+.auth-mini-copyright {
+    font-size: 0.8rem;
+    color: var(--auth-text-muted);
+}
+
+.auth-mini-copyright strong {
+    color: var(--auth-navy);
+}
+
+/* ===================================================================
+   RESPONSIVE DESIGN
+=================================================================== */
+@media (max-width: 991.98px) {
+    .auth-page-section {
+        padding: 25px 0;
+    }
+    .auth-split-card {
+        border-radius: 24px;
+    }
+    .auth-brand-pane,
+    .auth-form-pane {
+        padding: 2rem 1.85rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .auth-page-section {
+        padding: 16px 0 28px 0;
+    }
+    .auth-split-card {
+        border-radius: 20px;
+    }
+    .auth-brand-pane,
+    .auth-form-pane {
+        padding: 1.5rem 1.25rem;
+    }
+    .auth-form-title {
+        font-size: 1.45rem;
+    }
+}

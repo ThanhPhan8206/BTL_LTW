@@ -1,0 +1,202 @@
+@model QLSanBong.Areas.KhachHang.Models.PaymentProcessViewModel
+@{
+    ViewData["Title"] = "Thanh toán đặt cọc qua VietQR - UTC STADIUM";
+}
+
+<div class="container-fluid px-3 px-lg-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="text-decoration-none">Lịch đặt</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Thanh toán VietQR</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0" style="color: #002B5B;">
+                <i class="bi bi-qr-code text-warning me-2"></i>Thanh Toán Giữ Ca Thi Đấu Qua VietQR
+            </h2>
+        </div>
+        <a asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu" class="btn btn-outline-secondary rounded-pill px-3 py-2 small fw-semibold">
+            <i class="bi bi-journal-text me-1"></i> Xem danh sách lịch đặt
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 px-4 py-3 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                <span class="fw-semibold">@TempData["SuccessMessage"]</span>
+            </div>
+            <button type="button" class="btn-close btn-sm shadow-none" data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    }
+
+    <div class="row g-4 justify-content-center">
+        <!-- ===========================================================
+             CỘT TRÁI (5 PHẦN): MÃ VIETQR ĐỘNG TỰ ĐIỀN TIỀN & CÚ PHÁP
+        =========================================================== -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white h-100">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill small fw-bold">
+                        <i class="bi bi-lightning-charge-fill me-1"></i>VIETQR NAPAS 24/7 TỨC THÌ
+                    </span>
+                </div>
+
+                <h4 class="fw-bold mb-1" style="color: #002B5B;">Quét Mã Để Giữ Chỗ</h4>
+                <p class="text-muted small mb-3">Mở ứng dụng Ngân hàng bất kỳ hoặc ví điện tử để quét mã tự động</p>
+
+                <!-- Khung hiển thị ảnh QR VietQR -->
+                <div class="p-3 rounded-4 d-inline-block mx-auto mb-3 shadow-sm" style="background-color: #ffffff; border: 2px dashed #FFC107;">
+                    <img src="@Model.VietQrImageUrl" alt="Mã VietQR Thanh Toán"
+                         class="img-fluid rounded-3"
+                         style="max-width: 280px; width: 100%;" />
+                </div>
+
+                <div class="text-center small text-muted mb-3">
+                    <span class="text-success fw-bold"><i class="bi bi-shield-check me-1"></i>Số tiền &amp; Nội dung đã được mã hóa tự động</span>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="@Model.VietQrImageUrl" download="VietQR_UTCStadium_Don_@(Model.DatSanId).png" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        <i class="bi bi-download me-1"></i>Tải mã QR
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="window.print()">
+                        <i class="bi bi-printer me-1"></i>In thông tin
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===========================================================
+             CỘT PHẢI (7 PHẦN): THÔNG TIN TÀI KHOẢN & FORM XÁC NHẬN
+        =========================================================== -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                    <div>
+                        <span class="text-muted small">Mã đơn đặt sân:</span>
+                        <div class="fs-4 fw-extrabold text-primary">#@Model.DatSanId</div>
+                    </div>
+                    <div class="text-end">
+                        <span class="text-muted small">Hình thức:</span>
+                        <div><span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold">@Model.LoaiThanhToan</span></div>
+                    </div>
+                </div>
+
+                <!-- Tóm tắt ca thi đấu -->
+                <div class="p-3 rounded-3 mb-4" style="background-color: #F4F7FB; border: 1px solid #e2e8f0;">
+                    <div class="row g-2 small">
+                        <div class="col-sm-6">
+                            <span class="text-muted">Sân bóng:</span>
+                            <strong class="text-dark d-block">@Model.TenSan (@Model.LoaiSan)</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted">Thời gian đá:</span>
+                            <strong class="text-dark d-block">@Model.NgayDat.ToString("dd/MM/yyyy") &bull; @Model.KhungGioDisplay</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted">Tổng tiền đơn:</span>
+                            <strong class="text-dark d-block">@Model.TongTienDon.ToString("N0") đ</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted">Còn lại thanh toán tại sân:</span>
+                            <strong class="text-primary d-block">@Model.SoTienConLai.ToString("N0") đ</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin chuyển khoản chi tiết -->
+                <h5 class="fw-bold mb-3" style="color: #002B5B;">
+                    <i class="bi bi-bank2 text-warning me-2"></i>Thông Tin Chuyển Khoản Ngân Hàng
+                </h5>
+
+                <div class="list-group list-group-flush mb-4 small">
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <span class="text-muted">Ngân hàng thụ hưởng:</span>
+                        <strong class="text-dark">@Model.BankName</strong>
+                    </div>
+
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <span class="text-muted">Số tài khoản:</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <strong class="text-primary fs-5" id="txtAccNum">@Model.AccountNumber</strong>
+                            <button type="button" class="btn btn-sm btn-light border py-0 px-2 rounded btn-copy" data-clipboard="@Model.AccountNumber" title="Sao chép">
+                                <i class="bi bi-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <span class="text-muted">Chủ tài khoản:</span>
+                        <strong class="text-dark">@Model.AccountName</strong>
+                    </div>
+
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <span class="text-muted">Số tiền cần chuyển:</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <strong class="fs-4 fw-extrabold text-danger" id="txtPayAmount">@Model.SoTienThanhToan.ToString("N0") đ</strong>
+                            <button type="button" class="btn btn-sm btn-light border py-0 px-2 rounded btn-copy" data-clipboard="@Model.SoTienThanhToan.ToString("0")" title="Sao chép số tiền">
+                                <i class="bi bi-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 bg-warning-subtle rounded-3 p-3 mt-2 border">
+                        <div>
+                            <span class="text-dark fw-bold d-block">Nội dung chuyển khoản chuẩn:</span>
+                            <span class="text-danger fw-extrabold fs-6" id="txtSyntax">@Model.NoiDungChuyenKhoan</span>
+                        </div>
+                        <button type="button" class="btn btn-warning btn-sm fw-bold text-dark px-3 rounded-pill btn-copy" data-clipboard="@Model.NoiDungChuyenKhoan">
+                            <i class="bi bi-copy me-1"></i>Sao chép
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form xác nhận đã thanh toán -->
+                <form asp-area="KhachHang" asp-controller="DatSan" asp-action="XacNhanThanhToan" method="post" class="mt-auto">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.DatSanId" />
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-semibold">Mã giao dịch ngân hàng / Mã tham chiếu (Tùy chọn):</label>
+                        <input type="text" name="maGiaoDich" class="form-control rounded-3" placeholder="Ví dụ: MB12345678 hoặc FT26..." />
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-warning fw-bold text-dark rounded-pill px-4 py-2 flex-grow-1 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Tôi Đã Chuyển Khoản Thành Công</span>
+                        </button>
+
+                        <a asp-area="KhachHang" asp-controller="DatSan" asp-action="ChiTietHoaDon" asp-route-id="@Model.DatSanId" class="btn btn-outline-secondary rounded-pill px-3 py-2">
+                            <i class="bi bi-receipt me-1"></i> Xem hóa đơn
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".btn-copy").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const text = this.getAttribute("data-clipboard");
+                    if (text && navigator.clipboard) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            const originalHtml = this.innerHTML;
+                            this.innerHTML = '<i class="bi bi-check2"></i> Đã chép';
+                            setTimeout(() => { this.innerHTML = originalHtml; }, 2000);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
+

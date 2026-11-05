@@ -1,0 +1,422 @@
+@model QLSanBong.Areas.Admin.Models.AdminDashboardViewModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Tổng quan Quản trị - UTC STADIUM";
+    var chartLabels = JsonSerializer.Serialize(Model.RevenueChartData.Select(c => c.Label));
+    var chartRevenues = JsonSerializer.Serialize(Model.RevenueChartData.Select(c => c.Revenue));
+    var chartBookings = JsonSerializer.Serialize(Model.RevenueChartData.Select(c => c.BookingCount));
+}
+
+<!-- Welcome Header Banner -->
+<div class="p-4 rounded-4 text-white mb-4 shadow-sm" style="background: linear-gradient(135deg, #002B5B 0%, #0A3D78 100%);">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1">
+                    <i class="bi bi-shield-check me-1"></i> ADMIN DASHBOARD
+                </span>
+                <span class="text-white-50 small">
+                    <i class="bi bi-calendar3 me-1"></i> Hôm nay: @DateTime.Today.ToString("dd/MM/yyyy")
+                </span>
+            </div>
+            <h2 class="fw-bold mb-1">Bảng Điều Khiển Trung Tâm UTC STADIUM</h2>
+            <p class="text-white-50 mb-0 small">
+                Xin chào <strong>@(User.Identity?.Name ?? "Quản trị viên")</strong>. Giám sát tình hình kinh doanh, duyệt đơn ca thi đấu và kiểm soát trạng thái các cụm sân theo thời gian thực.
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" class="btn btn-warning fw-bold rounded-pill px-4 text-dark shadow-sm">
+                <i class="bi bi-calendar-check me-1"></i> Quản lý Đặt Sân
+            </a>
+            <a asp-area="Admin" asp-controller="KhachHang" asp-action="Index" class="btn btn-outline-light rounded-pill px-3 shadow-sm">
+                <i class="bi bi-people me-1"></i> Khách Hàng
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 4 Thẻ KPI Cốt Lõi (Clickable) -->
+<div class="row g-3 mb-4">
+    <!-- KPI 1: Đơn chờ duyệt -->
+    <div class="col-sm-6 col-xl-3">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-status="Chờ duyệt"
+           class="admin-kpi-card kpi-warning h-100" title="Click để chuyển sang danh sách Đơn chờ duyệt">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="admin-kpi-label">Đơn chờ duyệt</span>
+                <div class="admin-kpi-icon-wrap" style="background-color: rgba(245, 158, 11, 0.12); color: #B45309;">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+            <div class="admin-kpi-value text-warning">
+                @Model.ChoDuyetCount.ToString("N0")
+                <span class="fs-6 text-muted fw-normal">đơn</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mt-2 text-muted small">
+                <span>Cần xử lý ngay</span>
+                <i class="bi bi-arrow-right-short fs-5 text-warning"></i>
+            </div>
+        </a>
+    </div>
+
+    <!-- KPI 2: Yêu cầu đổi lịch -->
+    <div class="col-sm-6 col-xl-3">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="YeuCauDoiLich"
+           class="admin-kpi-card kpi-info h-100" title="Click để xử lý Yêu cầu đổi lịch của khách">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="admin-kpi-label">Đổi lịch chưa xử lý</span>
+                <div class="admin-kpi-icon-wrap" style="background-color: rgba(59, 130, 246, 0.12); color: #1D4ED8;">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+            </div>
+            <div class="admin-kpi-value text-primary">
+                @Model.YeuCauDoiLichCount.ToString("N0")
+                <span class="fs-6 text-muted fw-normal">yêu cầu</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mt-2 text-muted small">
+                <span>Xem và điều phối ca</span>
+                <i class="bi bi-arrow-right-short fs-5 text-primary"></i>
+            </div>
+        </a>
+    </div>
+
+    <!-- KPI 3: Số đơn đặt trong ngày -->
+    <div class="col-sm-6 col-xl-3">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-ngayDat="@DateTime.Today.ToString("yyyy-MM-dd")"
+           class="admin-kpi-card kpi-navy h-100" title="Click để xem toàn bộ danh sách đơn đặt hôm nay">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="admin-kpi-label">Đơn đá hôm nay</span>
+                <div class="admin-kpi-icon-wrap" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B;">
+                    <i class="bi bi-calendar2-event-fill"></i>
+                </div>
+            </div>
+            <div class="admin-kpi-value" style="color: #002B5B;">
+                @Model.DonHomNayCount.ToString("N0")
+                <span class="fs-6 text-muted fw-normal">trận</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mt-2 text-muted small">
+                <span>Lịch thi đấu @DateTime.Today.ToString("dd/MM")</span>
+                <i class="bi bi-arrow-right-short fs-5" style="color: #002B5B;"></i>
+            </div>
+        </a>
+    </div>
+
+    <!-- KPI 4: Doanh thu hôm nay -->
+    <div class="col-sm-6 col-xl-3">
+        <a asp-area="Admin" asp-controller="ThanhToan" asp-action="Index" asp-route-tuNgay="@DateTime.Today.ToString("yyyy-MM-dd")" asp-route-denNgay="@DateTime.Today.ToString("yyyy-MM-dd")"
+           class="admin-kpi-card kpi-success h-100" title="Click để xem chi tiết các giao dịch thanh toán hôm nay">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="admin-kpi-label">Doanh thu hôm nay</span>
+                <div class="admin-kpi-icon-wrap" style="background-color: rgba(16, 185, 129, 0.12); color: #047857;">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+            </div>
+            <div class="admin-kpi-value text-success">
+                @Model.DoanhThuHomNay.ToString("N0") <span class="fs-6 fw-bold">đ</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mt-2 text-muted small">
+                <span>Thanh toán thực nhận</span>
+                <i class="bi bi-arrow-right-short fs-5 text-success"></i>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Khối Biểu đồ & Thông tin sân -->
+<div class="row g-4 mb-4">
+    <!-- Cột trái: Biểu đồ doanh thu 7 ngày qua -->
+    <div class="col-lg-8">
+        <div class="admin-card h-100">
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0 text-navy">
+                        <i class="bi bi-bar-chart-line text-warning me-2"></i>Doanh Thu 7 Ngày Gần Nhất
+                    </h5>
+                    <span class="text-muted small">Xu hướng thu tiền từ các giao dịch cọc &amp; thanh toán sân</span>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
+                        <i class="bi bi-cash me-1 text-success"></i>Tổng 7 ngày:
+                        <strong>@Model.RevenueChartData.Sum(x => x.Revenue).ToString("N0") đ</strong>
+                    </span>
+                </div>
+            </div>
+
+            <div style="position: relative; height: 280px; width: 100%;">
+                <canvas id="revenueTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cột phải: Trạng thái Vận hành & Cụm sân -->
+    <div class="col-lg-4">
+        <div class="admin-card h-100 d-flex flex-column justify-content-between">
+            <div>
+                <h5 class="fw-bold mb-3 text-navy">
+                    <i class="bi bi-pie-chart text-primary me-2"></i>Tình Trạng Sân Bãi
+                </h5>
+
+                <div class="p-3 rounded-4 mb-3" style="background-color: #F8FAFC; border: 1px solid #E2E8F0;">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fw-semibold small text-muted">Sân bóng hoạt động:</span>
+                        <span class="badge bg-success rounded-pill px-3 py-1">@Model.TongSanHoatDong Sân</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-4 mb-3" style="background-color: #F8FAFC; border: 1px solid #E2E8F0;">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fw-semibold small text-muted">Khách hàng đăng ký:</span>
+                        <span class="badge bg-primary rounded-pill px-3 py-1">@Model.TongKhachHang Khách</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-4" style="background-color: #FEF3C7; border: 1px dashed #F59E0B;">
+                    <div class="d-flex align-items-center gap-2 text-warning-emphasis">
+                        <i class="bi bi-lightbulb-fill fs-5"></i>
+                        <span class="fw-bold small">Mẹo vận hành giờ cao điểm</span>
+                    </div>
+                    <p class="small text-muted mb-0 mt-1">
+                        Khung giờ 17:30 - 20:30 thường có tỷ lệ lấp đầy cao nhất. Khuyến khích kiểm tra trước danh sách đặt cọc để giữ sân chuẩn xác.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-3 pt-3 border-top d-flex gap-2">
+                <a asp-area="Admin" asp-controller="SanBong" asp-action="Index" class="btn btn-sm btn-outline-primary rounded-pill w-100 fw-semibold">
+                    <i class="bi bi-gear me-1"></i> Quản lý Sân
+                </a>
+                <a asp-area="Admin" asp-controller="KhachHang" asp-action="Index" class="btn btn-sm btn-outline-dark rounded-pill w-100 fw-semibold">
+                    <i class="bi bi-people me-1"></i> DS Khách
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bảng 5 Đơn Đặt Sân Mới Nhất Đang Chờ Duyệt -->
+<div class="admin-card">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+        <div>
+            <h5 class="fw-bold mb-0 text-navy">
+                <i class="bi bi-clock-history text-warning me-2"></i>5 Đơn Đặt Sân Mới Nhất Đang Chờ Duyệt
+            </h5>
+            <span class="text-muted small">Xử lý nhanh để chốt ca và tự động gửi email xác nhận cho khách</span>
+        </div>
+        <div>
+            <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" asp-route-status="Chờ duyệt" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-bold text-dark">
+                <span>Xem tất cả (@Model.ChoDuyetCount)</span>
+                <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.RecentPendingBookings.Any())
+    {
+        <div class="text-center py-5">
+            <div class="rounded-circle d-inline-flex p-3 mb-2" style="background-color: #ECFDF5; color: #10B981;">
+                <i class="bi bi-check2-all fs-2"></i>
+            </div>
+            <h6 class="fw-bold text-dark">Tuyệt vời! Hiện không còn đơn nào chờ duyệt</h6>
+            <p class="text-muted small mb-0">Tất cả các ca đặt sân đã được duyệt hoặc xử lý hoàn tất.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">MÃ ĐƠN</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th>SÂN BÓNG</th>
+                        <th>CA THI ĐẤU</th>
+                        <th>NGÀY ĐẶT</th>
+                        <th>TỔNG TIỀN</th>
+                        <th>ĐÃ TRẢ / CỌC</th>
+                        <th class="text-end" style="width: 170px;">THAO TÁC NHANH</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.RecentPendingBookings)
+                    {
+                        <tr>
+                            <td>
+                                <span class="fw-bold text-primary">#@item.Id</span>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@item.TenNguoiDung</div>
+                                <div class="small text-muted">
+                                    <i class="bi bi-telephone me-1"></i>@item.SoDienThoai
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark">@item.TenSan</span>
+                                <span class="badge bg-light text-muted border ms-1 small">@item.LoaiSan</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border fw-bold">
+                                    <i class="bi bi-clock me-1 text-primary"></i>@item.KhungGioDisplay
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold">@item.NgayDat.ToString("dd/MM/yyyy")</span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-navy">@item.TongTien.ToString("N0") đ</span>
+                            </td>
+                            <td>
+                                @if (item.DaThanhToan > 0)
+                                {
+                                    <span class="badge bg-success-subtle text-success fw-bold">
+                                        <i class="bi bi-check-circle me-1"></i>@item.DaThanhToan.ToString("N0") đ
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-muted">Chưa thanh toán</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <!-- Nút duyệt form -->
+                                    <form asp-area="Admin" asp-controller="DatSan" asp-action="DuyetDon" method="post" class="d-inline"
+                                          onsubmit="return confirm('Bạn có chắc chắn muốn DUYỆT đơn đặt sân #@item.Id? Hệ thống sẽ tự động gửi email xác nhận cho khách.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="hidden" name="returnUrl" value="/Admin/Dashboard" />
+                                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-2 py-1 shadow-sm fw-semibold" title="Duyệt đơn ngay">
+                                            <i class="bi bi-check-lg me-1"></i>Duyệt
+                                        </button>
+                                    </form>
+
+                                    <!-- Nút từ chối kích hoạt modal -->
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1"
+                                            data-bs-toggle="modal" data-bs-target="#modalTuChoi_@item.Id" title="Từ chối đơn">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Modal Từ Chối Đơn -->
+                                <div class="modal fade" id="modalTuChoi_@item.Id" tabindex="-1" aria-labelledby="modalLabel_@item.Id" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered text-start">
+                                        <div class="modal-content rounded-4 border-0 shadow">
+                                            <form asp-area="Admin" asp-controller="DatSan" asp-action="TuChoiDon" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <input type="hidden" name="returnUrl" value="/Admin/Dashboard" />
+
+                                                <div class="modal-header border-bottom-0 pb-0">
+                                                    <h5 class="modal-title fw-bold text-danger" id="modalLabel_@item.Id">
+                                                        <i class="bi bi-exclamation-octagon-fill me-2"></i>Từ Chối Đơn Đặt Sân #@item.Id
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                                </div>
+
+                                                <div class="modal-body py-3">
+                                                    <div class="alert alert-warning small rounded-3 mb-3">
+                                                        Khách hàng <strong>@item.TenNguoiDung</strong> (@item.SoDienThoai) đã đặt <strong>@item.TenSan</strong> ca <strong>@item.KhungGioDisplay</strong> ngày <strong>@item.NgayDat.ToString("dd/MM/yyyy")</strong>.
+                                                    </div>
+
+                                                    <label class="form-label fw-semibold small">Lý do từ chối (Gửi qua Gmail cho khách) <span class="text-danger">*</span></label>
+                                                    <textarea class="form-control rounded-3" name="lyDo" rows="3" required
+                                                              placeholder="Ví dụ: Sân đang trùng lịch giải đấu sinh viên UTC, quý khách vui lòng chọn ca khác..."></textarea>
+                                                </div>
+
+                                                <div class="modal-footer border-top-0 pt-0">
+                                                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-4 fw-semibold">
+                                                        <i class="bi bi-send-x me-1"></i> Xác Nhận &amp; Bắn Email
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('revenueTrendChart');
+            if (ctx) {
+                const labels = @Html.Raw(chartLabels);
+                const dataValues = @Html.Raw(chartRevenues);
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Doanh thu (VNĐ)',
+                            data: dataValues,
+                            backgroundColor: 'rgba(0, 43, 91, 0.85)',
+                            borderColor: '#002B5B',
+                            borderWidth: 1.5,
+                            borderRadius: 8,
+                            hoverBackgroundColor: '#FFC107',
+                            hoverBorderColor: '#FFA000'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let val = context.raw || 0;
+                                        return ' ' + Number(val).toLocaleString('vi-VN') + ' VNĐ';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#F1F5F9'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                                        if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
+                                        return value;
+                                    },
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 11,
+                                        weight: '600'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,257 @@
+@{
+    var currentCtrl = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAct = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] ?? "Quản trị Hệ thống - UTC STADIUM")</title>
+
+    <!-- Favicon UTC STADIUM -->
+    <link rel="icon" type="image/png" href="~/uploads/sanbong/logo.png" />
+    <link rel="shortcut icon" type="image/png" href="~/uploads/sanbong/logo.png" />
+
+    <!-- Google Fonts: Be Vietnam Pro -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Site & Admin Stylesheet -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/QLSanBong.styles.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body class="admin-body d-flex flex-column min-vh-100">
+    <!-- Topbar Header -->
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg admin-navbar">
+            <div class="container-fluid px-3 px-lg-4">
+                <a class="admin-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                    <img src="~/uploads/sanbong/logo.png" alt="UTC STADIUM Logo" class="admin-brand-logo"
+                         onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect width=%22100%25%22 height=%22100%25%22 rx=%2216%22 fill=%22%23FFC107%22/><text x=%2250%25%22 y=%2255%25%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2222%22 fill=%22%23002B5B%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>UTC</text></svg>';" />
+                    <div class="d-flex flex-column">
+                        <span class="admin-brand-title">UTC STADIUM</span>
+                        <span class="admin-brand-subtitle">ADMIN PORTAL</span>
+                    </div>
+                </a>
+
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                    <!-- Nút xem trang chủ công khai -->
+                    <a class="btn btn-sm btn-outline-light rounded-pill px-3 d-none d-sm-inline-flex align-items-center gap-1"
+                       asp-area="" asp-controller="Home" asp-action="Index" target="_blank" title="Mở trang chủ khách hàng trong tab mới">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        <span>Xem Trang Chủ</span>
+                    </a>
+
+                    <!-- Profile Admin & Menu -->
+                    <div class="dropdown">
+                        <button class="btn admin-user-pill dropdown-toggle border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-shield-lock-fill text-warning fs-6"></i>
+                            <span class="fw-bold d-none d-md-inline">@(User.Identity?.Name ?? "Quản trị viên")</span>
+                            <span class="badge bg-warning text-dark fw-bold rounded-pill" style="font-size: 0.65rem;">ADMIN</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 mt-2" style="min-width: 230px;">
+                            <li class="px-3 py-2 border-bottom mb-1">
+                                <div class="fw-bold text-dark">@(User.Identity?.Name ?? "Quản trị viên")</div>
+                                <div class="small text-muted text-truncate">@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "admin@utcstadium.vn")</div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 small d-flex align-items-center gap-2" asp-area="" asp-controller="Account" asp-action="Profile">
+                                    <i class="bi bi-person-circle text-primary"></i>
+                                    <span>Hồ sơ &amp; Đổi mật khẩu</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 small d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-globe2 text-success"></i>
+                                    <span>Giao diện Khách hàng</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 small d-flex align-items-center gap-2 text-danger fw-semibold" asp-area="" asp-controller="Account" asp-action="Logout">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Đăng xuất</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Nút đăng xuất trực tiếp -->
+                    <a class="btn btn-sm btn-danger rounded-pill px-3 d-none d-lg-inline-flex align-items-center gap-1 shadow-sm"
+                       asp-area="" asp-controller="Account" asp-action="Logout" title="Đăng xuất khỏi tài khoản Quản trị">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Đăng xuất</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Thông báo TempData -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="container-fluid px-3 px-lg-4 mt-3">
+            <div class="alert alert-success alert-dismissible fade show rounded-4 px-4 py-3 d-flex align-items-center justify-content-between shadow-sm border-0 mb-0" role="alert" style="background-color: #ECFDF5; border-left: 4px solid #10B981 !important;">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                    <span class="fw-semibold small text-success">@TempData["SuccessMessage"]</span>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="container-fluid px-3 px-lg-4 mt-3">
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 px-4 py-3 d-flex align-items-center justify-content-between shadow-sm border-0 mb-0" role="alert" style="background-color: #FEF2F2; border-left: 4px solid #EF4444 !important;">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                    <span class="fw-semibold small text-danger">@TempData["ErrorMessage"]</span>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        </div>
+    }
+
+    <!-- Nội dung layout với Sidebar 12 chức năng -->
+    <div class="container-fluid px-3 px-lg-4 py-4 flex-grow-1">
+        <div class="row g-4">
+            <!-- Sidebar Navigation -->
+            <aside class="col-lg-3 col-xl-2">
+                <div class="admin-sidebar">
+                    <div class="admin-sidebar-section-title">Tổng quan</div>
+                    <a class="admin-nav-item @(currentCtrl == "Dashboard" ? "active" : "")"
+                       asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-speedometer2 admin-nav-icon"></i>
+                            <span>1. Tổng quan</span>
+                        </div>
+                    </a>
+
+                    <div class="admin-sidebar-section-title mt-2">Vận hành Sân &amp; Lịch</div>
+                    <a class="admin-nav-item @(currentCtrl == "DatSan" ? "active" : "")"
+                       asp-area="Admin" asp-controller="DatSan" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-calendar2-check admin-nav-icon"></i>
+                            <span>2. Lịch đặt &amp; Đổi lịch</span>
+                        </div>
+                    </a>
+
+                    <a class="admin-nav-item @(currentCtrl == "SanBong" ? "active" : "")"
+                       asp-area="Admin" asp-controller="SanBong" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-dribbble admin-nav-icon"></i>
+                            <span>3. Sân &amp; Bảo trì</span>
+                        </div>
+                    </a>
+
+                    <a class="admin-nav-item @(currentCtrl == "KhungGio" || currentCtrl == "ThietLapGia" ? "active" : "")"
+                       asp-area="Admin" asp-controller="KhungGio" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-clock-history admin-nav-icon"></i>
+                            <span>4. Khung giờ &amp; Giá</span>
+                        </div>
+                    </a>
+
+                    <div class="admin-sidebar-section-title mt-2">Kinh doanh &amp; Khách</div>
+                    <a class="admin-nav-item @(currentCtrl == "DichVu" ? "active" : "")"
+                       asp-area="Admin" asp-controller="DichVu" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-cup-straw admin-nav-icon"></i>
+                            <span>5. Quản lý Dịch vụ</span>
+                        </div>
+                    </a>
+
+                    <a class="admin-nav-item @(currentCtrl == "MaGiamGia" ? "active" : "")"
+                       asp-area="Admin" asp-controller="MaGiamGia" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-ticket-perforated admin-nav-icon"></i>
+                            <span>6. Mã giảm giá</span>
+                        </div>
+                    </a>
+
+                    <a class="admin-nav-item @(currentCtrl == "KhachHang" ? "active" : "")"
+                       asp-area="Admin" asp-controller="KhachHang" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-people admin-nav-icon"></i>
+                            <span>7. Quản lý Khách</span>
+                        </div>
+                    </a>
+
+                    <a class="admin-nav-item @(currentCtrl == "ThanhToan" ? "active" : "")"
+                       asp-area="Admin" asp-controller="ThanhToan" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-credit-card-2-front admin-nav-icon"></i>
+                            <span>8. Quản lý Thu - Chi</span>
+                        </div>
+                    </a>
+
+                    <div class="admin-sidebar-section-title mt-2">Báo cáo &amp; Tương tác</div>
+                    <a class="admin-nav-item @(currentCtrl == "ThongKe" ? "active" : "")"
+                       asp-area="Admin" asp-controller="ThongKe" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-graph-up-arrow admin-nav-icon"></i>
+                            <span>9. Thống kê &amp; Báo cáo</span>
+                        </div>
+                    </a>
+
+                    <a class="admin-nav-item @(currentCtrl == "DanhGia" ? "active" : "")"
+                       asp-area="Admin" asp-controller="DanhGia" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-star admin-nav-icon"></i>
+                            <span>10. Đánh giá của khách</span>
+                        </div>
+                    </a>
+
+                    <a class="admin-nav-item @(currentCtrl == "ThongBao" ? "active" : "")"
+                       asp-area="Admin" asp-controller="ThongBao" asp-action="Index">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-bell admin-nav-icon"></i>
+                            <span>11. Thông báo &amp; Tin tức</span>
+                        </div>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Workspace Container -->
+            <main class="col-lg-9 col-xl-10">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <!-- Admin Footer -->
+    <footer class="py-3 bg-white border-top mt-auto">
+        <div class="container-fluid px-3 px-lg-4 d-flex flex-column flex-md-row align-items-center justify-content-between small text-muted gap-2">
+            <div>
+                &copy; 2026 <strong style="color: #002B5B;">UTC STADIUM</strong> &bull; Hệ thống Quản trị Vận hành Sân bóng Sinh viên
+            </div>
+            <div>
+                <span class="badge bg-light text-dark border px-2 py-1">Area: Admin</span>
+                <span class="badge bg-warning text-dark fw-bold px-2 py-1 ms-1">Phase 1 Complete</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & Vendor Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

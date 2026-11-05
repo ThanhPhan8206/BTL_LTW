@@ -1,0 +1,407 @@
+@model QLSanBong.Areas.Admin.Models.AdminDatSanDetailViewModel
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = $"Chi tiết Đơn Đặt Sân #{Model.Id} - UTC STADIUM Admin";
+
+    var isPending = Model.TrangThai == "Chờ duyệt";
+    var isConfirmed = Model.TrangThai == "Đã xác nhận" || Model.TrangThai == "Đã duyệt";
+    var isPlaying = Model.TrangThai == "Đang đá";
+    var isCompleted = Model.TrangThai == "Hoàn thành";
+    var isCancelled = Model.TrangThai == "Từ chối" || Model.TrangThai == "Đã hủy";
+}
+
+<!-- Top Header & Breadcrumb -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="DatSan" asp-action="Index" class="text-decoration-none">Lịch đặt sân</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chi tiết #@Model.Id</li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-center gap-2">
+            <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Đơn Đặt Sân #@Model.Id</h2>
+            @if (isPending)
+            {
+                <span class="admin-badge admin-badge-warning fs-6"><i class="bi bi-hourglass-split"></i> Chờ duyệt</span>
+            }
+            else if (isConfirmed)
+            {
+                <span class="admin-badge admin-badge-info fs-6"><i class="bi bi-check-circle"></i> Đã xác nhận</span>
+            }
+            else if (isPlaying)
+            {
+                <span class="badge bg-primary fs-6 rounded-pill px-3 py-1 shadow-sm"><i class="bi bi-dribbble me-1"></i> Đang đá</span>
+            }
+            else if (isCompleted)
+            {
+                <span class="admin-badge admin-badge-success fs-6"><i class="bi bi-check2-all"></i> Hoàn thành</span>
+            }
+            else
+            {
+                <span class="admin-badge admin-badge-locked fs-6"><i class="bi bi-x-circle"></i> @Model.TrangThai</span>
+            }
+        </div>
+    </div>
+
+    <!-- Nút Thao Tác Quy Trình Bàn Giao -->
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a asp-area="Admin" asp-controller="DatSan" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3 fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
+
+        @if (isPending)
+        {
+            <form asp-area="Admin" asp-controller="DatSan" asp-action="UpdateStatus" method="post" class="d-inline"
+                  onsubmit="return confirm('Duyệt đơn đặt sân #@Model.Id và gửi email xác nhận cho khách?');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="trangThaiMoi" value="Đã xác nhận" />
+                <input type="hidden" name="returnUrl" value="/Admin/DatSan/Details/@Model.Id" />
+                <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-check-lg me-1"></i> Duyệt Đơn
+                </button>
+            </form>
+
+            <button type="button" class="btn btn-outline-danger rounded-pill px-3 fw-semibold"
+                    data-bs-toggle="modal" data-bs-target="#modalTuChoiDetail">
+                <i class="bi bi-x-circle me-1"></i> Từ Chối
+            </button>
+        }
+
+        @if (isConfirmed)
+        {
+            <form asp-area="Admin" asp-controller="DatSan" asp-action="NhanSan" method="post" class="d-inline"
+                  onsubmit="return confirm('Xác nhận khách hàng đã đến NHẬN SÂN để bắt đầu trận đấu?');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="returnUrl" value="/Admin/DatSan/Details/@Model.Id" />
+                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-play-circle-fill me-1"></i> Bàn Giao Nhận Sân (Đang đá)
+                </button>
+            </form>
+
+            <button type="button" class="btn btn-outline-danger rounded-pill px-3 fw-semibold"
+                    data-bs-toggle="modal" data-bs-target="#modalHuyDonDetail">
+                <i class="bi bi-x-lg me-1"></i> Hủy Đơn
+            </button>
+        }
+
+        @if (isPlaying)
+        {
+            <form asp-area="Admin" asp-controller="DatSan" asp-action="TraSan" method="post" class="d-inline"
+                  onsubmit="return confirm('Xác nhận TRẢ SÂN và kết thúc trận đấu? Hệ thống sẽ tự động xuất hóa đơn.');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="returnUrl" value="/Admin/DatSan/Details/@Model.Id" />
+                <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-check2-circle me-1"></i> Nghiệm Thu Trả Sân &amp; Xuất Hóa Đơn
+                </button>
+            </form>
+        }
+    </div>
+</div>
+
+<!-- Modal Từ Chối Đơn -->
+@if (isPending)
+{
+    <div class="modal fade" id="modalTuChoiDetail" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-start">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <form asp-area="Admin" asp-controller="DatSan" asp-action="UpdateStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="trangThaiMoi" value="Từ chối" />
+                    <input type="hidden" name="returnUrl" value="/Admin/DatSan/Details/@Model.Id" />
+
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold text-danger">
+                            <i class="bi bi-x-octagon-fill me-2"></i>Từ Chối Đơn Đặt Sân #@Model.Id
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+
+                    <div class="modal-body py-3">
+                        <label class="form-label fw-semibold small">Lý do từ chối (Gửi qua Gmail cho khách) <span class="text-danger">*</span></label>
+                        <textarea class="form-control rounded-3" name="lyDo" rows="3" required
+                                  placeholder="Ví dụ: Trùng lịch bảo trì đột xuất, quý khách vui lòng chọn ca khác..."></textarea>
+                    </div>
+
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-sm btn-danger rounded-pill px-4 fw-semibold">
+                            <i class="bi bi-x-circle me-1"></i> Xác Nhận Từ Chối
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Modal Hủy Đơn Đã Xác Nhận -->
+@if (isConfirmed)
+{
+    <div class="modal fade" id="modalHuyDonDetail" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-start">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <form asp-area="Admin" asp-controller="DatSan" asp-action="UpdateStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="trangThaiMoi" value="Đã hủy" />
+                    <input type="hidden" name="returnUrl" value="/Admin/DatSan/Details/@Model.Id" />
+
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold text-danger">
+                            <i class="bi bi-x-octagon-fill me-2"></i>Hủy Đơn Đặt Sân #@Model.Id
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+
+                    <div class="modal-body py-3">
+                        <label class="form-label fw-semibold small">Lý do hủy đơn <span class="text-danger">*</span></label>
+                        <textarea class="form-control rounded-3" name="lyDo" rows="3" required
+                                  placeholder="Ví dụ: Khách gọi điện xin hủy vì thời tiết mưa to..."></textarea>
+                    </div>
+
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-sm btn-danger rounded-pill px-4 fw-semibold">
+                            <i class="bi bi-x-circle me-1"></i> Xác Nhận Hủy Đơn
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row g-4">
+    <!-- Cột trái: Thông tin Sân bóng, Dịch vụ & Thanh toán -->
+    <div class="col-lg-8">
+        <!-- Thông tin Sân & Ca thi đấu -->
+        <div class="admin-card mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                <h5 class="fw-bold mb-0 text-navy" style="color: #002B5B;">
+                    <i class="bi bi-dribbble text-warning me-2"></i>Thông Tin Sân &amp; Lịch Thi Đấu
+                </h5>
+                <span class="text-muted small">Tạo lúc: @(Model.NgayTao?.ToString("HH:mm dd/MM/yyyy") ?? "N/A")</span>
+            </div>
+
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4 text-center">
+                    <img src="@(string.IsNullOrEmpty(Model.AnhSan) ? "/uploads/sanbong/san-5-so-1.jpg" : Model.AnhSan)"
+                         alt="@Model.TenSan" class="rounded-4 border shadow-sm w-100" style="max-height: 140px; object-fit: cover;"
+                         onerror="this.onerror=null;this.src='/uploads/sanbong/san-5-so-1.jpg';" />
+                </div>
+                <div class="col-md-8">
+                    <h4 class="fw-bold text-dark mb-1">@Model.TenSan</h4>
+                    <div class="mb-3 d-flex flex-wrap gap-2">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold px-3 py-2">
+                            <i class="bi bi-dribbble me-1"></i>@Model.LoaiSan
+                        </span>
+                        <span class="badge bg-light text-dark border fw-bold px-3 py-2">
+                            <i class="bi bi-calendar3 me-1 text-primary"></i>Ngày đá: <strong class="text-dark">@Model.NgayDat.ToString("dd/MM/yyyy")</strong>
+                        </span>
+                    </div>
+                    <div class="p-3 rounded-3 mb-0 shadow-sm" style="background-color: #ffffff; border: 2px solid #002B5B;">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <span class="text-dark fw-bold fs-6 d-flex align-items-center">
+                                <i class="bi bi-alarm-fill text-warning fs-5 me-2"></i> Khung giờ ca thi đấu:
+                            </span>
+                            <span class="badge bg-primary text-white fw-bold px-3 py-2 fs-6 shadow-sm font-monospace" style="background-color: #002B5B !important; color: #ffffff !important; letter-spacing: 0.5px;">
+                                <i class="bi bi-clock-fill text-warning me-1"></i> @Model.KhungGioDisplay
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dịch vụ đi kèm -->
+        <div class="admin-card mb-4">
+            <h5 class="fw-bold mb-3 text-navy" style="color: #002B5B;">
+                <i class="bi bi-cup-straw text-success me-2"></i>Dịch Vụ Đi Kèm Đã Đặt
+            </h5>
+
+            @if (!Model.DanhSachDichVu.Any())
+            {
+                <p class="text-muted small mb-0 py-2">Khách hàng không chọn thêm dịch vụ đi kèm nào cho trận đấu này.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>TÊN DỊCH VỤ</th>
+                                <th>ĐƠN VỊ TÍNH</th>
+                                <th class="text-end">ĐƠN GIÁ</th>
+                                <th class="text-center">SỐ LƯỢNG</th>
+                                <th class="text-end">THÀNH TIỀN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in Model.DanhSachDichVu)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-dark">@s.TenDichVu</td>
+                                    <td><span class="badge bg-light text-muted border">@s.DonViTinh</span></td>
+                                    <td class="text-end font-monospace">@s.DonGia.ToString("N0") đ</td>
+                                    <td class="text-center font-monospace">
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 fs-6 fw-bold">@s.SoLuong</span>
+                                    </td>
+                                    <td class="text-end fw-bold font-monospace text-primary">@s.ThanhTien.ToString("N0") đ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- Lịch sử Giao dịch Thanh toán & Hóa đơn -->
+        <div class="admin-card">
+            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                <h5 class="fw-bold mb-0 text-navy" style="color: #002B5B;">
+                    <i class="bi bi-credit-card-2-front text-primary me-2"></i>Lịch Sử Giao Dịch &amp; Hóa Đơn
+                </h5>
+                @if (Model.DaXuatHoaDon)
+                {
+                    <span class="badge bg-success-subtle text-success fw-bold border border-success-subtle px-3 py-1">
+                        <i class="bi bi-receipt me-1"></i> Hóa đơn: @Model.MaHoaDon
+                    </span>
+                }
+            </div>
+
+            @if (!Model.DanhSachThanhToan.Any())
+            {
+                <p class="text-muted small mb-0 py-2">Chưa có giao dịch thanh toán nào được ghi nhận cho đơn này.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>MÃ GD</th>
+                                <th>HÌNH THỨC</th>
+                                <th>LOẠI</th>
+                                <th>SỐ TIỀN</th>
+                                <th>THỜI GIAN</th>
+                                <th class="text-center">TRẠNG THÁI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model.DanhSachThanhToan)
+                            {
+                                <tr>
+                                    <td><span class="fw-bold text-muted small">@(t.MaGiaoDich ?? $"#TT{t.Id}")</span></td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="bi bi-wallet2 me-1"></i>@t.PhuongThucThanhToan
+                                        </span>
+                                    </td>
+                                    <td><span class="small text-muted">@t.LoaiThanhToan</span></td>
+                                    <td class="fw-bold text-success">@t.SoTien.ToString("N0") đ</td>
+                                    <td><span class="small text-muted">@(t.ThoiGianThanhToan?.ToString("HH:mm dd/MM/yyyy") ?? "N/A")</span></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success-subtle text-success">@t.TrangThai</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Cột phải: Thông tin Khách hàng & Dòng thời gian thông báo -->
+    <div class="col-lg-4">
+        <!-- Khách hàng -->
+        <div class="admin-card mb-4">
+            <h5 class="fw-bold mb-3 text-navy" style="color: #002B5B;">
+                <i class="bi bi-person-fill text-warning me-2"></i>Thông Tin Khách Hàng
+            </h5>
+
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold border"
+                     style="width: 50px; height: 50px; font-size: 1.3rem; color: #002B5B;">
+                    @(string.IsNullOrEmpty(Model.TenKhachHang) ? "KH" : Model.TenKhachHang.Substring(0, 1).ToUpper())
+                </div>
+                <div>
+                    <h6 class="fw-bold text-dark mb-0">@Model.TenKhachHang</h6>
+                    <span class="small text-muted">Mã khách: #@Model.NguoiDungId</span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column gap-2 small mb-3">
+                <div>
+                    <span class="text-muted d-block">Số điện thoại liên hệ:</span>
+                    <strong class="text-dark"><i class="bi bi-telephone me-1 text-primary"></i>@Model.SoDienThoai</strong>
+                </div>
+                <div>
+                    <span class="text-muted d-block">Email tài khoản:</span>
+                    <span class="text-dark text-truncate d-block"><i class="bi bi-envelope me-1 text-muted"></i>@Model.Email</span>
+                </div>
+            </div>
+
+            <a asp-area="Admin" asp-controller="KhachHang" asp-action="Details" asp-route-id="@Model.NguoiDungId"
+               class="btn btn-sm btn-outline-primary rounded-pill w-100 fw-semibold">
+                <i class="bi bi-person-badge me-1"></i> Xem Hồ Sơ Đầy Đủ
+            </a>
+        </div>
+
+        <!-- Tóm tắt tài chính -->
+        <div class="admin-card mb-4" style="background-color: #F8FAFC; border: 1.5px solid #E2E8F0;">
+            <h5 class="fw-bold mb-3 text-navy" style="color: #002B5B;">
+                <i class="bi bi-calculator text-primary me-2"></i>Tóm Tắt Quyết Toán
+            </h5>
+
+            <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-muted">Tổng giá trị đơn:</span>
+                <strong class="text-dark">@Model.TongTien.ToString("N0") đ</strong>
+            </div>
+
+            <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-muted">Đã thanh toán / cọc:</span>
+                <strong class="text-success">@Model.DaThanhToan.ToString("N0") đ</strong>
+            </div>
+
+            <div class="d-flex justify-content-between pt-2 border-top mt-2">
+                <span class="fw-bold text-dark">Còn lại cần thu:</span>
+                <span class="fs-5 fw-bold text-danger">@Model.ConLai.ToString("N0") đ</span>
+            </div>
+        </div>
+
+        <!-- Dòng thời gian thông báo đã gửi -->
+        <div class="admin-card">
+            <h5 class="fw-bold mb-3 text-navy" style="color: #002B5B;">
+                <i class="bi bi-bell-fill text-warning me-2"></i>Lịch Sử Thông Báo (Web + Mail)
+            </h5>
+
+            @if (!Model.DanhSachThongBao.Any())
+            {
+                <p class="text-muted small mb-0 py-2">Chưa có thông báo nào được lưu lại.</p>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var n in Model.DanhSachThongBao)
+                    {
+                        <div class="p-2 rounded-3 bg-light border small">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-dark">@n.TieuDe</span>
+                                <span class="text-muted" style="font-size: 0.72rem;">@(n.NgayTao?.ToString("HH:mm dd/MM") ?? "")</span>
+                            </div>
+                            <p class="text-muted mb-0" style="font-size: 0.8rem; line-height: 1.4;">@n.NoiDung</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

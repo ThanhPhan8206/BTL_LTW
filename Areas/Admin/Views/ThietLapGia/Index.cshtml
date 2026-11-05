@@ -1,0 +1,289 @@
+@model QLSanBong.Areas.Admin.Models.AdminThietLapGiaMatrixViewModel
+@{
+    ViewData["Title"] = "Thiết lập Ma trận Giá Thuê Sân - UTC STADIUM";
+}
+
+<!-- Page Header Banner -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-navy text-white fw-bold rounded-pill px-3 py-1" style="background-color: #002B5B;">
+                <i class="bi bi-grid-3x3 me-1 text-warning"></i> MODULE 4
+            </span>
+            <span class="text-muted small">Cấu trúc đơn giá &amp; Ma trận phân loại ngày</span>
+        </div>
+        <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Ma Trận Thiết Lập Giá Thuê Sân</h2>
+        <p class="text-muted small mb-0">Cấu hình linh hoạt đơn giá theo từng Sân x Khung giờ x Loại ngày (Ngày thường, Cuối tuần, Ngày lễ).</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <!-- Nút kích hoạt modal sao chép giá -->
+        <button type="button" class="btn btn-warning text-dark fw-bold rounded-pill px-3 shadow-sm"
+                data-bs-toggle="modal" data-bs-target="#modalCopyPrice">
+            <i class="bi bi-copy me-1"></i> Sao Chép Bảng Giá Sân
+        </button>
+        <a asp-area="Admin" asp-controller="KhungGio" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3 fw-semibold">
+            <i class="bi bi-clock me-1"></i> Quản Lý Khung Giờ
+        </a>
+    </div>
+</div>
+
+<!-- Tabs Điều Hướng Khung Giờ & Ma Trận Giá -->
+<ul class="nav nav-pills mb-4 gap-2">
+    <li class="nav-item">
+        <a class="nav-link bg-white text-dark border rounded-pill fw-semibold px-4" asp-area="Admin" asp-controller="KhungGio" asp-action="Index">
+            <i class="bi bi-clock me-1 text-primary"></i> 1. Danh sách Khung giờ (@Model.DanhSachKhungGio.Count ca)
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active rounded-pill fw-semibold px-4" style="background-color: #002B5B;" href="javascript:void(0);">
+            <i class="bi bi-cash-stack me-1 text-warning"></i> 2. Thiết lập Ma trận Giá
+        </a>
+    </li>
+</ul>
+
+<!-- Bộ Chọn Loại Ngày: Ngày thường / Cuối tuần / Ngày lễ -->
+<div class="admin-card mb-4 p-3">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold small text-muted text-uppercase">Loại ngày áp dụng:</span>
+            <div class="btn-group" role="group">
+                @foreach (var dayType in Model.DanhSachNgayTrongTuan)
+                {
+                    <a asp-area="Admin" asp-controller="ThietLapGia" asp-action="Index" asp-route-ngayTrongTuan="@dayType"
+                       class="btn btn-sm rounded-pill px-4 fw-bold @(Model.SelectedNgayTrongTuan == dayType ? "btn-primary shadow-sm" : "btn-outline-secondary")"
+                       style="@(Model.SelectedNgayTrongTuan == dayType ? "background-color: #002B5B; border-color: #002B5B;" : "")">
+                        @if (dayType == "Ngày thường")
+                        {
+                            <i class="bi bi-calendar2-day me-1"></i>
+                        }
+                        else if (dayType == "Cuối tuần")
+                        {
+                            <i class="bi bi-calendar2-week me-1"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                        }
+                        @dayType
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="text-muted small">
+            Đang hiển thị ma trận giá cho: <strong class="text-navy" style="color: #002B5B;">@Model.SelectedNgayTrongTuan</strong>
+        </div>
+    </div>
+</div>
+
+<!-- Form Ma Trận Grid Table (Sân x Khung Giờ) -->
+<form asp-area="Admin" asp-controller="ThietLapGia" asp-action="CapNhatMaTran" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="ngayTrongTuan" value="@Model.SelectedNgayTrongTuan" />
+
+    <div class="admin-card">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+            <div>
+                <h5 class="fw-bold mb-0 text-navy" style="color: #002B5B;">
+                    <i class="bi bi-table text-warning me-2"></i>Bảng Ma Trận Giá (@Model.SelectedNgayTrongTuan)
+                </h5>
+                <span class="text-muted small">Nhập giá trực tiếp vào từng ô hoặc chỉnh sửa toàn bộ rồi nhấn Lưu Bảng Giá.</span>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-check2-all me-1"></i> Lưu Toàn Bộ Ma Trận Giá
+                </button>
+            </div>
+        </div>
+
+        @if (!Model.DanhSachSan.Any() || !Model.DanhSachKhungGio.Any())
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-exclamation-circle text-muted fs-1 mb-2"></i>
+                <h6 class="fw-bold text-dark">Chưa đủ dữ liệu Sân bóng hoặc Khung giờ</h6>
+                <p class="text-muted small mb-0">Vui lòng tạo ít nhất 1 Sân bóng và 1 Khung giờ trước khi thiết lập ma trận giá.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table admin-table align-middle table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 170px; background-color: #002B5B; color: #ffffff;" class="sticky-start">
+                                SÂN BÓNG \ CA THI ĐẤU
+                            </th>
+                            @foreach (var slot in Model.DanhSachKhungGio)
+                            {
+                                <th class="text-center" style="min-width: 145px; background-color: #F8FAFC;">
+                                    <div class="fw-bold text-navy">@slot.GioBatDau.ToString("HH:mm") - @slot.GioKetThuc.ToString("HH:mm")</div>
+                                    <span class="badge bg-light text-muted border fw-normal" style="font-size: 0.68rem;">Ca #@slot.Id</span>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pitch in Model.DanhSachSan)
+                        {
+                            <tr>
+                                <td class="sticky-start bg-white">
+                                    <div class="fw-bold text-dark">@pitch.TenSan</div>
+                                    <span class="badge bg-light text-navy border small">@pitch.LoaiSan</span>
+                                </td>
+
+                                @foreach (var slot in Model.DanhSachKhungGio)
+                                {
+                                    var key = $"{pitch.Id}_{slot.Id}_{Model.SelectedNgayTrongTuan}";
+                                    var currentPrice = Model.PriceMatrix.TryGetValue(key, out var pr) ? pr : (pitch.LoaiSan.Contains("7") ? 400000m : 250000m);
+
+                                    <td class="text-center p-2">
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" step="5000" min="0"
+                                                   name="price_@(pitch.Id)_@(slot.Id)"
+                                                   id="input_@(pitch.Id)_@(slot.Id)"
+                                                   value="@((int)currentPrice)"
+                                                   class="form-control text-end fw-bold text-navy"
+                                                   style="color: #002B5B; background-color: #FDFEFE;"
+                                                   title="@pitch.TenSan (@slot.GioBatDau:HH:mm - @slot.GioKetThuc:HH:mm)" />
+                                            <button type="button" class="btn btn-outline-secondary btn-quick-save"
+                                                    onclick="quickSavePrice(@pitch.Id, @slot.Id, '@Model.SelectedNgayTrongTuan')"
+                                                    title="Lưu nhanh ô này">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                <span class="text-muted small">
+                    <i class="bi bi-lightbulb text-warning me-1"></i>Đơn vị tính: <strong>VNĐ / ca</strong>. Nhấn dấu tích xanh trên từng ô để lưu tức thì hoặc nhấn nút Lưu Toàn Bộ bên phải.
+                </span>
+                <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-check2-all me-1"></i> Lưu Toàn Bộ Ma Trận Giá
+                </button>
+            </div>
+        }
+    </div>
+</form>
+
+<!-- Modal [Nên có] Sao chép giá từ sân này sang sân khác -->
+<div class="modal fade" id="modalCopyPrice" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered text-start">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form asp-area="Admin" asp-controller="ThietLapGia" asp-action="SaoChepGia" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-navy" style="color: #002B5B;">
+                        <i class="bi bi-copy text-warning me-2"></i>Sao Chép Bảng Giá Giữa Các Sân
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <div class="modal-body py-3">
+                    <p class="text-muted small mb-3">
+                        Sao chép toàn bộ bảng giá đã cấu hình (gồm cả Ngày thường, Cuối tuần, Ngày lễ) từ một sân chuẩn sang sân khác nhanh chóng.
+                    </p>
+
+                    <!-- Chọn Sân Nguồn -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Sân Nguồn (Đã có bảng giá chuẩn) <span class="text-danger">*</span></label>
+                        <select name="sanNguonId" class="form-select rounded-3" required id="selectSanNguon">
+                            @foreach (var s in Model.DanhSachSan)
+                            {
+                                <option value="@s.Id">@s.TenSan (@s.LoaiSan)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Lựa chọn sao chép -->
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="apDungTatCaCungLoai" value="true" id="checkAllSameType" onchange="toggleTargetPitch(this)">
+                        <label class="form-check-label fw-semibold small text-primary" for="checkAllSameType">
+                            Áp dụng cho TOÀN BỘ các sân khác có cùng loại kích thước (VD: Tất cả sân 5)
+                        </label>
+                    </div>
+
+                    <!-- Chọn Sân Đích Cụ Thể -->
+                    <div class="mb-3" id="targetPitchGroup">
+                        <label class="form-label fw-semibold small">Sân Đích Nhận Bảng Giá <span class="text-danger">*</span></label>
+                        <select name="sanDichId" class="form-select rounded-3" id="selectSanDich">
+                            @foreach (var s in Model.DanhSachSan)
+                            {
+                                <option value="@s.Id">@s.TenSan (@s.LoaiSan)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="alert alert-warning small rounded-3 mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        Thao tác này sẽ cập nhật hoặc ghi đè các mức giá hiện tại trên sân đích để khớp hoàn toàn với sân nguồn.
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-sm btn-warning fw-bold text-dark rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-copy me-1"></i> Xác Nhận Sao Chép
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleTargetPitch(checkbox) {
+            const group = document.getElementById('targetPitchGroup');
+            if (checkbox.checked) {
+                group.style.display = 'none';
+            } else {
+                group.style.display = 'block';
+            }
+        }
+
+        async function quickSavePrice(sanBongId, khungGioId, ngayTrongTuan) {
+            const input = document.getElementById(`input_${sanBongId}_${khungGioId}`);
+            if (!input) return;
+
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val < 0) {
+                alert('Vui lòng nhập giá hợp lệ >= 0');
+                return;
+            }
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+            const formData = new FormData();
+            formData.append('sanBongId', sanBongId);
+            formData.append('khungGioId', khungGioId);
+            formData.append('ngayTrongTuan', ngayTrongTuan);
+            formData.append('giaThue', val);
+            formData.append('__RequestVerificationToken', token);
+
+            try {
+                const response = await fetch('/Admin/ThietLapGia/CapNhatGia', {
+                    method: 'POST',
+                    body: formData
+                });
+                const res = await response.json();
+                if (res.success) {
+                    input.classList.add('is-valid');
+                    setTimeout(() => input.classList.remove('is-valid'), 1500);
+                } else {
+                    alert(res.message || 'Lỗi khi lưu giá');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Lỗi kết nối máy chủ');
+            }
+        }
+    </script>
+}
+

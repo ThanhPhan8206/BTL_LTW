@@ -1,0 +1,256 @@
+@inject QLSanBong.Models.Entities.QLSanBongDbContext DbContext
+@{
+    var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
+    var currentCtrl = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAct = ViewContext.RouteData.Values["action"]?.ToString();
+
+    var fullName = User.Identity?.Name ?? "Sinh viên";
+    var avatarUrl = User.FindFirst("AnhDaiDienUrl")?.Value;
+
+    // Lấy chữ cái đại diện tên nếu chưa có avatar
+    var nameParts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var initial = nameParts.Length > 0 ? nameParts[^1][0].ToString().ToUpper() : "U";
+
+    // Số lượng thông báo chưa đọc trong bảng ThongBao
+    int unreadNotifCount = 0;
+    var uidStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    if (int.TryParse(uidStr, out int userId))
+    {
+        unreadNotifCount = DbContext.ThongBaos.Count(t => t.NguoiDungId == userId && t.DaDoc != true);
+    }
+}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] ?? "Khu vực Khách hàng - UTC STADIUM")</title>
+
+    <!-- Favicon UTC STADIUM -->
+    <link rel="icon" type="image/png" href="~/uploads/sanbong/logo.png" />
+    <link rel="shortcut icon" type="image/png" href="~/uploads/sanbong/logo.png" />
+
+    <!-- Google Fonts: Be Vietnam Pro -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS & Bootstrap Icons -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- CSS chung & CSS riêng phân hệ Khách hàng -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/client/trangchu.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/client/khachhang.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/QLSanBong.styles.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body class="d-flex flex-column min-vh-100 mb-0 customer-body">
+    <!-- Navbar Phân hệ Khách hàng (Nền xanh navy #002B5B đồng bộ thương hiệu - Cố định sticky z-index 1030) -->
+    <header class="sticky-top customer-header-sticky">
+        <nav class="navbar navbar-expand-xl customer-navbar">
+            <div class="container-fluid px-3 px-lg-5">
+                <!-- Logo & Thương hiệu -->
+                <a class="navbar-brand d-flex align-items-center gap-2 m-0" asp-area="KhachHang" asp-controller="Home" asp-action="Index">
+                    <img src="~/uploads/sanbong/logo.png" alt="Logo UTC STADIUM" class="customer-brand-logo"
+                         onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect width=%22100%25%22 height=%22100%25%22 rx=%2216%22 fill=%22%23FFC107%22/><text x=%2250%25%22 y=%2255%25%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2222%22 fill=%22%23002B5B%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>UTC</text></svg>';" />
+                    <div class="d-flex flex-column">
+                        <span class="customer-brand-name">UTC STADIUM</span>
+                        <span class="customer-brand-subtext">CỔNG SINH VIÊN &amp; ĐẶT SÂN</span>
+                    </div>
+                </a>
+
+                <button class="navbar-toggler border-0 text-white shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#customerNavCollapse" aria-label="Menu">
+                    <i class="bi bi-list fs-2 text-warning"></i>
+                </button>
+
+                <div class="collapse navbar-collapse" id="customerNavCollapse">
+                    <!-- Menu trung tâm dành riêng cho Khách hàng đã đăng nhập -->
+                    <ul class="navbar-nav mx-auto mb-2 mb-xl-0 customer-menu-center gap-1 gap-xl-2">
+                        <li class="nav-item">
+                            <a class="nav-link customer-menu-link @(currentCtrl == "Home" && currentAct == "Index" ? "active" : "")"
+                               asp-area="KhachHang" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-grid-1x2-fill me-1"></i>
+                                <span>Tổng quan &amp; Đặt sân</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link customer-menu-link @(currentCtrl == "DatSan" ? "active" : "")"
+                               asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu">
+                                <i class="bi bi-calendar-check me-1"></i>
+                                <span>Lịch đặt của tôi</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link customer-menu-link @(currentCtrl == "YeuCauDoiLich" ? "active" : "")"
+                               asp-area="KhachHang" asp-controller="YeuCauDoiLich" asp-action="Index">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                <span>Yêu cầu đổi lịch</span>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link customer-menu-link position-relative dropdown-toggle @(currentCtrl == "ThongBao" ? "active" : "")"
+                               href="#" id="navbarNotifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell-fill me-1"></i>
+                                <span>Thông báo</span>
+                                @if (unreadNotifCount > 0)
+                                {
+                                    <span class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.68rem;">
+                                        @(unreadNotifCount > 99 ? "99+" : unreadNotifCount.ToString())
+                                        <span class="visually-hidden">thông báo mới</span>
+                                    </span>
+                                }
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-2" aria-labelledby="navbarNotifDropdown" style="width: 320px; max-width: 90vw;">
+                                <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold small" style="color: #002B5B;"><i class="bi bi-bell-fill text-warning me-1"></i>Hộp thư</span>
+                                    <span class="badge bg-warning text-dark rounded-pill">@(unreadNotifCount) mới</span>
+                                </li>
+                                @{
+                                    var quickNotifs = DbContext.ThongBaos.Where(t => t.NguoiDungId == userId).OrderByDescending(t => t.NgayTao).Take(3).ToList();
+                                }
+                                @if (quickNotifs.Any())
+                                {
+                                    foreach (var qn in quickNotifs)
+                                    {
+                                        <li class="p-2 border-bottom">
+                                            <a asp-area="KhachHang" asp-controller="ThongBao" asp-action="Index" class="text-decoration-none text-dark d-block">
+                                                <div class="fw-bold small text-truncate" style="color: #002B5B;">@qn.TieuDe</div>
+                                                <div class="text-muted small text-truncate" style="font-size: 0.78rem;">@qn.NoiDung</div>
+                                                <div class="text-muted small" style="font-size: 0.72rem;"><i class="bi bi-clock me-1"></i>@(qn.NgayTao?.ToString("dd/MM HH:mm"))</div>
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li class="p-3 text-center text-muted small">Không có thông báo mới</li>
+                                }
+                                <li class="pt-2 text-center">
+                                    <a asp-area="KhachHang" asp-controller="ThongBao" asp-action="Index" class="btn btn-sm btn-outline-primary rounded-pill w-100 fw-semibold" style="font-size: 0.8rem;">
+                                        Xem tất cả hộp thư
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <!-- Góc phải: Avatar & Dropdown Cá nhân -->
+                    <div class="d-flex align-items-center gap-3 customer-user-zone">
+                        <a href="/" class="btn btn-sm btn-outline-light rounded-pill px-3 d-none d-xxl-inline-flex align-items-center gap-1 text-decoration-none">
+                            <i class="bi bi-globe2 text-warning"></i>
+                            <span class="small">Trang chủ công khai</span>
+                        </a>
+
+                        <div class="dropdown">
+                            <button class="btn customer-user-btn dropdown-toggle d-flex align-items-center gap-2 p-1 pe-3 rounded-pill"
+                                    type="button" id="customerUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                @if (!string.IsNullOrEmpty(avatarUrl))
+                                {
+                                    <img src="@avatarUrl" alt="@fullName" class="customer-avatar-img rounded-circle" />
+                                }
+                                else
+                                {
+                                    <div class="customer-avatar-initial rounded-circle">
+                                        @initial
+                                    </div>
+                                }
+                                <div class="text-start d-none d-md-block line-clamp-1">
+                                    <div class="customer-greeting-sub">Xin chào,</div>
+                                    <div class="customer-greeting-name">@fullName</div>
+                                </div>
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end customer-dropdown-menu shadow-lg border-0 rounded-4 mt-2 p-2" aria-labelledby="customerUserDropdown">
+                                <li class="px-3 py-2 border-bottom mb-1">
+                                    <div class="fw-bold text-dark">@fullName</div>
+                                    <div class="small text-muted text-truncate" style="max-width: 220px;">@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "")</div>
+                                    <span class="badge bg-warning text-dark mt-1" style="font-size: 0.7rem;">Thành viên Sinh viên</span>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2" asp-area="KhachHang" asp-controller="Account" asp-action="Profile">
+                                        <i class="bi bi-person-circle me-2 text-primary"></i>Hồ sơ cá nhân
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2" asp-area="" asp-controller="Account" asp-action="ForgotPassword">
+                                        <i class="bi bi-key-fill me-2 text-warning"></i>Đổi mật khẩu / OTP
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2" asp-area="KhachHang" asp-controller="DatSan" asp-action="LichSu">
+                                        <i class="bi bi-journal-text me-2 text-success"></i>Lịch sử hóa đơn
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2 text-danger fw-semibold" asp-area="" asp-controller="Account" asp-action="Logout">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="container-fluid px-3 px-lg-5 mt-3">
+            <div class="alert alert-success alert-dismissible fade show rounded-4 px-4 py-2 d-flex align-items-center justify-content-between shadow-sm mb-0" role="alert">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                    <span class="fw-semibold small">@TempData["SuccessMessage"]</span>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="container-fluid px-3 px-lg-5 mt-3">
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 px-4 py-2 d-flex align-items-center justify-content-between shadow-sm mb-0" role="alert">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                    <span class="fw-semibold small">@TempData["ErrorMessage"]</span>
+                </div>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Đóng"></button>
+            </div>
+        </div>
+    }
+
+    <!-- Nội dung chính -->
+    <main role="main" class="flex-grow-1 py-4">
+        @RenderBody()
+    </main>
+
+    <!-- Footer phân hệ Khách hàng -->
+    <footer class="customer-footer py-3 bg-white border-top mt-auto">
+        <div class="container-fluid px-3 px-lg-5 d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 small text-muted">
+            <div>
+                &copy; 2026 <strong style="color: #002B5B;">UTC STADIUM</strong> &bull; Hệ thống Đặt Sân &amp; Kết Nối Giải Đấu Sinh Viên
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span>Hotline hỗ trợ trực ca: <strong class="text-dark">0988.686.868</strong></span>
+                <span class="text-secondary">&bull;</span>
+                <a href="/" class="text-decoration-none text-muted">Trang chủ UTC</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>
+

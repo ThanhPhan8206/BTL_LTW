@@ -1,0 +1,407 @@
+@model QLSanBong.Areas.Admin.Models.AdminThanhToanListViewModel
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Quản lý Thanh toán & Hóa đơn - UTC STADIUM Admin";
+}
+
+<!-- Page Header Banner -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-navy text-white fw-bold rounded-pill px-3 py-1" style="background-color: #002B5B;">
+                <i class="bi bi-credit-card-2-front-fill me-1 text-warning"></i> MODULE 8
+            </span>
+            <span class="text-muted small">Tài chính, Dòng tiền &amp; Hóa đơn điện tử</span>
+        </div>
+        <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Quản Lý Thanh Toán &amp; Hóa Đơn</h2>
+        <p class="text-muted small mb-0">Theo dõi toàn bộ dòng tiền cọc, thanh toán VietQR, tiền mặt tại quầy và các giao dịch hoàn cọc.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm" style="background-color: #002B5B; border-color: #002B5B;"
+                data-bs-toggle="modal" data-bs-target="#modalThuTienMat">
+            <i class="bi bi-cash-stack me-1 text-warning"></i> Ghi Nhận Thu Tiền Mặt
+        </button>
+    </div>
+</div>
+
+<!-- 4 Thẻ Thống Kê Tài Chính -->
+<div class="row g-3 mb-4">
+    <!-- Tổng doanh thu thực nhận -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Tổng doanh thu thực nhận</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(16, 185, 129, 0.12); color: #047857;">
+                    <i class="bi bi-wallet2 fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-success">
+                @Model.TongDoanhThu.ToString("N0") <span class="fs-6 fw-bold">đ</span>
+            </div>
+            <span class="small text-muted">Toàn bộ giao dịch thành công</span>
+        </div>
+    </div>
+
+    <!-- Tiền mặt tại quầy -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Tiền mặt tại quầy</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B;">
+                    <i class="bi bi-cash-coin fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold" style="color: #002B5B;">
+                @Model.TongTienMat.ToString("N0") <span class="fs-6 fw-bold">đ</span>
+            </div>
+            <span class="small text-muted">Thực thu trực tiếp</span>
+        </div>
+    </div>
+
+    <!-- Chuyển khoản VietQR -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Chuyển khoản VietQR</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(59, 130, 246, 0.12); color: #1D4ED8;">
+                    <i class="bi bi-qr-code fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-primary">
+                @Model.TongChuyenKhoan.ToString("N0") <span class="fs-6 fw-bold">đ</span>
+            </div>
+            <span class="small text-muted">Thanh toán tự động Napas247</span>
+        </div>
+    </div>
+
+    <!-- Đã hoàn cọc -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Tổng tiền đã hoàn cọc</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(239, 68, 68, 0.12); color: #B91C1C;">
+                    <i class="bi bi-arrow-counterclockwise fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-danger">
+                @Model.TongHoanCoc.ToString("N0") <span class="fs-6 fw-bold">đ</span>
+            </div>
+            <span class="small text-muted">Hủy đơn hoặc hoàn tiền theo quy định</span>
+        </div>
+    </div>
+</div>
+
+<!-- Toolbar Bộ Lọc & Tìm Kiếm -->
+<div class="admin-filter-bar mb-4">
+    <form asp-area="Admin" asp-controller="ThanhToan" asp-action="Index" method="get" class="row g-2 align-items-center">
+        <!-- Input Search -->
+        <div class="col-lg-3 col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="search" value="@Model.Search" class="form-control bg-light border-start-0"
+                       placeholder="Mã GD, mã đơn #12, tên, SĐT..." />
+            </div>
+        </div>
+
+        <!-- Từ ngày -->
+        <div class="col-lg-2 col-md-3">
+            <input type="date" name="tuNgay" value="@(Model.TuNgay.HasValue ? Model.TuNgay.Value.ToString("yyyy-MM-dd") : "")"
+                   class="form-control bg-light" title="Từ ngày thanh toán" />
+        </div>
+
+        <!-- Đến ngày -->
+        <div class="col-lg-2 col-md-3">
+            <input type="date" name="denNgay" value="@(Model.DenNgay.HasValue ? Model.DenNgay.Value.ToString("yyyy-MM-dd") : "")"
+                   class="form-control bg-light" title="Đến ngày thanh toán" />
+        </div>
+
+        <!-- Filter Trạng thái -->
+        <div class="col-lg-2 col-md-6">
+            <select name="trangThai" class="form-select bg-light">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Đã thanh toán" selected="@(Model.TrangThai == "Đã thanh toán")">Đã thanh toán</option>
+                <option value="Chờ thanh toán" selected="@(Model.TrangThai == "Chờ thanh toán")">Chờ thanh toán</option>
+                <option value="Đã hoàn tiền" selected="@(Model.TrangThai == "Đã hoàn tiền")">Đã hoàn tiền</option>
+            </select>
+        </div>
+
+        <!-- Filter Hình thức -->
+        <div class="col-lg-2 col-md-6">
+            <select name="phuongThuc" class="form-select bg-light">
+                <option value="">-- Tất cả hình thức --</option>
+                <option value="Tiền mặt" selected="@(Model.PhuongThuc == "Tiền mặt")">Tiền mặt</option>
+                <option value="VietQR" selected="@(Model.PhuongThuc == "VietQR" || Model.PhuongThuc == "QR")">Chuyển khoản VietQR</option>
+            </select>
+        </div>
+
+        <!-- Submit & Reset -->
+        <div class="col-lg-1 col-md-12 d-flex gap-1">
+            <button type="submit" class="btn btn-primary rounded-pill px-3 fw-semibold w-100" style="background-color: #002B5B; border-color: #002B5B;" title="Lọc dữ liệu">
+                <i class="bi bi-funnel"></i>
+            </button>
+            <a asp-area="Admin" asp-controller="ThanhToan" asp-action="Index" class="btn btn-light rounded-pill px-2 border" title="Xóa bộ lọc">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Bảng Danh Sách Giao Dịch Thanh Toán -->
+<div class="admin-card">
+    @if (!Model.Items.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-receipt-cutoff text-muted fs-1 mb-2"></i>
+            <h6 class="fw-bold text-dark">Không tìm thấy giao dịch thanh toán nào</h6>
+            <p class="text-muted small mb-0">Thử thay đổi điều kiện lọc ngày hoặc từ khóa tìm kiếm.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 100px;">MÃ GD</th>
+                        <th style="width: 80px;">MÃ ĐƠN</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th>SÂN &amp; CA ĐÁ</th>
+                        <th>HÌNH THỨC</th>
+                        <th>LOẠI GIAO DỊCH</th>
+                        <th class="text-end">SỐ TIỀN</th>
+                        <th>THỜI GIAN</th>
+                        <th class="text-center">TRẠNG THÁI</th>
+                        <th class="text-end" style="width: 150px;">THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.Items)
+                    {
+                        var isPaid = t.TrangThai == "Đã thanh toán" || t.TrangThai == "Thành công";
+                        var isPending = t.TrangThai == "Chờ thanh toán";
+                        var isRefunded = t.TrangThai == "Đã hoàn tiền" || t.LoaiThanhToan == "Hoàn cọc";
+
+                        <tr>
+                            <td>
+                                <span class="fw-bold small text-muted">@(t.MaGiaoDich ?? $"#TT{t.Id}")</span>
+                            </td>
+                            <td>
+                                <a asp-area="Admin" asp-controller="DatSan" asp-action="Details" asp-route-id="@t.DatSanId"
+                                   class="fw-bold text-primary text-decoration-none">
+                                    #@t.DatSanId
+                                </a>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@t.TenKhachHang</div>
+                                <div class="small text-muted"><i class="bi bi-telephone me-1"></i>@t.SoDienThoai</div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark small">@t.TenSan</div>
+                                <span class="badge bg-light text-navy border" style="font-size: 0.72rem;">@t.KhungGioDisplay</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    @if (t.PhuongThucThanhToan.Contains("QR") || t.PhuongThucThanhToan.Contains("Chuyển khoản"))
+                                    {
+                                        <i class="bi bi-qr-code text-primary me-1"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-cash-coin text-success me-1"></i>
+                                    }
+                                    @t.PhuongThucThanhToan
+                                </span>
+                            </td>
+                            <td>
+                                <span class="small text-muted">@t.LoaiThanhToan</span>
+                            </td>
+                            <td class="text-end">
+                                <span class="fw-bold fs-6 @(isRefunded ? "text-danger" : "text-success")">
+                                    @(isRefunded ? "-" : "+")@t.SoTien.ToString("N0") đ
+                                </span>
+                            </td>
+                            <td>
+                                <span class="small text-muted">
+                                    @(t.ThoiGianThanhToan?.ToString("HH:mm dd/MM/yyyy") ?? "N/A")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                @if (isPaid)
+                                {
+                                    <span class="admin-badge admin-badge-success">
+                                        <i class="bi bi-check-circle-fill"></i> Thành công
+                                    </span>
+                                }
+                                else if (isPending)
+                                {
+                                    <span class="admin-badge admin-badge-warning">
+                                        <i class="bi bi-hourglass-split"></i> Chờ duyệt
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="admin-badge admin-badge-locked">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Đã hoàn tiền
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    @if (isPending)
+                                    {
+                                        <!-- Xác nhận thanh toán -->
+                                        <form asp-area="Admin" asp-controller="ThanhToan" asp-action="XacNhanThanhToan" method="post" class="d-inline"
+                                              onsubmit="return confirm('Xác nhận đã nhận tiền @t.SoTien.ToString("N0") đ cho giao dịch này?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@t.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-2 py-1 fw-bold" title="Xác nhận thanh toán">
+                                                <i class="bi bi-check-lg me-1"></i>Duyệt tiền
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <!-- Xem / In Hóa đơn -->
+                                    <a asp-area="Admin" asp-controller="ThanhToan" asp-action="HoaDon" asp-route-id="@t.DatSanId"
+                                       class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1" title="Xem / In Hóa Đơn">
+                                        <i class="bi bi-receipt"></i>
+                                    </a>
+
+                                    <!-- Hoàn cọc (nếu đơn bị hủy) -->
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1"
+                                            data-bs-toggle="modal" data-bs-target="#modalHoanCoc_@t.Id" title="Ghi nhận hoàn cọc">
+                                        <i class="bi bi-arrow-return-left"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Modal Hoàn Cọc -->
+                                <div class="modal fade" id="modalHoanCoc_@t.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered text-start">
+                                        <div class="modal-content rounded-4 border-0 shadow">
+                                            <form asp-area="Admin" asp-controller="ThanhToan" asp-action="HoanCoc" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="datSanId" value="@t.DatSanId" />
+
+                                                <div class="modal-header border-bottom-0 pb-0">
+                                                    <h5 class="modal-title fw-bold text-danger">
+                                                        <i class="bi bi-arrow-return-left me-2"></i>Ghi Nhận Hoàn Cọc Đơn #@t.DatSanId
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                                </div>
+
+                                                <div class="modal-body py-3">
+                                                    <div class="alert alert-light border small rounded-3 mb-3">
+                                                        Khách: <strong>@t.TenKhachHang</strong> - SĐT: @t.SoDienThoai<br />
+                                                        Số tiền đã đóng: <strong class="text-success">@t.SoTien.ToString("N0") đ</strong>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold small">Số Tiền Hoàn Trả (VNĐ) <span class="text-danger">*</span></label>
+                                                        <input type="number" name="soTienHoan" class="form-control rounded-3" value="@t.SoTien" required />
+                                                    </div>
+
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold small">Lý Do Hoàn Cọc <span class="text-danger">*</span></label>
+                                                        <textarea name="lyDo" rows="2" class="form-control rounded-3" required
+                                                                  placeholder="Hủy đơn trước 12h theo quy định, hoàn tiền qua tài khoản..."></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal-footer border-top-0 pt-0">
+                                                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-4 fw-semibold">
+                                                        <i class="bi bi-check-lg me-1"></i> Xác Nhận Hoàn Tiền
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phân trang -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 mt-4 pt-3 border-top">
+                <span class="text-muted small">
+                    Trang <strong>@Model.CurrentPage</strong> / <strong>@Model.TotalPages</strong> (Tổng @Model.TotalItems giao dịch)
+                </span>
+
+                <nav aria-label="Thanh toán pagination">
+                    <ul class="pagination admin-pagination mb-0">
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a class="page-link" asp-area="Admin" asp-controller="ThanhToan" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai" asp-route-phuongThuc="@Model.PhuongThuc">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-area="Admin" asp-controller="ThanhToan" asp-action="Index"
+                                   asp-route-page="@i" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai" asp-route-phuongThuc="@Model.PhuongThuc">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a class="page-link" asp-area="Admin" asp-controller="ThanhToan" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.Search" asp-route-trangThai="@Model.TrangThai" asp-route-phuongThuc="@Model.PhuongThuc">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    }
+</div>
+
+<!-- Modal Ghi Nhận Thu Tiền Mặt Tại Quầy -->
+<div class="modal fade" id="modalThuTienMat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered text-start">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form asp-area="Admin" asp-controller="ThanhToan" asp-action="ThuTienMat" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-navy" style="color: #002B5B;">
+                        <i class="bi bi-cash-coin text-warning me-2"></i>Lập Biên Lai Thu Tiền Mặt Tại Quầy
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <div class="modal-body py-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Mã Đơn Đặt Sân (#ID) <span class="text-danger">*</span></label>
+                        <input type="number" name="datSanId" class="form-control rounded-3" placeholder="Ví dụ: 12" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Số Tiền Thực Thu (VNĐ) <span class="text-danger">*</span></label>
+                        <input type="number" step="10000" name="soTien" class="form-control rounded-3 fw-bold text-success" placeholder="Ví dụ: 250000" required />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold small">Ghi Chú Thu Tiền</label>
+                        <input type="text" name="ghiChu" class="form-control rounded-3" placeholder="Thu phần còn lại sau trận đấu..." />
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4 fw-semibold" style="background-color: #002B5B; border-color: #002B5B;">
+                        <i class="bi bi-check-lg me-1 text-warning"></i> Lưu Biên Lai &amp; Bắn Thông Báo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

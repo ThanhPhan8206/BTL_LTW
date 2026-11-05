@@ -1,0 +1,461 @@
+@model QLSanBong.Areas.KhachHang.Models.BookingCreateViewModel
+@{
+    ViewData["Title"] = "Đặt sân chi tiết & Dịch vụ đi kèm - UTC STADIUM";
+}
+
+<div class="container-fluid px-3 px-lg-5">
+    <!-- Breadcrumb điều hướng -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="text-decoration-none">Tổng quan</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Đặt sân chi tiết</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0" style="color: #002B5B;">
+                <i class="bi bi-calendar2-check-fill text-warning me-2"></i>Đăng Ký Ca Đá &amp; Dịch Vụ Đi Kèm
+            </h2>
+        </div>
+        <a asp-area="KhachHang" asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3 py-2 small fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Đổi sân khác
+        </a>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+    {
+        <div class="alert alert-danger rounded-4 py-3 px-4 shadow-sm mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                <div asp-validation-summary="ModelOnly" class="mb-0 fw-semibold"></div>
+            </div>
+        </div>
+    }
+
+    <form asp-area="KhachHang" asp-controller="DatSan" asp-action="TaoDon" method="post" id="formBooking">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="SanBongId" />
+        <input type="hidden" asp-for="TenSan" />
+        <input type="hidden" asp-for="LoaiSan" />
+        <input type="hidden" asp-for="AnhSan" />
+        <input type="hidden" asp-for="GiaTienSan" id="hdnPitchPrice" />
+        <input type="hidden" asp-for="SoTienGiam" id="hdnDiscountAmount" value="0" />
+
+        <div class="row g-4">
+            <!-- =======================================================
+                 CỘT TRÁI (7 PHẦN): THÔNG TIN SÂN, KHUNG GIỜ & DỊCH VỤ
+            ======================================================= -->
+            <div class="col-lg-7">
+                <!-- 1. Thẻ tóm tắt sân bóng đang chọn -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <div class="d-flex flex-column flex-sm-row gap-3 align-items-sm-center">
+                        <img src="@Model.AnhSan" alt="@Model.TenSan" class="rounded-3 shadow-sm"
+                             style="width: 140px; height: 95px; object-fit: cover;"
+                             onerror="this.onerror=null;this.src='/uploads/sanbong/san-5-so-1.jpg';" />
+                        <div class="flex-grow-1">
+                            <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-1 small fw-semibold">
+                                <i class="bi bi-people-fill me-1"></i>@Model.LoaiSan
+                            </span>
+                            <h4 class="fw-bold mb-1" style="color: #002B5B;">@Model.TenSan</h4>
+                            <div class="text-muted small">Mặt cỏ nhân tạo tiêu chuẩn, dàn đèn LED cao cấp chống chói</div>
+                        </div>
+                        <div class="text-sm-end">
+                            <div class="small text-muted">Giá thuê ca:</div>
+                            <div class="fs-4 fw-bold text-warning-emphasis" id="displayPitchPrice">
+                                @Model.GiaTienSan.ToString("N0") đ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Chọn ngày & khung giờ thi đấu -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <h5 class="fw-bold mb-3" style="color: #002B5B;">
+                        <i class="bi bi-clock-history text-warning me-2"></i>Thời Gian Thi Đấu
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="NgayDat" class="form-label fw-bold small text-muted">Ngày đá <span class="text-danger">*</span></label>
+                            <input asp-for="NgayDat" type="date" class="form-control rounded-3"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                   value="@Model.NgayDat.ToString("yyyy-MM-dd")" id="bookingDateInput" />
+                            <span asp-validation-for="NgayDat" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="KhungGioId" class="form-label fw-bold small text-muted">Ca thi đấu <span class="text-danger">*</span></label>
+                            <select asp-for="KhungGioId" class="form-select rounded-3" id="bookingSlotSelect">
+                                <option value="">-- Vui lòng chọn khung giờ thi đấu --</option>
+                                @if (Model.DanhSachKhungGio != null && Model.DanhSachKhungGio.Any())
+                                {
+                                    foreach (var slot in Model.DanhSachKhungGio)
+                                    {
+                                        <option value="@slot.Id" selected="@(Model.KhungGioId == slot.Id)">
+                                            Ca @slot.GioBatDau.ToString("HH:mm") - @slot.GioKetThuc.ToString("HH:mm")
+                                        </option>
+                                    }
+                                }
+                                else if (ViewBag.KhungGios != null)
+                                {
+                                    foreach (var slot in (IEnumerable<QLSanBong.Models.Entities.KhungGio>)ViewBag.KhungGios)
+                                    {
+                                        <option value="@slot.Id" selected="@(Model.KhungGioId == slot.Id)">
+                                            Ca @slot.GioBatDau.ToString("HH:mm") - @slot.GioKetThuc.ToString("HH:mm")
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="KhungGioId" class="text-danger small fw-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Chọn dịch vụ đi kèm (dbo.DichVu & dbo.ChiTietDichVuDat) -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0" style="color: #002B5B;">
+                                <i class="bi bi-cup-straw text-warning me-2"></i>Dịch Vụ Đi Kèm (Tùy chọn)
+                            </h5>
+                            <p class="text-muted small mb-0">Nước giải khát, bóng tiêu chuẩn, áo pitch tập và trọng tài</p>
+                        </div>
+                        <span class="badge bg-light text-dark border rounded-pill px-3 py-1 small">Hỗ trợ tận sân</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light small text-uppercase text-muted">
+                                <tr>
+                                    <th style="width: 40px;"></th>
+                                    <th>Tên dịch vụ</th>
+                                    <th>Đơn giá</th>
+                                    <th style="width: 140px;">Số lượng</th>
+                                    <th class="text-end" style="width: 130px;">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.DanhSachDichVu.Count; i++)
+                                {
+                                    <tr class="service-row" data-index="@i">
+                                        <td>
+                                            <input type="checkbox" asp-for="DanhSachDichVu[i].IsSelected"
+                                                   class="form-check-input service-check"
+                                                   id="check_@i" />
+                                            <input type="hidden" asp-for="DanhSachDichVu[i].DichVuId" />
+                                            <input type="hidden" asp-for="DanhSachDichVu[i].TenDichVu" />
+                                            <input type="hidden" asp-for="DanhSachDichVu[i].DonViTinh" />
+                                            <input type="hidden" asp-for="DanhSachDichVu[i].GiaDichVu" class="service-unit-price" />
+                                        </td>
+                                        <td>
+                                            <label for="check_@i" class="fw-semibold small mb-0 d-block cursor-pointer">
+                                                @Model.DanhSachDichVu[i].TenDichVu
+                                            </label>
+                                            <span class="text-muted" style="font-size: 0.72rem;">Đơn vị: @Model.DanhSachDichVu[i].DonViTinh</span>
+                                        </td>
+                                        <td>
+                                            <span class="small fw-bold text-dark">@Model.DanhSachDichVu[i].GiaDichVu.ToString("N0") đ</span>
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <button type="button" class="btn btn-outline-secondary btn-minus px-2" disabled="@(!Model.DanhSachDichVu[i].IsSelected)">-</button>
+                                                <input type="number" asp-for="DanhSachDichVu[i].SoLuong"
+                                                       class="form-control text-center service-qty"
+                                                       min="0" max="99"
+                                                       value="@(Model.DanhSachDichVu[i].IsSelected ? Model.DanhSachDichVu[i].SoLuong : 0)"
+                                                       readonly />
+                                                <button type="button" class="btn btn-outline-secondary btn-plus px-2" disabled="@(!Model.DanhSachDichVu[i].IsSelected)">+</button>
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="fw-bold small service-row-total text-primary">0 đ</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4. Ghi chú đặc biệt cho BQL Sân -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold mb-2" style="color: #002B5B;">
+                        <i class="bi bi-pencil-square text-warning me-2"></i>Ghi Chú Đơn Đặt
+                    </h5>
+                    <textarea asp-for="GhiChu" class="form-control rounded-3" rows="3"
+                              placeholder="Ví dụ: Thi đấu giải Khoa CNTT, yêu cầu bật trước dàn đèn 10 phút và chuẩn bị còi trọng tài..."></textarea>
+                    <span asp-validation-for="GhiChu" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- =======================================================
+                 CỘT PHẢI (5 PHẦN): TÍNH TIỀN, VOUCHER, ĐẶT CỌC & VIETQR
+            ======================================================= -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 85px; z-index: 10;">
+                    <h4 class="fw-bold mb-3" style="color: #002B5B;">
+                        <i class="bi bi-receipt text-warning me-2"></i>Tóm Tắt Thanh Toán
+                    </h4>
+
+                    <!-- Thông tin người đặt (Auto-fill) -->
+                    <div class="p-3 rounded-3 mb-3" style="background-color: #F4F7FB; border: 1px solid #e2e8f0; font-size: 0.82rem;">
+                        <div class="fw-bold text-dark mb-1 d-flex align-items-center gap-1">
+                            <i class="bi bi-person-check-fill text-success"></i>
+                            <span>Người đặt: @Model.HoTenNguoiDat</span>
+                        </div>
+                        <div class="text-muted d-flex justify-content-between">
+                            <span>SĐT: @Model.SoDienThoaiNguoiDat</span>
+                            <span>Email: @Model.EmailNguoiDat</span>
+                        </div>
+                    </div>
+
+                    <!-- Bảng tính chi phí chi tiết -->
+                    <div class="small mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tiền thuê sân:</span>
+                            <strong class="text-dark" id="txtPitchAmount">@Model.GiaTienSan.ToString("N0") đ</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Dịch vụ đi kèm:</span>
+                            <strong class="text-dark" id="txtServicesAmount">0 đ</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tạm tính:</span>
+                            <strong class="text-dark" id="txtSubTotal">@Model.GiaTienSan.ToString("N0") đ</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 text-success" id="rowDiscount" style="display: none;">
+                            <span>Mã giảm giá / Voucher:</span>
+                            <strong id="txtDiscountAmount">-0 đ</strong>
+                        </div>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-dark fs-6">Tổng giá trị đơn:</span>
+                            <span class="fs-4 fw-extrabold text-warning-emphasis" id="txtFinalTotal">
+                                @Model.GiaTienSan.ToString("N0") đ
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Ô áp dụng Voucher (dbo.MaGiamGia) -->
+                    <div class="mb-3 p-3 rounded-3" style="background-color: #fffbeb; border: 1px dashed #fcd34d;">
+                        <label class="form-label fw-bold small text-dark mb-1">
+                            <i class="bi bi-ticket-perforated-fill text-warning me-1"></i>Mã Voucher giảm giá
+                        </label>
+                        <div class="input-group">
+                            <input asp-for="MaVoucher" id="voucherCodeInput" class="form-control text-uppercase" placeholder="Vd: UTC10 hoặc SINHVIEN20K" />
+                            <button type="button" id="btnApplyVoucher" class="btn btn-warning fw-bold text-dark px-3">
+                                Áp dụng
+                            </button>
+                        </div>
+                        <div id="voucherAlert" class="small mt-1 fw-semibold" style="display: none;"></div>
+                    </div>
+
+                    <!-- Lựa chọn hình thức thanh toán -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-dark mb-2">
+                            <i class="bi bi-wallet2 text-warning me-1"></i>Hình thức thanh toán qua VietQR
+                        </label>
+
+                        <div class="form-check p-3 rounded-3 mb-2 border cursor-pointer payment-option selected" id="optDeposit">
+                            <input class="form-check-input ms-0 me-2" type="radio" asp-for="HinhThucThanhToan" id="payDeposit" value="DatCoc" checked />
+                            <label class="form-check-label fw-bold small d-flex justify-content-between w-100" for="payDeposit">
+                                <span>Đặt cọc giữ sân (30%)</span>
+                                <span class="text-primary fw-extrabold" id="txtDepositAmount">
+                                    @Model.SoTienDatCoc.ToString("N0") đ
+                                </span>
+                            </label>
+                            <div class="text-muted" style="font-size: 0.73rem; margin-left: 1.6rem;">
+                                Khóa ca thi đấu ngay. Số tiền còn lại sẽ thanh toán tại quầy quản lý sân trước khi đá.
+                            </div>
+                        </div>
+
+                        <div class="form-check p-3 rounded-3 border cursor-pointer payment-option" id="optFull">
+                            <input class="form-check-input ms-0 me-2" type="radio" asp-for="HinhThucThanhToan" id="payFull" value="ToanBo" />
+                            <label class="form-check-label fw-bold small d-flex justify-content-between w-100" for="payFull">
+                                <span>Thanh toán toàn bộ (100%)</span>
+                                <span class="text-success fw-extrabold" id="txtFullAmount">
+                                    @Model.GiaTienSan.ToString("N0") đ
+                                </span>
+                            </label>
+                            <div class="text-muted" style="font-size: 0.73rem; margin-left: 1.6rem;">
+                                Tiện lợi, không cần mang theo tiền mặt khi ra sân.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nút Submit Đặt sân -->
+                    <button type="submit" class="btn btn-warning fw-bold text-dark rounded-pill py-3 w-100 shadow-sm d-flex align-items-center justify-content-center gap-2" style="font-size: 1.05rem;">
+                        <i class="bi bi-qr-code-scan fs-5"></i>
+                        <span>Tiếp Tục &amp; Quét Mã VietQR</span>
+                    </button>
+
+                    <div class="text-center small text-muted mt-2" style="font-size: 0.75rem;">
+                        <i class="bi bi-shield-lock-fill text-success me-1"></i>Giao dịch mã hóa an toàn qua cổng VietQR Napas247
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const hdnPitchPrice = document.getElementById("hdnPitchPrice");
+            const hdnDiscountAmount = document.getElementById("hdnDiscountAmount");
+            const txtServicesAmount = document.getElementById("txtServicesAmount");
+            const txtSubTotal = document.getElementById("txtSubTotal");
+            const txtDiscountAmount = document.getElementById("txtDiscountAmount");
+            const rowDiscount = document.getElementById("rowDiscount");
+            const txtFinalTotal = document.getElementById("txtFinalTotal");
+            const txtDepositAmount = document.getElementById("txtDepositAmount");
+            const txtFullAmount = document.getElementById("txtFullAmount");
+
+            function formatVnd(val) {
+                return new Intl.NumberFormat('vi-VN').format(val) + " đ";
+            }
+
+            function recalculateTotals() {
+                const pitchPrice = parseFloat(hdnPitchPrice.value) || 0;
+                let servicesTotal = 0;
+
+                document.querySelectorAll(".service-row").forEach(row => {
+                    const check = row.querySelector(".service-check");
+                    const qtyInput = row.querySelector(".service-qty");
+                    const unitPrice = parseFloat(row.querySelector(".service-unit-price").value) || 0;
+                    const rowTotalSpan = row.querySelector(".service-row-total");
+
+                    if (check && check.checked) {
+                        const qty = parseInt(qtyInput.value) || 0;
+                        const rowTotal = qty * unitPrice;
+                        servicesTotal += rowTotal;
+                        rowTotalSpan.textContent = formatVnd(rowTotal);
+                    } else {
+                        rowTotalSpan.textContent = "0 đ";
+                    }
+                });
+
+                const subTotal = pitchPrice + servicesTotal;
+                const discount = parseFloat(hdnDiscountAmount.value) || 0;
+                const finalTotal = Math.max(0, subTotal - discount);
+                const depositTotal = Math.round((finalTotal * 0.3) / 1000) * 1000;
+
+                txtServicesAmount.textContent = formatVnd(servicesTotal);
+                txtSubTotal.textContent = formatVnd(subTotal);
+                txtFinalTotal.textContent = formatVnd(finalTotal);
+                txtDepositAmount.textContent = formatVnd(depositTotal);
+                txtFullAmount.textContent = formatVnd(finalTotal);
+
+                if (discount > 0) {
+                    rowDiscount.style.display = "flex";
+                    txtDiscountAmount.textContent = "-" + formatVnd(discount);
+                } else {
+                    rowDiscount.style.display = "none";
+                }
+            }
+
+            // Tương tác checkbox dịch vụ & tăng giảm số lượng
+            document.querySelectorAll(".service-row").forEach(row => {
+                const check = row.querySelector(".service-check");
+                const qtyInput = row.querySelector(".service-qty");
+                const btnPlus = row.querySelector(".btn-plus");
+                const btnMinus = row.querySelector(".btn-minus");
+
+                check.addEventListener("change", function () {
+                    if (this.checked) {
+                        if (parseInt(qtyInput.value) <= 0) qtyInput.value = 1;
+                        btnPlus.removeAttribute("disabled");
+                        btnMinus.removeAttribute("disabled");
+                    } else {
+                        qtyInput.value = 0;
+                        btnPlus.setAttribute("disabled", "true");
+                        btnMinus.setAttribute("disabled", "true");
+                    }
+                    recalculateTotals();
+                });
+
+                btnPlus.addEventListener("click", function () {
+                    let cur = parseInt(qtyInput.value) || 0;
+                    qtyInput.value = cur + 1;
+                    recalculateTotals();
+                });
+
+                btnMinus.addEventListener("click", function () {
+                    let cur = parseInt(qtyInput.value) || 0;
+                    if (cur > 1) {
+                        qtyInput.value = cur - 1;
+                    } else {
+                        qtyInput.value = 0;
+                        check.checked = false;
+                        btnPlus.setAttribute("disabled", "true");
+                        btnMinus.setAttribute("disabled", "true");
+                    }
+                    recalculateTotals();
+                });
+            });
+
+            // Tương tác áp dụng Voucher (AJAX)
+            const btnApplyVoucher = document.getElementById("btnApplyVoucher");
+            const voucherCodeInput = document.getElementById("voucherCodeInput");
+            const voucherAlert = document.getElementById("voucherAlert");
+
+            btnApplyVoucher.addEventListener("click", function () {
+                const code = voucherCodeInput.value.trim();
+                if (!code) {
+                    voucherAlert.className = "small mt-1 text-danger fw-semibold";
+                    voucherAlert.textContent = "Vui lòng nhập mã voucher.";
+                    voucherAlert.style.display = "block";
+                    return;
+                }
+
+                const pitchPrice = parseFloat(hdnPitchPrice.value) || 0;
+                let servicesTotal = 0;
+                document.querySelectorAll(".service-row").forEach(row => {
+                    const check = row.querySelector(".service-check");
+                    const qtyInput = row.querySelector(".service-qty");
+                    const unitPrice = parseFloat(row.querySelector(".service-unit-price").value) || 0;
+                    if (check && check.checked) {
+                        servicesTotal += (parseInt(qtyInput.value) || 0) * unitPrice;
+                    }
+                });
+                const subTotal = pitchPrice + servicesTotal;
+
+                fetch(`/KhachHang/DatSan/KiemTraVoucher?code=${encodeURIComponent(code)}&tamTinh=${subTotal}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        voucherAlert.style.display = "block";
+                        if (data.success) {
+                            voucherAlert.className = "small mt-1 text-success fw-bold";
+                            voucherAlert.textContent = data.message;
+                            hdnDiscountAmount.value = data.soTienGiam;
+                        } else {
+                            voucherAlert.className = "small mt-1 text-danger fw-semibold";
+                            voucherAlert.textContent = data.message;
+                            hdnDiscountAmount.value = 0;
+                        }
+                        recalculateTotals();
+                    })
+                    .catch(() => {
+                        voucherAlert.className = "small mt-1 text-danger fw-semibold";
+                        voucherAlert.textContent = "Không thể kiểm tra mã voucher lúc này.";
+                        voucherAlert.style.display = "block";
+                    });
+            });
+
+            // Radio hình thức thanh toán highlight
+            document.querySelectorAll(".payment-option").forEach(el => {
+                el.addEventListener("click", function () {
+                    const radio = this.querySelector("input[type=radio]");
+                    if (radio) {
+                        radio.checked = true;
+                        document.querySelectorAll(".payment-option").forEach(o => o.classList.remove("selected", "border-primary"));
+                        this.classList.add("selected", "border-primary");
+                    }
+                });
+            });
+
+            recalculateTotals();
+        });
+    </script>
+}
+

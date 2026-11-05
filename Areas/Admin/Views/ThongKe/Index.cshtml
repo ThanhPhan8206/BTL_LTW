@@ -1,0 +1,387 @@
+@model QLSanBong.Areas.Admin.Models.AdminThongKeViewModel
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Thống kê & Báo cáo doanh thu - UTC STADIUM Admin";
+}
+
+<!-- Page Header Banner -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-navy text-white fw-bold rounded-pill px-3 py-1" style="background-color: #002B5B;">
+                <i class="bi bi-graph-up-arrow text-warning me-1"></i> MODULE 9
+            </span>
+            <span class="text-muted small">Phân tích dòng tiền &amp; Hiệu suất sân bãi</span>
+        </div>
+        <h2 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Báo Cáo Thống Kê &amp; Phân Tích</h2>
+        <p class="text-muted small mb-0">Theo dõi doanh thu, tốc độ tăng trưởng, tỷ lệ hủy đơn và phân tích khung giờ cao điểm.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-3 shadow-sm" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> In Báo Cáo
+        </button>
+    </div>
+</div>
+
+<!-- Bộ Lọc Khoảng Thời Gian -->
+<div class="admin-card p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-4">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white text-muted"><i class="bi bi-calendar-event me-1"></i> Từ ngày</span>
+                <input type="date" name="tuNgay" class="form-control" value="@Model.TuNgay.ToString("yyyy-MM-dd")" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white text-muted"><i class="bi bi-calendar-check me-1"></i> Đến ngày</span>
+                <input type="date" name="denNgay" class="form-control" value="@Model.DenNgay.ToString("yyyy-MM-dd")" />
+            </div>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 w-100 fw-bold" style="background-color: #002B5B; border-color: #002B5B;">
+                <i class="bi bi-funnel-fill me-1"></i> Thống Kê
+            </button>
+            <a asp-action="Index" class="btn btn-sm btn-light rounded-pill px-3 border" title="Đặt lại về 30 ngày gần nhất">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- 4 Thẻ KPI Tài Chính & Vận Hành -->
+<div class="row g-3 mb-4">
+    <!-- Tổng doanh thu thực tế -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Doanh thu thực tế</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(16, 185, 129, 0.12); color: #047857;">
+                    <i class="bi bi-cash-stack fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-success mb-1">
+                @Model.TongDoanhThu.ToString("N0") <span class="fs-6 fw-bold">đ</span>
+            </div>
+            <div class="small text-muted d-flex justify-content-between">
+                <span><i class="bi bi-qr-code text-primary me-1"></i> QR: @Model.TongChuyenKhoan.ToString("N0") đ</span>
+                <span><i class="bi bi-cash text-success me-1"></i> Tiền mặt: @Model.TongTienMat.ToString("N0") đ</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tổng số đơn đặt sân -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Tổng số đơn đặt</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(0, 43, 91, 0.08); color: #002B5B;">
+                    <i class="bi bi-calendar2-range fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold mb-1" style="color: #002B5B;">
+                @Model.TongDonDat <span class="fs-6 fw-normal text-muted">lượt</span>
+            </div>
+            <div class="small text-muted">
+                <i class="bi bi-check2-all text-success me-1"></i> Hoàn thành: <strong class="text-success">@Model.DonHoanThanh</strong> đơn
+            </div>
+        </div>
+    </div>
+
+    <!-- Đơn chờ duyệt / Đang xử lý -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Đang xử lý / Chờ cọc</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(245, 158, 11, 0.12); color: #D97706;">
+                    <i class="bi bi-hourglass-split fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-warning mb-1">
+                @Model.DonChoDuyet <span class="fs-6 fw-normal text-muted">đơn</span>
+            </div>
+            <div class="small text-muted">
+                Cần theo dõi và xác nhận cọc kịp thời
+            </div>
+        </div>
+    </div>
+
+    <!-- Tỷ lệ hủy đơn -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="admin-card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Tỷ lệ đơn bị hủy</span>
+                <div class="rounded-circle p-2" style="background-color: rgba(239, 68, 68, 0.12); color: #B91C1C;">
+                    <i class="bi bi-x-octagon fs-4"></i>
+                </div>
+            </div>
+            <div class="fs-3 fw-bold text-danger mb-1">
+                @Model.TyLeHuy%
+            </div>
+            <div class="small text-muted">
+                <span class="text-danger fw-semibold">@Model.DonDaHuy</span> đơn bị hủy / từ chối
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Khối Biểu Đồ Trực Quan Chart.js -->
+<div class="row g-4 mb-4">
+    <!-- Biểu đồ Doanh Thu & Lượng Đơn Theo Ngày -->
+    <div class="col-lg-8">
+        <div class="admin-card p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Biểu Đồ Doanh Thu &amp; Xu Hướng Đặt Sân</h5>
+                    <small class="text-muted">Doanh thu (VNĐ) và số lượt trận thi đấu theo ngày</small>
+                </div>
+                <span class="badge bg-primary-subtle text-primary">Biểu đồ kết hợp</span>
+            </div>
+            <div style="height: 320px;">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ Tỷ Lệ Theo Loại Sân -->
+    <div class="col-lg-4">
+        <div class="admin-card p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Cơ Cấu Loại Sân</h5>
+                    <small class="text-muted">Phân bổ lượt đặt sân 5, 7 và 11</small>
+                </div>
+            </div>
+            <div style="height: 260px;" class="d-flex align-items-center justify-content-center">
+                <canvas id="pitchTypeChart"></canvas>
+            </div>
+            <div class="text-center small text-muted mt-2">
+                Dựa trên tổng @Model.TongDonDat lượt đặt trong khoảng lọc
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Biểu đồ Khung Giờ Cao Điểm -->
+    <div class="col-lg-6">
+        <div class="admin-card p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Khung Giờ Thi Đấu Cao Điểm</h5>
+                    <small class="text-muted">Top các khung giờ có mật độ thi đấu dày đặc nhất</small>
+                </div>
+                <span class="badge bg-warning-subtle text-dark">Giờ vàng</span>
+            </div>
+            <div style="height: 280px;">
+                <canvas id="peakHourChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ Trạng Thái Đơn Đặt -->
+    <div class="col-lg-6">
+        <div class="admin-card p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="fw-bold mb-0 text-navy" style="color: #002B5B;">Phân Bổ Trạng Thái Đơn</h5>
+                    <small class="text-muted">Tỷ trọng các trạng thái xử lý trong hệ thống</small>
+                </div>
+            </div>
+            <div style="height: 280px;" class="d-flex align-items-center justify-content-center">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bảng Thống Kê Chi Tiết Từng Ngày -->
+<div class="admin-card overflow-hidden">
+    <div class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
+        <h6 class="fw-bold mb-0 text-navy" style="color: #002B5B;">
+            <i class="bi bi-table me-1"></i> Bảng Dữ Liệu Chi Tiết Theo Ngày
+        </h6>
+        <span class="small text-muted">Từ @Model.TuNgay.ToString("dd/MM/yyyy") đến @Model.DenNgay.ToString("dd/MM/yyyy")</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr class="small text-uppercase fw-bold text-secondary">
+                    <th>Ngày</th>
+                    <th class="text-center">Số Đơn Đặt</th>
+                    <th class="text-center">Đơn Bị Hủy</th>
+                    <th class="text-center">Tỷ Lệ Hủy</th>
+                    <th class="text-end">Doanh Thu Trong Ngày</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.BangTongHopNgay != null && Model.BangTongHopNgay.Any())
+                {
+                    foreach (var item in Model.BangTongHopNgay)
+                    {
+                        <tr>
+                            <td>
+                                <strong class="text-dark">@item.Ngay.ToString("dd/MM/yyyy")</strong>
+                                <span class="badge bg-light text-muted border ms-1">@item.Ngay.DayOfWeek</span>
+                            </td>
+                            <td class="text-center font-monospace">
+                                <span class="badge bg-primary-subtle text-primary">@item.SoDon</span>
+                            </td>
+                            <td class="text-center font-monospace">
+                                @if (item.SoDonHuy > 0)
+                                {
+                                    <span class="badge bg-danger-subtle text-danger">@item.SoDonHuy</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">0</span>
+                                }
+                            </td>
+                            <td class="text-center font-monospace small">
+                                @(item.TyLeHuy > 0 ? $"{item.TyLeHuy}%" : "0%")
+                            </td>
+                            <td class="text-end font-monospace fw-bold @(item.DoanhThu > 0 ? "text-success" : "text-muted")">
+                                @item.DoanhThu.ToString("N0") đ
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Không có dữ liệu trong khoảng thời gian này.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Script Khởi Tạo Chart.js -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Biểu đồ Doanh thu & Số đơn theo ngày
+        const revCtx = document.getElementById('revenueChart');
+        if (revCtx) {
+            new Chart(revCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DoanhThuTheoNgayLabels)),
+                    datasets: [
+                        {
+                            label: 'Doanh thu (VNĐ)',
+                            data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DoanhThuTheoNgayValues)),
+                            backgroundColor: 'rgba(0, 43, 91, 0.75)',
+                            borderColor: '#002B5B',
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: 'Số đơn đặt',
+                            data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SoDonTheoNgayValues)),
+                            borderColor: '#10B981',
+                            backgroundColor: '#10B981',
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: {
+                                callback: function (value) { return value.toLocaleString() + ' đ'; }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Biểu đồ Loại sân
+        const pitchCtx = document.getElementById('pitchTypeChart');
+        if (pitchCtx) {
+            new Chart(pitchCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LoaiSanLabels)),
+                    datasets: [{
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LoaiSanValues)),
+                        backgroundColor: ['#002B5B', '#10B981', '#3B82F6', '#F59E0B', '#8B5CF6'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // 3. Biểu đồ Khung giờ cao điểm
+        const peakCtx = document.getElementById('peakHourChart');
+        if (peakCtx) {
+            new Chart(peakCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.KhungGioLabels)),
+                    datasets: [{
+                        label: 'Số lượt thi đấu',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.KhungGioValues)),
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderColor: '#2563EB',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }
+
+        // 4. Biểu đồ Trạng thái đơn
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            new Chart(statusCtx, {
+                type: 'pie',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrangThaiDonLabels)),
+                    datasets: [{
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrangThaiDonValues)),
+                        backgroundColor: ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#64748B']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
